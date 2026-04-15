@@ -1,1 +1,2 @@
-# RentalAccountingApp
+#RentalAccountingApp
+#Это приложение по учету проката инвенторя сделаное по заданию Курсовой работы.
