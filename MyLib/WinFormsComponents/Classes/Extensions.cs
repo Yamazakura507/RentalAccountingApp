@@ -1,9 +1,8 @@
-﻿using DataBaseProvaider;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Npgsql;
-using RentalAccountingApp.Classes.Model;
+using WinFormsComponents.Classes.Model;
 
-namespace RentalAccountingApp.Classes
+namespace WinFormsComponents.Classes
 {
     /// <summary>
     /// Класс выполнения процеса
@@ -62,9 +61,6 @@ namespace RentalAccountingApp.Classes
         {
             string updatedJson = JsonConvert.SerializeObject(connections);
             File.WriteAllText("connection_list.json", updatedJson);
-
-            DBProvider.NpgsqlProvider = new(AppInfo.ActiveConnection.ConnectionBuilder);
-            DBProvider.NpgsqlProvider.HandlerErrror.ErrorReporter = new Progress<string>(message => InfoViewer.ErrrorMessege(message));
         }
 
         /// <summary>
@@ -86,6 +82,16 @@ namespace RentalAccountingApp.Classes
                     return false;
                 }
             }
+        }
+
+        public static Form GetForm(this Control control)
+        {
+            if (control is not Form)
+            {
+                control = control.Parent.GetForm();
+            }
+
+            return (Form)control;
         }
     }
 }

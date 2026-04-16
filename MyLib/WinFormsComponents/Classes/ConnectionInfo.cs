@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Npgsql;
-using RentalAccountingApp.Classes.Model;
+using WinFormsComponents.Classes.Model;
 
-namespace RentalAccountingApp.Classes
+namespace WinFormsComponents.Classes
 {
-    public static class AppInfo
+    public static class ConnectionInfo
     {
         public static ConnectionElement[] Conections => JsonConvert.DeserializeObject<ConnectionElement[]>(File.ReadAllText("connection_list.json"));
 

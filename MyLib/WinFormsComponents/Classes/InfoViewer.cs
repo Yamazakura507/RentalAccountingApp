@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualBasic;
 
-namespace RentalAccountingApp.Classes
+namespace WinFormsComponents.Classes
 {
     /// <summary>
     /// Класс информирования

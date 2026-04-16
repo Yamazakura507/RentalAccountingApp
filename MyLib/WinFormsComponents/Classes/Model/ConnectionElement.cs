@@ -1,7 +1,7 @@
 ﻿using Npgsql;
 using System.Text.Json.Serialization;
 
-namespace RentalAccountingApp.Classes.Model
+namespace WinFormsComponents.Classes.Model
 {
     /// <summary>
     /// Объект с информацией о соединении
