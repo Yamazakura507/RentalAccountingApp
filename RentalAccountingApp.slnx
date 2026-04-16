@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="../../../../Libs/NpgDataBase/DataBaseProvaider/DataBaseProvaider.csproj" />
+  <Project Path="../../../../Libs/PostgresSQL/PostgresSQL.csproj" />
   <Project Path="RentalAccountingApp.csproj" />
 </Solution>

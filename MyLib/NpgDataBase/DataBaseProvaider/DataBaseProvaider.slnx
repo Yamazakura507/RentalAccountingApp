@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="../../PostgresSQL/PostgresSQL.csproj" />
+  <Project Path="../TestCMD/TestCMD.csproj" />
+  <Project Path="DataBaseProvaider.csproj" />
+</Solution>
