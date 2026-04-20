@@ -1,0 +1,407 @@
+﻿namespace WinFormsComponents.Controls
+{
+    partial class DBModelListView
+    {
+        /// <summary> 
+        /// Обязательная переменная конструктора.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary> 
+        /// Освободить все используемые ресурсы.
+        /// </summary>
+        /// <param name="disposing">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Код, автоматически созданный конструктором компонентов
+
+        /// <summary> 
+        /// Требуемый метод для поддержки конструктора — не изменяйте 
+        /// содержимое этого метода с помощью редактора кода.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            components = new System.ComponentModel.Container();
+            tsListMenu = new ToolStrip();
+            tsbAdd = new ToolStripButton();
+            tsbDel = new ToolStripButton();
+            tsbRepair = new ToolStripButton();
+            toolStripSeparator1 = new ToolStripSeparator();
+            tstbSearh = new ToolStripTextBox();
+            tsbSearh = new ToolStripButton();
+            tsddbFilter = new ToolStripDropDownButton();
+            tsmiSearh = new ToolStripMenuItem();
+            tsmiFilter = new ToolStripMenuItem();
+            tsmiShowDeleted = new ToolStripMenuItem();
+            tsmiShowAlways = new ToolStripMenuItem();
+            tsmiShowExacRemoving = new ToolStripMenuItem();
+            tsmiShowExacNotRemoving = new ToolStripMenuItem();
+            tsbTileMode = new ToolStripButton();
+            tsbRowMode = new ToolStripButton();
+            tsbGrid = new ToolStripButton();
+            tsbNonGrid = new ToolStripButton();
+            lvModel = new ListView();
+            cmsModel = new ContextMenuStrip(components);
+            tsmiAdd = new ToolStripMenuItem();
+            tsmiDel = new ToolStripMenuItem();
+            tsmiRepair = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            tsbStartPage = new ToolStripButton();
+            tsbBackPage = new ToolStripButton();
+            tstbActualPage = new ToolStripTextBox();
+            tslCountPages = new ToolStripLabel();
+            tsbNextPage = new ToolStripButton();
+            tsbEndPage = new ToolStripButton();
+            tsListMenu.SuspendLayout();
+            cmsModel.SuspendLayout();
+            SuspendLayout();
+            // 
+            // tsListMenu
+            // 
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, toolStripSeparator1, tstbSearh, tsbSearh, tsddbFilter, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, toolStripSeparator2, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Location = new Point(0, 0);
+            tsListMenu.Name = "tsListMenu";
+            tsListMenu.Size = new Size(900, 25);
+            tsListMenu.TabIndex = 2;
+            tsListMenu.Text = "toolStrip1";
+            // 
+            // tsbAdd
+            // 
+            tsbAdd.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbAdd.Image = Properties.Resources.add;
+            tsbAdd.ImageTransparentColor = Color.Magenta;
+            tsbAdd.Name = "tsbAdd";
+            tsbAdd.Size = new Size(23, 22);
+            tsbAdd.Text = "Добавить";
+            tsbAdd.ToolTipText = "Добавить(Insert)";
+            // 
+            // tsbDel
+            // 
+            tsbDel.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbDel.Image = Properties.Resources.delete;
+            tsbDel.ImageTransparentColor = Color.Magenta;
+            tsbDel.Name = "tsbDel";
+            tsbDel.Size = new Size(23, 22);
+            tsbDel.Text = "Удалить";
+            tsbDel.ToolTipText = "Удалить(Delete)";
+            tsbDel.Visible = false;
+            tsbDel.Click += tsbDelOrRepairOnClick;
+            // 
+            // tsbRepair
+            // 
+            tsbRepair.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbRepair.Image = Properties.Resources.undelete;
+            tsbRepair.ImageTransparentColor = Color.Magenta;
+            tsbRepair.Name = "tsbRepair";
+            tsbRepair.Size = new Size(23, 22);
+            tsbRepair.Text = "Востановить";
+            tsbRepair.ToolTipText = "Востановить(Ctrl+R)";
+            tsbRepair.Visible = false;
+            tsbRepair.Click += tsbDelOrRepairOnClick;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(6, 25);
+            // 
+            // tstbSearh
+            // 
+            tstbSearh.BorderStyle = BorderStyle.FixedSingle;
+            tstbSearh.Name = "tstbSearh";
+            tstbSearh.Size = new Size(100, 25);
+            tstbSearh.ToolTipText = "Поиск(Enter)";
+            tstbSearh.KeyPress += tstbSearhOnKeyPress;
+            // 
+            // tsbSearh
+            // 
+            tsbSearh.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbSearh.Image = Properties.Resources.searh;
+            tsbSearh.ImageTransparentColor = Color.Magenta;
+            tsbSearh.Name = "tsbSearh";
+            tsbSearh.Size = new Size(23, 22);
+            tsbSearh.Text = "Поиск";
+            tsbSearh.ToolTipText = "Поиск";
+            tsbSearh.Click += tsbSearhOnClick;
+            // 
+            // tsddbFilter
+            // 
+            tsddbFilter.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsddbFilter.DropDownItems.AddRange(new ToolStripItem[] { tsmiSearh, tsmiFilter, tsmiShowDeleted });
+            tsddbFilter.Image = Properties.Resources.filter;
+            tsddbFilter.ImageTransparentColor = Color.Magenta;
+            tsddbFilter.Name = "tsddbFilter";
+            tsddbFilter.Size = new Size(29, 22);
+            tsddbFilter.Text = "Фильтр";
+            tsddbFilter.ToolTipText = "Фильтр(Поиск/Фильтрация/Сортировка)";
+            // 
+            // tsmiSearh
+            // 
+            tsmiSearh.Image = Properties.Resources.searh;
+            tsmiSearh.Name = "tsmiSearh";
+            tsmiSearh.Size = new Size(187, 22);
+            tsmiSearh.Text = "Параметры поиска";
+            tsmiSearh.ToolTipText = "Параметры поиска";
+            tsmiSearh.Visible = false;
+            // 
+            // tsmiFilter
+            // 
+            tsmiFilter.Image = Properties.Resources.filter;
+            tsmiFilter.Name = "tsmiFilter";
+            tsmiFilter.Size = new Size(187, 22);
+            tsmiFilter.Text = "Фильтрация";
+            tsmiFilter.ToolTipText = "Фильтрация";
+            tsmiFilter.Visible = false;
+            // 
+            // tsmiShowDeleted
+            // 
+            tsmiShowDeleted.DropDownItems.AddRange(new ToolStripItem[] { tsmiShowAlways, tsmiShowExacRemoving, tsmiShowExacNotRemoving });
+            tsmiShowDeleted.Image = Properties.Resources.visible_delete;
+            tsmiShowDeleted.Name = "tsmiShowDeleted";
+            tsmiShowDeleted.Size = new Size(187, 22);
+            tsmiShowDeleted.Text = "Показать удаленные";
+            tsmiShowDeleted.ToolTipText = "Показать удаленные";
+            tsmiShowDeleted.DropDownOpened += tsmiShowDeletedOnDropDownOpened;
+            // 
+            // tsmiShowAlways
+            // 
+            tsmiShowAlways.Image = Properties.Resources.undelete;
+            tsmiShowAlways.Name = "tsmiShowAlways";
+            tsmiShowAlways.Size = new Size(234, 22);
+            tsmiShowAlways.Tag = "0";
+            tsmiShowAlways.Text = "Все(Ctrl+A)";
+            tsmiShowAlways.ToolTipText = "Отобразить все(Ctrl+S+A)";
+            tsmiShowAlways.Click += tsmiRemoveModeShowOnClick;
+            // 
+            // tsmiShowExacRemoving
+            // 
+            tsmiShowExacRemoving.Image = Properties.Resources.delete;
+            tsmiShowExacRemoving.Name = "tsmiShowExacRemoving";
+            tsmiShowExacRemoving.Size = new Size(234, 22);
+            tsmiShowExacRemoving.Tag = "1";
+            tsmiShowExacRemoving.Text = "Только удаленные(Ctrl+D)";
+            tsmiShowExacRemoving.ToolTipText = "Отобразить только удаленные(Ctrl+S+R)";
+            tsmiShowExacRemoving.Click += tsmiRemoveModeShowOnClick;
+            // 
+            // tsmiShowExacNotRemoving
+            // 
+            tsmiShowExacNotRemoving.Image = Properties.Resources.visible_delete;
+            tsmiShowExacNotRemoving.Name = "tsmiShowExacNotRemoving";
+            tsmiShowExacNotRemoving.Size = new Size(234, 22);
+            tsmiShowExacNotRemoving.Tag = "2";
+            tsmiShowExacNotRemoving.Text = "Только не удаленные(Ctrl+V)";
+            tsmiShowExacNotRemoving.ToolTipText = "Отобразить только не удаленные(Ctrl+S+V)";
+            tsmiShowExacNotRemoving.Click += tsmiRemoveModeShowOnClick;
+            // 
+            // tsbTileMode
+            // 
+            tsbTileMode.Alignment = ToolStripItemAlignment.Right;
+            tsbTileMode.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbTileMode.Image = Properties.Resources.tile_mode;
+            tsbTileMode.ImageTransparentColor = Color.Magenta;
+            tsbTileMode.Name = "tsbTileMode";
+            tsbTileMode.Size = new Size(23, 22);
+            tsbTileMode.Tag = "0";
+            tsbTileMode.Text = "Отображать плиткой";
+            tsbTileMode.ToolTipText = "Отображать плиткой(Ctrl+U)";
+            tsbTileMode.Click += tsbVisibleModeOnClick;
+            // 
+            // tsbRowMode
+            // 
+            tsbRowMode.Alignment = ToolStripItemAlignment.Right;
+            tsbRowMode.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbRowMode.Image = Properties.Resources.row_mode;
+            tsbRowMode.ImageTransparentColor = Color.Magenta;
+            tsbRowMode.Name = "tsbRowMode";
+            tsbRowMode.Size = new Size(23, 22);
+            tsbRowMode.Tag = "1";
+            tsbRowMode.Text = "Отображать строками";
+            tsbRowMode.ToolTipText = "Отображать строками(Ctrl+U)";
+            tsbRowMode.Visible = false;
+            tsbRowMode.Click += tsbVisibleModeOnClick;
+            // 
+            // tsbGrid
+            // 
+            tsbGrid.Alignment = ToolStripItemAlignment.Right;
+            tsbGrid.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbGrid.Image = Properties.Resources.grid;
+            tsbGrid.ImageTransparentColor = Color.Magenta;
+            tsbGrid.Name = "tsbGrid";
+            tsbGrid.Size = new Size(23, 22);
+            tsbGrid.Text = "Отобразить сетку";
+            tsbGrid.ToolTipText = "Отобразить сетку(Ctrl+G)";
+            tsbGrid.Visible = false;
+            tsbGrid.Click += tsbGridOnClick;
+            // 
+            // tsbNonGrid
+            // 
+            tsbNonGrid.Alignment = ToolStripItemAlignment.Right;
+            tsbNonGrid.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbNonGrid.Image = Properties.Resources.non_grid;
+            tsbNonGrid.ImageTransparentColor = Color.Magenta;
+            tsbNonGrid.Name = "tsbNonGrid";
+            tsbNonGrid.Size = new Size(23, 22);
+            tsbNonGrid.Text = "Скрыть сетку";
+            tsbNonGrid.ToolTipText = "Скрыть сетку(Ctrl+G)";
+            tsbNonGrid.Click += tsbGridOnClick;
+            // 
+            // lvModel
+            // 
+            lvModel.ContextMenuStrip = cmsModel;
+            lvModel.Dock = DockStyle.Fill;
+            lvModel.FullRowSelect = true;
+            lvModel.GridLines = true;
+            lvModel.Location = new Point(0, 25);
+            lvModel.Name = "lvModel";
+            lvModel.Size = new Size(900, 451);
+            lvModel.TabIndex = 3;
+            lvModel.UseCompatibleStateImageBehavior = false;
+            lvModel.View = View.Details;
+            lvModel.SelectedIndexChanged += lvModelOnSelectedIndexChanged;
+            lvModel.KeyDown += lvModelOnKeyDown;
+            // 
+            // cmsModel
+            // 
+            cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair });
+            cmsModel.Name = "cmsModel";
+            cmsModel.Size = new Size(186, 70);
+            cmsModel.Opening += cmsModelOnOpening;
+            // 
+            // tsmiAdd
+            // 
+            tsmiAdd.Image = Properties.Resources.add;
+            tsmiAdd.Name = "tsmiAdd";
+            tsmiAdd.Size = new Size(185, 22);
+            tsmiAdd.Text = "Добавить(Insert)";
+            tsmiAdd.ToolTipText = "Добавить(Insert)";
+            // 
+            // tsmiDel
+            // 
+            tsmiDel.Image = Properties.Resources.delete;
+            tsmiDel.Name = "tsmiDel";
+            tsmiDel.Size = new Size(185, 22);
+            tsmiDel.Text = "Удалить(Delete)";
+            tsmiDel.ToolTipText = "Удалить(Delete)";
+            tsmiDel.Click += tsbDelOrRepairOnClick;
+            // 
+            // tsmiRepair
+            // 
+            tsmiRepair.Image = Properties.Resources.undelete;
+            tsmiRepair.Name = "tsmiRepair";
+            tsmiRepair.Size = new Size(185, 22);
+            tsmiRepair.Text = "Востановить(Ctrl+R)";
+            tsmiRepair.ToolTipText = "Востановить(Ctrl+R)";
+            tsmiRepair.Visible = false;
+            tsmiRepair.Click += tsbDelOrRepairOnClick;
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(6, 25);
+            // 
+            // tsbStartPage
+            // 
+            tsbStartPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbStartPage.Image = Properties.Resources.left_dou_arrow;
+            tsbStartPage.ImageTransparentColor = Color.Magenta;
+            tsbStartPage.Name = "tsbStartPage";
+            tsbStartPage.Size = new Size(23, 22);
+            tsbStartPage.Text = "В начало списка(Ctrl+Home)";
+            // 
+            // tsbBackPage
+            // 
+            tsbBackPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbBackPage.Image = Properties.Resources.left_arrow;
+            tsbBackPage.ImageTransparentColor = Color.Magenta;
+            tsbBackPage.Name = "tsbBackPage";
+            tsbBackPage.Size = new Size(23, 22);
+            tsbBackPage.Text = "Предыдущая страница(Ctrl+←)";
+            // 
+            // tstbActualPage
+            // 
+            tstbActualPage.BorderStyle = BorderStyle.FixedSingle;
+            tstbActualPage.Name = "tstbActualPage";
+            tstbActualPage.Size = new Size(40, 25);
+            tstbActualPage.ToolTipText = "Текщая старница(Enter)";
+            // 
+            // tslCountPages
+            // 
+            tslCountPages.Name = "tslCountPages";
+            tslCountPages.Size = new Size(29, 22);
+            tslCountPages.Text = "/cnt";
+            tslCountPages.ToolTipText = "Всего cnt страниц";
+            // 
+            // tsbNextPage
+            // 
+            tsbNextPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbNextPage.Image = Properties.Resources.right_arrow;
+            tsbNextPage.ImageTransparentColor = Color.Magenta;
+            tsbNextPage.Name = "tsbNextPage";
+            tsbNextPage.Size = new Size(23, 22);
+            tsbNextPage.Text = "Следующая страница(Ctrl+→)";
+            // 
+            // tsbEndPage
+            // 
+            tsbEndPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbEndPage.Image = Properties.Resources.right_dou_arrow;
+            tsbEndPage.ImageTransparentColor = Color.Magenta;
+            tsbEndPage.Name = "tsbEndPage";
+            tsbEndPage.Size = new Size(23, 22);
+            tsbEndPage.Text = "Последняя страница(Ctrl+End)";
+            // 
+            // DBModelListView
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(lvModel);
+            Controls.Add(tsListMenu);
+            Name = "DBModelListView";
+            Size = new Size(900, 476);
+            Load += DBModelListViewOnLoad;
+            tsListMenu.ResumeLayout(false);
+            tsListMenu.PerformLayout();
+            cmsModel.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
+        }
+
+        #endregion
+
+        private ToolStrip tsListMenu;
+        private ToolStripButton tsbAdd;
+        private ToolStripButton tsbDel;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripTextBox tstbSearh;
+        private ToolStripButton tsbSearh;
+        private ToolStripDropDownButton tsddbFilter;
+        private ToolStripMenuItem tsmiSearh;
+        private ToolStripMenuItem tsmiFilter;
+        private ContextMenuStrip cmsModel;
+        public ListView lvModel;
+        private ToolStripMenuItem tsmiShowDeleted;
+        private ToolStripButton tsbRepair;
+        private ToolStripMenuItem tsmiAdd;
+        private ToolStripMenuItem tsmiDel;
+        private ToolStripMenuItem tsmiRepair;
+        private ToolStripMenuItem tsmiShowAlways;
+        private ToolStripMenuItem tsmiShowExacRemoving;
+        private ToolStripMenuItem tsmiShowExacNotRemoving;
+        private ToolStripButton tsbTileMode;
+        private ToolStripButton tsbRowMode;
+        private ToolStripButton tsbGrid;
+        private ToolStripButton tsbNonGrid;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripButton tsbStartPage;
+        private ToolStripButton tsbBackPage;
+        private ToolStripTextBox tstbActualPage;
+        private ToolStripLabel tslCountPages;
+        private ToolStripButton tsbNextPage;
+        private ToolStripButton tsbEndPage;
+    }
+}

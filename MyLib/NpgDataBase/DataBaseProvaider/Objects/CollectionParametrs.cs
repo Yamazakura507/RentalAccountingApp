@@ -5,8 +5,8 @@ namespace DataBaseProvaider.Objects
 {
     public class CollectionParametrs : IDisposable, INotifyPropertyChanged
     {
-        private IEnumerable<ConditionsParametr> conditions = new ConditionsParametr[0];
-        private IEnumerable<OrderParametr> orders = new OrderParametr[0];
+        private IEnumerable<ConditionsParametr> conditions = new List<ConditionsParametr>();
+        private IEnumerable<OrderParametr> orders = new List<OrderParametr>();
         private int serhingParametrsCount = 0;
         private int limit = 0;
         private int offset = 0;
@@ -21,8 +21,8 @@ namespace DataBaseProvaider.Objects
             {
                 if (conditions != value)
                 {
-                    conditions = value ?? new ConditionsParametr[0];
-                    serhingParametrsCount = conditions.Count(i => i.IsSerhing);
+                    conditions = value ?? new List<ConditionsParametr>();
+                    serhingParametrsCount = conditions.Count(i => i?.IsSerhing ?? false);
                     OnPropertyChanged();
                 }
             }

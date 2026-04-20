@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using DataBaseProvaider.Attributes;
+using System.ComponentModel;
 
 namespace DataBaseProvaider.Enums
 {
@@ -13,22 +14,26 @@ namespace DataBaseProvaider.Enums
     public enum LogicOperators
     {
         /// <summary>
+        /// Пустая вставка(конец условия)
+        /// </summary>
+        /// <value>0</value>
+        [Comment("НЕТ")]
+        [Description("")]
+        None = 0,
+        /// <summary>
         /// Оператор И
         /// </summary>
-        /// <vlaue>0</vlaue>
+        /// <vlaue>1</vlaue>
+        [Comment("Оператор И")]
         [Description("AND")]
-        And = 0,
+        And = 1,
         /// <summary>
         /// Оператор ИЛИ
         /// </summary>
-        /// <vlaue>1</vlaue>
+        /// <vlaue>2</vlaue>
+        [Comment("Оператор ИЛИ")]
         [Description("OR")]
-        Or = 1,
-        /// <summary>
-        /// Пустая вставка(конец условия)
-        /// </summary>
-        /// <value>2</value>
-        [Description("")]
-        None = 2,
+        Or = 2
+        
     }
 }

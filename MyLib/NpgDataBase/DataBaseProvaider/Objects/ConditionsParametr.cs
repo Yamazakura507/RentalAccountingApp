@@ -1,11 +1,12 @@
-﻿using DataBaseProvaider.Enums;
+﻿using DataBaseProvaider.Classes.Abstract;
+using DataBaseProvaider.Enums;
 
 namespace DataBaseProvaider.Objects
 {
     /// <summary>
     /// Параметр фильтрации
     /// </summary>
-    public class ConditionsParametr : IDisposable
+    public class ConditionsParametr : BaseParametrCollection, IDisposable
     {
         /// <summary>
         /// Наименование колонки
@@ -38,7 +39,7 @@ namespace DataBaseProvaider.Objects
         /// <param name="columnName">Наименование колонки</param>
         /// <param name="operators">Условный оператор</param>
         /// <param name="value">Искомое/Сравниваемое значение</param>
-        public ConditionsParametr(string columnName, ConditionalOperators operators, object value) 
+        public ConditionsParametr(string columnName, ConditionalOperators operators, object value = null) 
         { 
             ColumnName = columnName;
             Operator = operators;
@@ -52,7 +53,7 @@ namespace DataBaseProvaider.Objects
         /// <param name="operators">Условный оператор</param>
         /// <param name="logic">Логический оператор</param>
         /// <param name="value">Искомое/Сравниваемое значение</param>
-        public ConditionsParametr(string columnName, ConditionalOperators operators, LogicOperators logic, object value)
+        public ConditionsParametr(string columnName, ConditionalOperators operators, LogicOperators logic, object value = null)
         {
             ColumnName = columnName;
             Operator = operators;
@@ -70,5 +71,37 @@ namespace DataBaseProvaider.Objects
         /// Деструктор/Очистка памяти от объекта
         /// </summary>
         public void Dispose() => GC.SuppressFinalize(this);
+
+        public static IEnumerable<ConditionsParametr> operator +(IEnumerable<ConditionsParametr> parametrs, ConditionsParametr condition)
+        {
+            return parametrs.Append(condition);
+        }
+
+        public static IEnumerable<ConditionsParametr> operator -(IEnumerable<ConditionsParametr> parametrs, ConditionsParametr condition)
+        {
+            return parametrs.Except([ condition ]);
+        }
+
+        /// <summary>
+        /// Сравнение объектов только по Id
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ConditionsParametr);
+        }
+
+        /// <summary>
+        /// Сравнение объектов только по Id (типизированная версия)
+        /// </summary>
+        public bool Equals(ConditionsParametr other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Id == other.Id;
+        }
     }
 }

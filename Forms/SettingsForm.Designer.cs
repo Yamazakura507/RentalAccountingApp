@@ -31,9 +31,9 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
             tcSettings = new TabControl();
-            ilSettings = new ImageList(components);
-            connectingSettingsControl1 = new WinFormsComponents.ConnectingSettingsControl();
             tpConectionSettings = new TabPage();
+            connectingSettingsControl1 = new WinFormsComponents.ConnectingSettingsControl();
+            ilSettings = new ImageList(components);
             tcSettings.SuspendLayout();
             tpConectionSettings.SuspendLayout();
             SuspendLayout();
@@ -49,22 +49,6 @@
             tcSettings.Size = new Size(984, 216);
             tcSettings.TabIndex = 0;
             // 
-            // ilSettings
-            // 
-            ilSettings.ColorDepth = ColorDepth.Depth32Bit;
-            ilSettings.ImageStream = (ImageListStreamer)resources.GetObject("ilSettings.ImageStream");
-            ilSettings.TransparentColor = Color.Transparent;
-            ilSettings.Images.SetKeyName(0, "connect.png");
-            // 
-            // connectingSettingsControl1
-            // 
-            connectingSettingsControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            connectingSettingsControl1.BackColor = Color.Transparent;
-            connectingSettingsControl1.Location = new Point(4, 3);
-            connectingSettingsControl1.Name = "connectingSettingsControl1";
-            connectingSettingsControl1.Size = new Size(966, 183);
-            connectingSettingsControl1.TabIndex = 0;
-            // 
             // tpConectionSettings
             // 
             tpConectionSettings.Controls.Add(connectingSettingsControl1);
@@ -77,6 +61,22 @@
             tpConectionSettings.Text = "Соеденение";
             tpConectionSettings.UseVisualStyleBackColor = true;
             // 
+            // connectingSettingsControl1
+            // 
+            connectingSettingsControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            connectingSettingsControl1.BackColor = Color.Transparent;
+            connectingSettingsControl1.Location = new Point(4, 3);
+            connectingSettingsControl1.Name = "connectingSettingsControl1";
+            connectingSettingsControl1.Size = new Size(966, 183);
+            connectingSettingsControl1.TabIndex = 0;
+            // 
+            // ilSettings
+            // 
+            ilSettings.ColorDepth = ColorDepth.Depth32Bit;
+            ilSettings.ImageStream = (ImageListStreamer)resources.GetObject("ilSettings.ImageStream");
+            ilSettings.TransparentColor = Color.Transparent;
+            ilSettings.Images.SetKeyName(0, "connect.png");
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -86,8 +86,8 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1000, 255);
             Name = "SettingsForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "НАСТРОЙКИ";
-            Load += SettingsFormOnLoad;
             tcSettings.ResumeLayout(false);
             tpConectionSettings.ResumeLayout(false);
             ResumeLayout(false);

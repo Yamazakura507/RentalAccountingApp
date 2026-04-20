@@ -1,7 +1,7 @@
 ﻿using DataBaseProvaider.Objects;
 using Npgsql;
 using PostgresSQL;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Data;
 
 namespace DataBaseProvaider
@@ -78,9 +78,9 @@ namespace DataBaseProvaider
                                         tableName,
                                         conditionsStr);
             string command = String.Format(
-                "UPDATE \"{0}\" SET {1}{2} {3};",
+                "UPDATE \"{0}\" t SET {1}{2}; {3};",
                 tableName,
-                String.Join(", ", parametrs.Select(x => $"\"{x.Key}\" = @{x.Key}")),
+                String.Join(", ", parametrs.Select(x => $"t.\"{x.Key}\" = @{x.Key}")),
                 conditionsStr,
                 returningString);
 
@@ -114,7 +114,7 @@ namespace DataBaseProvaider
             (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
 
             string tableName = typeof(TModel).Name;
-            string command = String.Format("DELETE FROM \"{0}\"{1};",tableName,conditionsCommand.quary);;
+            string command = String.Format("DELETE FROM \"{0}\" t{1};",tableName,conditionsCommand.quary);
 
             using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
             {
@@ -183,12 +183,12 @@ namespace DataBaseProvaider
         /// <param name="limit">Ограничение вывода с конца/лимит</param>
         /// <param name="offset">Ограничение вывода с начала/пропуск</param>
         /// <returns>Динамическую коллекцию типа модели</returns>
-        async public static Task<ObservableCollection<TModel>> GetCollectionModel<TModel>(CollectionParametrs parametrs = null) where TModel : new()
+        async public static Task<BindingList<TModel>> GetCollectionModel<TModel>(CollectionParametrs parametrs = null) where TModel : new()
         {
             parametrs = parametrs ?? new CollectionParametrs();
 
             (string quary, NpgsqlParameter[] parametrs) conditions = parametrs.ToStringConditions();
-            ObservableCollection<TModel> collection = new ();
+            BindingList<TModel> collection = new ();
 
             string command = String.Format(
                                 "SELECT * FROM \"{0}\" t{1}{2}{3}{4}",

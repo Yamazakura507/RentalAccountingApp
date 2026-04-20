@@ -6,10 +6,5 @@
         {
             InitializeComponent();
         }
-
-        private void SettingsFormOnLoad(object sender, EventArgs e)
-        {
-            
-        }
     }
 }

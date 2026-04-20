@@ -189,7 +189,7 @@ namespace DataBaseProvaider
         /// <para>Коллекцию типа</para>
         /// <para>-Рекомендуется в качестве T указывать <see cref="object"/> или dynamic.</para>
         /// </returns>
-        async public static Task<ObservableCollection<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod)
+        async public static Task<BindingList<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod)
         {
             MethodInfo method = typeof(DBProvider).GetMethod(nameMethod);
             MethodInfo genericMethod = method.MakeGenericMethod(type);
@@ -199,7 +199,23 @@ namespace DataBaseProvaider
 
             IEnumerable<T> collection = ((dynamic)task).Result;
 
-            return new ObservableCollection<T>(collection);
+            return new BindingList<T>(collection.ToList());
+        }
+
+        /// <summary>
+        /// Вызов метода возращающего процес с неявным типом через рефлексию
+        /// </summary>
+        /// <param name="type">Тип обрабатываемой модели</param>
+        /// <param name="parametrs">Параметры вызываемого метода</param>
+        /// <param name="nameMethod">Наименование метода</param>
+        /// <returns>Процес</returns>
+        async public static Task InvokeMethodByType(this Type type, object[] parametrs, string nameMethod)
+        {
+            MethodInfo method = typeof(DBProvider).GetMethod(nameMethod);
+            MethodInfo genericMethod = method.MakeGenericMethod(type);
+
+            Task task = genericMethod.Invoke(null, parametrs) as Task;
+            await task.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -209,7 +225,7 @@ namespace DataBaseProvaider
         /// <returns>Кортеж из строки части запроса для фильтрации и набор параметров подставляемых в запрос</returns>
         internal static (string, NpgsqlParameter[]) ToStringConditions(this CollectionParametrs collection)
         {
-            IEnumerable<ConditionsParametr> conditions = collection.Conditions.Where(c => c.Value != null || !c.IsSerhing);
+            IEnumerable<ConditionsParametr> conditions = collection.Conditions.Where(c => (c.Value != null && !String.IsNullOrEmpty(c.Value.ToString())) || !c.IsSerhing);
             string conditionsStr = String.Empty;
             List<NpgsqlParameter> conditionsParametr = null;
             int cntCondition = conditions.Count();
@@ -223,29 +239,37 @@ namespace DataBaseProvaider
                 {
                     ConditionsParametr condition = conditions.ElementAt(i);
 
+                    condition.LogicOperator = i + 1 == cntCondition 
+                                                ? LogicOperators.None 
+                                                : condition.LogicOperator == LogicOperators.None 
+                                                    ? LogicOperators.And 
+                                                    : condition.LogicOperator;
+
                     if (condition.Operator.Equals(ConditionalOperators.Levenshtein))
                     {
                         LevenshteinSupplement levenshteinCondition = (LevenshteinSupplement)condition;
 
-                        conditionsStr += String.Format("{1}(t.\"{0}\",@{0},@maxDistance{0}) <= @maxDistance{0} {2} ",
+                        conditionsStr += String.Format("{1}(t.\"{0}\",@{0}{3},@maxDistance{0}{3}) <= @maxDistance{0}{3} {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
-                                         condition.LogicOperator.GetDescription());
+                                         condition.LogicOperator.GetDescription(), 
+                                         condition.Id);
 
-                        conditionsParametr.Add(new(String.Format("@{0}", condition.ColumnName), condition.Value));
-                        conditionsParametr.Add(new(String.Format("@maxDistance{0}", condition.ColumnName),
+                        conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id), condition.Value));
+                        conditionsParametr.Add(new(String.Format("@maxDistance{0}{1}", condition.ColumnName, condition.Id),
                                                                        levenshteinCondition.MaxDistance ?? 3));
 
                         levenshteinCondition.LevenshteinSetOrders(collection);
                     }
                     else
                     {
-                        conditionsStr += String.Format("t.\"{0}\" {1} @{0} {3} ",
+                        conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3} {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
-                                         condition.LogicOperator.GetDescription());
+                                         condition.LogicOperator.GetDescription(), 
+                                         condition.Id);
 
-                        conditionsParametr.Add(new(String.Format("@{0}", condition.ColumnName),
+                        conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id),
                                                                        condition.Operator.CheckLikeOperation(condition.Value ?? DBNull.Value)));
                     }
                 }

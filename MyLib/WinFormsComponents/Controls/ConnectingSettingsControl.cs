@@ -154,13 +154,7 @@ namespace WinFormsComponents
             ThisForm.InterfaceUnlock(tspbProgress);
         }
 
-        private void tbPortOnKeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsDigit(e.KeyChar) && e.KeyChar != (char)Keys.Back)
-            {
-                e.Handled = true;
-            }
-        }
+        private void tbPortOnKeyPress(object sender, KeyPressEventArgs e) => e.NumRestrictionTextBox();
 
         private void tspbProgressOnVisibleChanged(object sender, EventArgs e)
         {
@@ -223,17 +217,17 @@ namespace WinFormsComponents
             }
         }
 
-        private void tbPortOnTextChanged(object sender, EventArgs e)
+        async private void tbPortOnTextChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrEmpty(tbPort.Text))
+            if (!await tbPort.TextEmptyTextBox())
             {
                 tbPort.Text = Properties.Settings.Default.Port.ToString();
             }
         }
 
-        private void tbHostOnTextChanged(object sender, EventArgs e)
+        async private void tbHostOnTextChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrEmpty(tbHost.Text))
+            if (!await tbHost.TextEmptyTextBox())
             {
                 tbHost.Text = Properties.Settings.Default.Host;
             }
@@ -250,7 +244,7 @@ namespace WinFormsComponents
             LoadConnectionList();
         }
 
-        private void lvConnections_KeyDown(object sender, KeyEventArgs e)
+        private void lvConnectionsOnKeyDown(object sender, KeyEventArgs e)
         {
             IEnumerable<ListViewItem> items = lvConnections.SelectedItems.Cast<ListViewItem>();
             ConnectionElement firstConnect = (ConnectionElement)items.FirstOrDefault()?.Tag;

@@ -63,6 +63,7 @@
             // 
             lvConnections.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lvConnections.ContextMenuStrip = cmsConectionList;
+            lvConnections.FullRowSelect = true;
             lvConnections.Location = new Point(789, 28);
             lvConnections.Name = "lvConnections";
             lvConnections.Size = new Size(174, 145);
@@ -71,7 +72,7 @@
             lvConnections.UseCompatibleStateImageBehavior = false;
             lvConnections.View = View.List;
             lvConnections.SelectedIndexChanged += lvConnectionsOnSelectedIndexChanged;
-            lvConnections.KeyDown += lvConnections_KeyDown;
+            lvConnections.KeyDown += lvConnectionsOnKeyDown;
             // 
             // cmsConectionList
             // 
@@ -200,7 +201,7 @@
             btLockPassword.UseVisualStyleBackColor = true;
             btLockPassword.EnabledChanged += btLockPasswordOnEnabledChanged;
             btLockPassword.Click += btLockPasswordOnClick;
-            btLockPassword.KeyDown += lvConnections_KeyDown;
+            btLockPassword.KeyDown += lvConnectionsOnKeyDown;
             // 
             // tbPassword
             // 
@@ -210,7 +211,7 @@
             tbPassword.PasswordChar = '*';
             tbPassword.Size = new Size(575, 29);
             tbPassword.TabIndex = 22;
-            tbPassword.KeyDown += lvConnections_KeyDown;
+            tbPassword.KeyDown += lvConnectionsOnKeyDown;
             // 
             // tbLogin
             // 
@@ -219,7 +220,7 @@
             tbLogin.Name = "tbLogin";
             tbLogin.Size = new Size(615, 29);
             tbLogin.TabIndex = 21;
-            tbLogin.KeyDown += lvConnections_KeyDown;
+            tbLogin.KeyDown += lvConnectionsOnKeyDown;
             // 
             // tbDataBase
             // 
@@ -228,7 +229,7 @@
             tbDataBase.Name = "tbDataBase";
             tbDataBase.Size = new Size(615, 29);
             tbDataBase.TabIndex = 20;
-            tbDataBase.KeyDown += lvConnections_KeyDown;
+            tbDataBase.KeyDown += lvConnectionsOnKeyDown;
             // 
             // tbPort
             // 
@@ -239,7 +240,7 @@
             tbPort.Size = new Size(615, 29);
             tbPort.TabIndex = 19;
             tbPort.TextChanged += tbPortOnTextChanged;
-            tbPort.KeyDown += lvConnections_KeyDown;
+            tbPort.KeyDown += lvConnectionsOnKeyDown;
             tbPort.KeyPress += tbPortOnKeyPress;
             // 
             // tbHost
@@ -250,7 +251,7 @@
             tbHost.Size = new Size(615, 29);
             tbHost.TabIndex = 18;
             tbHost.TextChanged += tbHostOnTextChanged;
-            tbHost.KeyDown += lvConnections_KeyDown;
+            tbHost.KeyDown += lvConnectionsOnKeyDown;
             // 
             // label5
             // 

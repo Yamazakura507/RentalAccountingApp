@@ -43,6 +43,7 @@
 
   <ItemGroup>
     <ProjectReference Include="MyLib\NpgDataBase\DataBaseProvaider\DataBaseProvaider.csproj" />
+    <ProjectReference Include="MyLib\RentalDBModels\RentalDBModels.csproj" />
     <ProjectReference Include="MyLib\WinFormsComponents\WinFormsComponents.csproj" />
   </ItemGroup>
 
