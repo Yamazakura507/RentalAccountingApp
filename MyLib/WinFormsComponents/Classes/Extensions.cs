@@ -1,12 +1,7 @@
 ﻿using DataBaseProvaider;
 using DataBaseProvaider.Attributes;
-using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
-using Newtonsoft.Json;
-using Npgsql;
-using System.ComponentModel;
 using System.Reflection;
-using WinFormsComponents.Classes.Model;
 
 namespace WinFormsComponents.Classes
 {
@@ -18,11 +13,11 @@ namespace WinFormsComponents.Classes
         /// <summary>
         /// Блокировка интерфейса формы
         /// </summary>
-        /// <param name="loaderForm">Форма</param>
+        /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceLock(this Form loaderForm, ToolStripProgressBar progress = null)
+        public static void InterfaceLock(this Control loaderControl, ToolStripProgressBar progress = null)
         {
-            loaderForm.Enabled = false;
+            loaderControl.Enabled = false;
             progress?.Visible = true;
             progress?.Enabled = true;
         }
@@ -30,11 +25,11 @@ namespace WinFormsComponents.Classes
         /// <summary>
         /// Разблокировка интерфейса формы
         /// </summary>
-        /// <param name="loaderForm">Форма</param>
+        /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceUnlock(this Form loaderForm, ToolStripProgressBar progress = null)
+        public static void InterfaceUnlock(this Control loaderControl, ToolStripProgressBar progress = null)
         {
-            loaderForm.Enabled = true;
+            loaderControl.Enabled = true;
             progress?.Visible = false;
             progress?.Enabled = false;
         }
@@ -42,11 +37,11 @@ namespace WinFormsComponents.Classes
         /// <summary>
         /// Блокировка интерфейса формы
         /// </summary>
-        /// <param name="loaderForm">Форма</param>
+        /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceLock(this Form loaderForm, ProgressBar progress = null)
+        public static void InterfaceLock(this Control loaderControl, ProgressBar progress = null)
         {
-            loaderForm.Enabled = false;
+            loaderControl.Enabled = false;
             progress?.Visible = true;
             progress?.Enabled = true;
         }
@@ -54,43 +49,13 @@ namespace WinFormsComponents.Classes
         /// <summary>
         /// Разблокировка интерфейса формы
         /// </summary>
-        /// <param name="loaderForm">Форма</param>
+        /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceUnlock(this Form loaderForm, ProgressBar progress = null)
+        public static void InterfaceUnlock(this Control loaderControl, ProgressBar progress = null)
         {
-            loaderForm.Enabled = true;
+            loaderControl.Enabled = true;
             progress?.Visible = false;
             progress?.Enabled = false;
-        }
-
-        public static void Save(this ConnectionElement[] connections)
-        {
-            string updatedJson = JsonConvert.SerializeObject(connections);
-            File.WriteAllText("connection_list.json", updatedJson);
-
-            DBProvider.NpgsqlProvider = new(ConnectionInfo.ActiveConnection?.ConnectionBuilder ?? ConnectionInfo.DefaultConnection);
-            DBProvider.NpgsqlProvider.HandlerErrror.ErrorReporter = new Progress<string>(async message => InfoViewer.ErrrorMessege(message));
-        }
-
-        /// <summary>
-        /// Проверка соединения
-        /// </summary>
-        /// <param name="connectionBuilder">Строка соединения</param>
-        /// <returns>Результат проверкаи</returns>
-        public static bool IsCheckConection(this NpgsqlConnectionStringBuilder connectionBuilder)
-        {
-            using (NpgsqlConnection connection = new(connectionBuilder.ToString()))
-            {
-                try
-                {
-                    connection.Open();
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    return false;
-                }
-            }
         }
 
         /// <summary>
@@ -162,6 +127,19 @@ namespace WinFormsComponents.Classes
             {
                 collection.RemoveAt(i);
             }
+        }
+
+        /// <summary>
+        /// Получение полного количества старниц записей модели
+        /// </summary>
+        /// <param name="conditions">Список ограничений</param>
+        /// <returns>Количество страниц записей</returns>
+        public async static Task<int> GetCountPage(this Type model, IEnumerable<ConditionsParametr> conditions, int limit)
+        {
+            double countPage = await model.GetResultByType<int>([conditions], "Count");
+            countPage = countPage / limit;
+
+            return Convert.ToInt32(Math.Ceiling(countPage));
         }
     }
 }

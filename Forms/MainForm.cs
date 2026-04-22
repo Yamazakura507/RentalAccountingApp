@@ -1,5 +1,6 @@
 using RentalAccountingApp.Forms;
 using RentalDBModels.Views;
+using WinFormsComponents.Classes;
 
 namespace RentalAccountingApp
 {
@@ -8,6 +9,8 @@ namespace RentalAccountingApp
         public MainForm()
         {
             InitializeComponent();
+
+            ConnectionInfo.ConnectDB();
             dbmlvMaterials.ModelType = typeof(Materials);
         }
 
@@ -16,7 +19,7 @@ namespace RentalAccountingApp
             new SettingsForm().Show();
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private void MainFormOnLoad(object sender, EventArgs e)
         {
             
         }

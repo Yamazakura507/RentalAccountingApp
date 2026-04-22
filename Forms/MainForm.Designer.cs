@@ -147,7 +147,7 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ПРОКАТ";
-            Load += MainForm_Load;
+            Load += MainFormOnLoad;
             tsMainMenu.ResumeLayout(false);
             tsMainMenu.PerformLayout();
             tcDBViewr.ResumeLayout(false);

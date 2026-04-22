@@ -15,8 +15,8 @@ namespace WinFormsComponents.Controls
     public partial class DBModelListView : UserControl
     {
         private Type modelType;
-        private readonly IFilterUIService filterUIService;
-        private readonly IListViewPopulationService listViewPopulationService;
+        private readonly IFilter searchFilter;
+        private readonly IListViewLoader listViewLoader;
         private string parametrRemovingName = null;
 
         /// <summary>
@@ -102,6 +102,12 @@ namespace WinFormsComponents.Controls
         public bool IsGridLines { get; set; } = true;
 
         /// <summary>
+        /// Включить постраничный вывод
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public int PageLimit { get; set; } = 0; 
+
+        /// <summary>
         /// Настройка взаимодействия с БД(Удаление/Оновление)
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -111,30 +117,24 @@ namespace WinFormsComponents.Controls
         {
             InitializeComponent();
 
-            filterUIService = new FilterUIService(FilterOffColor, FilterOnColor);
-            listViewPopulationService = new ListViewPopulationService(RemovingRowColor);
-        }
-
-        /// <summary>
-        /// Добавление подключения
-        /// </summary>
-        private void ConnectDB()
-        {
-            DBProvider.NpgsqlProvider = new(ConnectionInfo.ActiveConnection?.ConnectionBuilder ?? ConnectionInfo.DefaultConnection);
-            DBProvider.NpgsqlProvider.HandlerErrror.ErrorReporter = new Progress<string>(async message => InfoViewer.ErrrorMessege(message));
+            searchFilter = new SearhFilterLoader(FilterOffColor, FilterOnColor);
+            listViewLoader = new ListViewLoader(RemovingRowColor);
+            Parameters ??= new();
+            TermsOfInteractionDB ??= new();
+            tsmiPager.DropDown.Closing += PagerDropDownOnClosing;
         }
 
         /// <summary>
         /// Подгрузка стартовой информации
         /// </summary>
-        private void LoadInfo()
+        private async Task LoadInfo()
         {
             lvModel.GroupImageList = lvModel.StateImageList = lvModel.LargeImageList = lvModel.SmallImageList = ImageList;
-            Parameters ??= new();
-            TermsOfInteractionDB ??= new();
             parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false)?.Name;
+            tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
 
             CreateParametrShowRemoving();
+            await UpdateCountPage(PageLimit == 0 ? Properties.Settings.Default.Limit : PageLimit);
             ShowVisibleMode(VisibleMode);
             ShowGridVisible(IsGridLines);
             CheckSearch();
@@ -167,6 +167,7 @@ namespace WinFormsComponents.Controls
         {
             tsmiSearh.Visible = IsSearch;
             tsmiFilter.Visible = IsFilter;
+            tssFilter.Visible = IsSearch || IsFilter;
             tsmiSearh.DropDownItems.Clear();
             tsmiFilter.DropDownItems.Clear();
 
@@ -181,7 +182,7 @@ namespace WinFormsComponents.Controls
                 {
                     if (IsSearch)
                     {
-                        ToolStripMenuItem tsmiSearh = filterUIService.CreateSearchFilter(titleMenu, property.Name,
+                        ToolStripMenuItem tsmiSearh = searchFilter.CreateFilter(titleMenu, property.Name,
                         searchParameters.FirstOrDefault(i => i.ColumnName.Equals(property.Name)),
                         UpdateSearhParametrs);
 
@@ -218,7 +219,7 @@ namespace WinFormsComponents.Controls
             ShowDeleted = showRemooving;
             Parameters.Conditions -= Parameters.Conditions.FirstOrDefault(i => i.ColumnName.Equals(parametrRemovingName));
             CreateParametrShowRemoving();
-            await LoadListAsync();
+            await UpdateCountPage(Parameters.Limit);
         }
 
         /// <summary>
@@ -292,7 +293,7 @@ namespace WinFormsComponents.Controls
                 updateParametr?.Invoke(newParametr);
 
                 CheckSearch();
-                await LoadListAsync();
+                await UpdateCountPage(Parameters.Limit);
             }
         }
 
@@ -310,7 +311,98 @@ namespace WinFormsComponents.Controls
 
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
-            listViewPopulationService.PopulateListView(lvModel, modelType, Items);
+            listViewLoader.PopulateListView(lvModel, modelType, Items);
+        }
+
+        /// <summary>
+        /// Метод обнавления постраничного вывода
+        /// </summary>
+        /// <param name="limit">Ограничение вывода</param>
+        /// <param name="offset">Ограничение пропуска</param>
+        /// <returns>Процес</returns>
+        private async Task UpdatePager(ActionPager actionPager)
+        {
+            int count = Convert.ToInt32(tslCountPages.Tag);
+            int nowPage = 1;
+            Int32.TryParse(tstbActualPage.Text, out nowPage);
+
+            switch (actionPager)
+            {
+                case ActionPager.Next:
+                    nowPage += 1;
+                    break;
+                case ActionPager.Back:
+                    nowPage -= 1;
+                    break;
+                case ActionPager.Start:
+                    nowPage = 1;
+                    break;
+                case ActionPager.End:
+                    nowPage = count;
+                    break;
+                case ActionPager.Enter:
+                    if (nowPage > count) nowPage = count;
+                    else if (nowPage < 1) nowPage = 1;
+                    break;
+            }
+
+            Parameters.Offset = (nowPage - 1) * Parameters.Limit;
+
+            tstbActualPage.Text = nowPage.ToString();
+            IsCheckPager(nowPage, count);
+            await LoadListAsync();
+        }
+
+        /// <summary>
+        /// Обновление количества страниц
+        /// </summary>
+        /// <param name="limit">Ограничитель вывода страницы</param>
+        /// <returns>Процес</returns>
+        private async Task UpdateCountPage(int limit)
+        {
+            bool isLimiter = limit != 0;
+            tsbStartPage.Visible = tsbEndPage.Visible
+                = tsbNextPage.Visible = tsbBackPage.Visible
+                = tslCountPages.Visible = tstbActualPage.Visible = tssPager.Visible = isLimiter;
+
+            Parameters.Limit = PageLimit = limit;
+
+            if (isLimiter)
+            {
+                int nowPage = Convert.ToInt32(tstbActualPage.Text);
+                int count = await modelType.GetCountPage(Parameters.Conditions, limit);
+
+                count = count == 0 ? 1 : count;
+
+                tslCountPages.Text = String.Format("/{0}", count.ToString());
+                tslCountPages.ToolTipText = String.Format("Всего {0} страниц", count.ToString());
+                tslCountPages.Tag = count;
+
+                if (nowPage > count) await UpdatePager(ActionPager.End);
+                else await UpdatePager(ActionPager.Enter);
+            }
+        }
+
+        /// <summary>
+        /// Проверка доступности действий страничника
+        /// </summary>
+        /// <param name="nowPage">Текущая страница</param>
+        /// <param name="count">Количество страниц</param>
+        public void IsCheckPager(int nowPage, int count)
+        {
+            tstbActualPage.Enabled = count > 1;
+            tsbNextPage.Enabled = tsbEndPage.Enabled = tstbActualPage.Enabled && nowPage < count;
+            tsbBackPage.Enabled = tsbStartPage.Enabled = tstbActualPage.Enabled && nowPage > 1;
+        }
+
+        /// <summary>
+        /// Обновление поискового запроса
+        /// </summary>
+        /// <returns>Процес</returns>
+        private async Task UpdateSearch()
+        {
+            await LoadListAsync();
+            await UpdateCountPage(Parameters.Limit);
         }
 
         /// <summary>
@@ -339,7 +431,7 @@ namespace WinFormsComponents.Controls
         /// Метод удаления/востановления выделеных строк
         /// </summary>
         /// <returns>Процес</returns>
-        async private Task DeleteOrRepair()
+        private async Task DeleteOrRepair()
         {
             await modelType.InvokeMethodByType([TermsOfInteractionDB.GetDeleteParamers(lvModel.SelectedItems, ModelType)], nameof(DBProvider.Delete))
                 .ContinueWith(async task =>
@@ -355,8 +447,7 @@ namespace WinFormsComponents.Controls
         {
             if (!this.Enabled) return;
 
-            LoadInfo();
-            ConnectDB();
+            await LoadInfo();
             ColumnLoad();
             await LoadListAsync();
         }
@@ -366,11 +457,11 @@ namespace WinFormsComponents.Controls
             if (e.KeyChar == (char)Keys.Enter)
             {
                 e.Handled = true;
-                await LoadListAsync();
+                await UpdateSearch();
             }
         }
 
-        private async void tsbSearhOnClick(object sender, EventArgs e) => await LoadListAsync();
+        private async void tsbSearhOnClick(object sender, EventArgs e) => await UpdateSearch();
 
         private void tsmiShowDeletedOnDropDownOpened(object sender, EventArgs e)
         {
@@ -413,7 +504,7 @@ namespace WinFormsComponents.Controls
 
         private void tsbGridOnClick(object sender, EventArgs e) => ShowGridVisible(!IsGridLines);
 
-        async private void tsbDelOrRepairOnClick(object sender, EventArgs e) => await DeleteOrRepair();
+        private async void tsbDelOrRepairOnClick(object sender, EventArgs e) => await DeleteOrRepair();
 
         private async void lvModelOnKeyDown(object sender, KeyEventArgs e)
         {
@@ -427,32 +518,93 @@ namespace WinFormsComponents.Controls
                     break;
                 case Keys.Enter:
                     break;
-                case Keys.Insert:
-                    break;
                 case Keys.R when e.Control && isRepair:
                     await DeleteOrRepair();
-                    e.SuppressKeyPress = true;
+                    break;
+                case Keys.Insert:
                     break;
                 case Keys.A when e.Control && ShowDeleted != ShowRemooving.Always:
                     await ShowRemoving(ShowRemooving.Always);
-                    e.SuppressKeyPress = true;
                     break;
                 case Keys.D when e.Control && ShowDeleted != ShowRemooving.ExecRemoving:
                     await ShowRemoving(ShowRemooving.ExecRemoving);
-                    e.SuppressKeyPress = true;
                     break;
                 case Keys.V when e.Control && ShowDeleted != ShowRemooving.ExecNotRemoving:
                     await ShowRemoving(ShowRemooving.ExecNotRemoving);
-                    e.SuppressKeyPress = true;
                     break;
                 case Keys.G when e.Control && VisibleMode != VisibleMode.Tile:
                     ShowGridVisible(!IsGridLines);
-                    e.SuppressKeyPress = true;
                     break;
                 case Keys.U when e.Control:
                     ShowVisibleMode(VisibleMode == VisibleMode.Tile ? VisibleMode.Row : VisibleMode.Tile);
-                    e.SuppressKeyPress = true;
                     break;
+                case Keys.E when e.Control && tsbEndPage.Enabled && tsbEndPage.Visible:
+                    await UpdatePager(ActionPager.End);
+                    break;
+                case Keys.H when e.Control && tsbStartPage.Enabled && tsbStartPage.Visible:
+                    await UpdatePager(ActionPager.Start);
+                    break;
+                case Keys.B when e.Control && tsbBackPage.Enabled && tsbBackPage.Visible:
+                    await UpdatePager(ActionPager.Back);
+                    break;
+                case Keys.N when e.Control && tsbNextPage.Enabled && tsbNextPage.Visible:
+                    await UpdatePager(ActionPager.Next);
+                    break;
+                case Keys.P when e.Control:
+                    tsmiPagerCheckit.Checked = !tsmiPagerCheckit.Checked;
+                    PagerDropDownOnClosing(null, null);
+                    break;
+            }
+
+            e.SuppressKeyPress = true;
+        }
+
+        private async void tstbActualPageOnKeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.NumRestrictionTextBox();
+
+            if (e.KeyChar == (char)Keys.Enter)
+            {
+                e.Handled = true;
+                await UpdatePager(ActionPager.Enter);
+            }
+        }
+
+        private async void tsbActionPageOnClick(object sender, EventArgs e) => await UpdatePager(((ToolStripButton)sender).Tag.ToString().StringToEnum<ActionPager>());
+
+        private async void PagerDropDownOnClosing(object? sender, ToolStripDropDownClosingEventArgs e)
+        {
+            if (e is not null && e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
+            else
+            {
+                tsmitbLimitPage.Text = String.IsNullOrEmpty(tsmitbLimitPage.Text) ? "100" : tsmitbLimitPage.Text;
+                await UpdateCountPage(tsmiPagerCheckit.Checked ? Convert.ToInt32(tsmitbLimitPage.Text) : 0);
+            }
+        }
+
+        private void tsmitbLimitPageOnKeyPress(object sender, KeyPressEventArgs e) => e.NumRestrictionTextBox();
+
+        private void tsmiRepairLimitPageOnClick(object sender, EventArgs e) => tsmitbLimitPage.Text = Properties.Settings.Default.Limit.ToString();
+
+        private void tsmiPagerCheckitOnCheckedChanged(object sender, EventArgs e)
+        {
+            Dictionary<bool, (string, string, Color)> parametrs = new()
+            {
+                { false, ("Включить(Ctrl+P)", "Включить постраничный вывод(Ctrl+P)", FilterOffColor) },
+                { true, ("Выключить(Ctrl+P)", "Выключить постраничный вывод(Ctrl+P)", FilterOnColor) }
+            };
+
+            FilterFunction.CheckedChangedItemMenu(tsmiPagerCheckit,parametrs);
+            tslPager.Visible = tsmitbLimitPage.Visible = tsmiPagerCheckit.Checked;
+            tsmiRepairLimitPage.Visible = tsmiPagerCheckit.Checked && Properties.Settings.Default.Limit != 0;
+
+            if (tsmiPagerCheckit.Checked)
+            {
+                tsmitbLimitPage.Text = Properties.Settings.Default.Limit != 0 && PageLimit == 0 
+                                        ? Properties.Settings.Default.Limit.ToString() 
+                                        : PageLimit == 0 
+                                            ? "100" 
+                                            : PageLimit.ToString();
             }
         }
     }

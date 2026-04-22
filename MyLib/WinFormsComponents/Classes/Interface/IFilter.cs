@@ -14,13 +14,17 @@ namespace WinFormsComponents.Classes.Interface
     public delegate void UpdateParametrChangedHandler(ConditionsParametr baseSearhParametr);
 
     /// <summary>
-    /// Инерфейс сервиса создания UI фильтров
+    /// Инерфейс сервиса создания фильтров
     /// </summary>
-    internal interface IFilterUIService
+    internal interface IFilter
     {
         /// <summary>
-        /// Создание поискового фильтра
+        /// Формирование фильтра для параметра
         /// </summary>
-        ToolStripMenuItem CreateSearchFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null);
+        /// <param name="columnText">Текст свойства фильтрации</param>
+        /// <param name="columnName">Наименование параметра фильтрации</param>
+        /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
+        /// <param name="onFilterChanged">Обработчик включения фильтра</param>
+        ToolStripMenuItem CreateFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null);
     }
 }

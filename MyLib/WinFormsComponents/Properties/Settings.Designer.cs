@@ -82,5 +82,17 @@ namespace WinFormsComponents.Properties {
                 this["DataBase"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int Limit {
+            get {
+                return ((int)(this["Limit"]));
+            }
+            set {
+                this["Limit"] = value;
+            }
+        }
     }
 }

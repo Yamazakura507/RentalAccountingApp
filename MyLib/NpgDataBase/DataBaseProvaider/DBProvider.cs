@@ -21,10 +21,7 @@ namespace DataBaseProvaider
         /// <exception cref="Exception">Исключение при отсутствии подключения</exception>
         async public static Task<DataRow> Insert<TModel>(Dictionary<string, object> parametrs, string[] returningColumns = null)
         {
-            if (NpgsqlProvider is null)
-            {
-                throw new Exception("Отсутствует объект подключения");
-            }
+            ConectionCheck();
 
             DataRow returningValue = null;
             string tableName = typeof(TModel).Name;
@@ -63,10 +60,7 @@ namespace DataBaseProvaider
         /// <exception cref="Exception">Исключение при отсутствии подключения</exception>
         async public static Task<DataRow> Update<TModel>(Dictionary<string, object> parametrs, IEnumerable<ConditionsParametr> conditions, string[] returningColumns = null)
         {
-            if (NpgsqlProvider is null)
-            {
-                throw new Exception("Отсутствует объект подключения");
-            }
+            ConectionCheck();
 
             DataRow returningValue = null;
             string tableName = typeof(TModel).Name;
@@ -74,7 +68,7 @@ namespace DataBaseProvaider
             string returningString = returningColumns != null && returningColumns.Length == 0
                                         ? String.Empty
                                         : String.Format("SELECT {0} FROM \"{1}\" t{2}",
-                                        returningColumns is null ? "*" : String.Join(", ", returningColumns.Select(x => $"t.\"{x}\"")), 
+                                        returningColumns is null ? "*" : String.Join(", ", returningColumns.Select(x => $"t.\"{x}\"")),
                                         tableName,
                                         conditionsStr);
             string command = String.Format(
@@ -105,16 +99,13 @@ namespace DataBaseProvaider
         /// <exception cref="Exception">Исключение при отсутствии подключения</exception>
         async public static Task Delete<TModel>(IEnumerable<ConditionsParametr> conditions)
         {
-            if (NpgsqlProvider is null)
-            {
-                throw new Exception("Отсутствует объект подключения");
-            }
+            ConectionCheck();
 
             CollectionParametrs parametrs = new() { Conditions = conditions };
             (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
 
             string tableName = typeof(TModel).Name;
-            string command = String.Format("DELETE FROM \"{0}\" t{1};",tableName,conditionsCommand.quary);
+            string command = String.Format("DELETE FROM \"{0}\" t{1};", tableName, conditionsCommand.quary);
 
             using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
             {
@@ -129,7 +120,7 @@ namespace DataBaseProvaider
         /// Coment транзакции - прервать транзакцию с сохранением выполненой работы
         /// </summary>
         /// <returns>Результат прерывания</returns>
-        async public static Task<bool>Comit() => await npgSqlProviderClone.TransactionCommitAsync();
+        async public static Task<bool> Comit() => await npgSqlProviderClone.TransactionCommitAsync();
 
         /// <summary>
         /// Rollback транзакции - прервать транзакцию и откатить изменения
@@ -144,12 +135,9 @@ namespace DataBaseProvaider
         /// <param name="id">Идентификатотр объекта модели/строки</param>
         /// <returns>Объект модели по запрашевоемому идентификатору</returns>
         /// <exception cref="Exception">Возможны исключения преобразования строки в объект</exception>
-        async public static Task<TModel> GetModel<TModel>(int id) where TModel : new ()
+        async public static Task<TModel> GetModel<TModel>(int id) where TModel : new()
         {
-            if (NpgsqlProvider is null)
-            {
-                throw new Exception("Отсутствует объект подключения");
-            }
+            ConectionCheck();
 
             string command = String.Format("SELECT * FROM \"{0}\" t WHERE t.\"Id\" = @Id", typeof(TModel).Name);
             DataRow row = null;
@@ -157,7 +145,7 @@ namespace DataBaseProvaider
             using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
             {
                 npgSqlProviderClone = msProvider;
-                row = await msProvider.GetRowAsync(command, new[] { new NpgsqlParameter("@Id", id) } );
+                row = await msProvider.GetRowAsync(command, new[] { new NpgsqlParameter("@Id", id) });
             }
 
             npgSqlProviderClone = null;
@@ -185,10 +173,12 @@ namespace DataBaseProvaider
         /// <returns>Динамическую коллекцию типа модели</returns>
         async public static Task<BindingList<TModel>> GetCollectionModel<TModel>(CollectionParametrs parametrs = null) where TModel : new()
         {
+            ConectionCheck();
+
             parametrs = parametrs ?? new CollectionParametrs();
 
             (string quary, NpgsqlParameter[] parametrs) conditions = parametrs.ToStringConditions();
-            BindingList<TModel> collection = new ();
+            BindingList<TModel> collection = new();
 
             string command = String.Format(
                                 "SELECT * FROM \"{0}\" t{1}{2}{3}{4}",
@@ -216,6 +206,47 @@ namespace DataBaseProvaider
             npgSqlProviderClone = null;
 
             return collection;
+        }
+
+        /// <summary>
+        /// Получение количества строк в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <returns>Количество строк</returns>
+        async public static Task<int> Count<TModel>(IEnumerable<ConditionsParametr> conditions = null)
+        {
+            ConectionCheck();
+
+            CollectionParametrs parametrs = new() { Conditions = conditions };
+            (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
+
+            string tableName = typeof(TModel).Name;
+            string command = String.Format("SELECT COUNT(*) FROM \"{0}\" t{1};", tableName, conditionsCommand.quary);
+
+            int count = 0;
+
+            using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
+            {
+                npgSqlProviderClone = msProvider;
+                count = await msProvider.GetValueAsync<int>(command, conditionsCommand.parametrs);
+            }
+
+            npgSqlProviderClone = null;
+
+            return count;
+        }
+
+        /// <summary>
+        /// Проверка объекта подключения
+        /// </summary>
+        /// <exception cref="Exception">Сообщение исключение, если отсутствует объект подключения</exception>
+        private static void ConectionCheck()
+        {
+            if (NpgsqlProvider is null)
+            {
+                throw new Exception("Отсутствует объект подключения");
+            }
         }
     }
 }

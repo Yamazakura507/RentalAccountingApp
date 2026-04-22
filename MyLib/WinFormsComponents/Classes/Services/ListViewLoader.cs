@@ -8,19 +8,25 @@ namespace WinFormsComponents.Classes.Services
     /// <summary>
     /// Сервис заполнения ListView
     /// </summary>
-    public class ListViewPopulationService : IListViewPopulationService
+    public class ListViewLoader : IListViewLoader
     {
         /// <summary>
         /// Цвет удаленных строк
         /// </summary>
         private Color removingRowColor = Color.MistyRose;
 
-        public ListViewPopulationService(Color removingRowColor) 
+        /// <summary>
+        /// Конструктор сервиса заполнения ListView
+        /// </summary>
+        /// <param name="removingRowColor">Цвет удаленных строк</param>
+        public ListViewLoader(Color removingRowColor) 
         {
             this.removingRowColor = removingRowColor;
         }
-
-        public ListViewPopulationService()
+        /// <summary>
+        /// Конструктор сервиса заполнения ListView
+        /// </summary>
+        public ListViewLoader()
         {
         }
 

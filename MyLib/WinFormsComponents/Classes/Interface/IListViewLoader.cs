@@ -5,7 +5,7 @@ namespace WinFormsComponents.Classes.Interface
     /// <summary>
     /// Интерфейс сервиса заполнения ListView
     /// </summary>
-    internal interface IListViewPopulationService
+    internal interface IListViewLoader
     {
         /// <summary>
         /// Заполнение ListView данными

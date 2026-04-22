@@ -13,7 +13,7 @@ namespace RentalDBModels.Views
         public bool Flag { get; set; }
 
         [ViewModel(Headline = true)]
-        [Description("Матерьял")]
+        [Description("Материал")]
         public string Name { get; set; }
 
         [ViewModel(ViewHide = true, Image = true)]

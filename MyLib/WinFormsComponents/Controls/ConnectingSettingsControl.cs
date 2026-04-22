@@ -98,8 +98,6 @@ namespace WinFormsComponents
         /// <param name="actionSave">Действие при сохранении: 0 - Изменение, 1 - Добавление, 2 - Удаление</param>
         private void SaveConnections(int actionSave = 0)
         {
-
-
             ThisForm.InterfaceLock(tspbProgress);
             tslProgress.Text = "Проверка соединения...";
 

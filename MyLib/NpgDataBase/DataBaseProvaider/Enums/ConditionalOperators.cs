@@ -10,7 +10,8 @@ namespace DataBaseProvaider.Enums
     /// <para>Equal - Равно, NotEqual - Не равно</para>
     /// <para>More - Больше, Less - Меньше</para>
     /// <para>MoreOrEqual - Больше или равно, LessOrEqual - Меньше или равно</para>
-    /// <para>Like - Содержит(регистро зависимый), ILike - Не содержит(регистро не зависимый)</para>
+    /// <para>Like - Содержит(регистро зависимый), ILike - Cодержит(регистро не зависимый)</para>
+    /// <para>ExactLike - Содержит(регистро зависимый, точный), ExactILike - Cодержит(регистро не зависимый, точный)</para>
     /// </remarks>
     public enum ConditionalOperators
     {
@@ -57,19 +58,19 @@ namespace DataBaseProvaider.Enums
         [Description("<=")]
         LessOrEqual = 5,
         /// <summary>
-        /// Содержит(регистро зависимый) - операция like/contains
+        /// Содержит(регистро не зависимый) - операция ilike/contains
         /// </summary>
         /// <value>6</value>
         [Comment("Содержит")]
-        [Description("like")]
-        Like = 6,
+        [Description("ilike")]
+        ILike = 6,
         /// <summary>
-        /// Содержит(регистро не зависимый) - операция ilike/contains
+        /// Содержит(регистро зависимый) - операция like/contains
         /// </summary>
         /// <value>7</value>
         [Comment("Содержит")]
-        [Description("ilike")]
-        ILike = 7,
+        [Description("like")]
+        Like = 7,
         /// <summary>
         /// Содержит(регистро зависимый) - операция like/contains
         /// </summary>

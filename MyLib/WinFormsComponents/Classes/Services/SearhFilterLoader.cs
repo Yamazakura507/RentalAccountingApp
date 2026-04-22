@@ -8,7 +8,7 @@ namespace WinFormsComponents.Classes.Services
     /// <summary>
     /// Сервис визуализации фильтров
     /// </summary>
-    public class FilterUIService : IFilterUIService
+    public class SearhFilterLoader : IFilter
     {
         /// <summary>
         /// Цвет отключенного фильтра
@@ -29,7 +29,7 @@ namespace WinFormsComponents.Classes.Services
         /// </summary>
         /// <param name="filterOffColor">Цвет отключенного фильтра</param>
         /// <param name="filterOnColor">Цвет включенного фильтра</param>
-        public FilterUIService(Color filterOffColor, Color filterOnColor)
+        public SearhFilterLoader(Color filterOffColor, Color filterOnColor)
         {
             this.filterOffColor = filterOffColor;
             this.filterOnColor = filterOnColor;
@@ -42,14 +42,20 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="columnName">Наименование параметра фильтрации</param>
         /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
         /// <param name="onFilterChanged">Обработчик включения фильтра</param>
-        public ToolStripMenuItem CreateSearchFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null)
+        public ToolStripMenuItem CreateFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null)
         {
             baseParametr = searchParametr;
             ToolStripMenuItem menuItem = new(columnText, Properties.Resources.searh);
 
-            ToolStripMenuItem checkItem = CreateCheckItem(searchParametr != null);
-            ToolStripComboBox comboBoxSearchType = ComboBoxFilterLoad<ConditionalOperators>(checkItem.Checked, searchParametr, "Условие поиска");
-            ToolStripComboBox comboBoxLogicType = ComboBoxFilterLoad<LogicOperators>(checkItem.Checked, searchParametr, "Логическое соединение условий поиска");
+            Dictionary<bool, (string, string, Color)> checkItemParametrs = new()
+            {
+                { false, ("Включить", "Включить в параметры поиска", filterOffColor) },
+                { true, ("Выключить", "Исключить из параметров поиска", filterOnColor) }
+            };
+
+            ToolStripMenuItem checkItem = checkItemParametrs.CreateOptionItem(searchParametr != null);
+            ToolStripComboBox comboBoxSearchType = FilterFunction.ComboBoxFilterLoad<ConditionalOperators>(checkItem.Checked, searchParametr, "Условие поиска");
+            ToolStripComboBox comboBoxLogicType = FilterFunction.ComboBoxFilterLoad<LogicOperators>(checkItem.Checked, searchParametr, "Логическое соединение условий поиска");
 
             menuItem.DropDown.Closing += (s, e) =>
             {
@@ -61,8 +67,8 @@ namespace WinFormsComponents.Classes.Services
             };
             checkItem.CheckedChanged += (s, e) =>
             {
+                checkItem.CheckedChangedItemMenu(checkItemParametrs);
                 comboBoxSearchType.Enabled = comboBoxLogicType.Enabled = checkItem.Checked;
-                UpdateCheckItemAppearance(checkItem);
             };
             comboBoxSearchType.SelectedIndexChanged += (s, e) =>
             {
@@ -156,76 +162,6 @@ namespace WinFormsComponents.Classes.Services
         }
 
         /// <summary>
-        /// Формирование чекита о включении фильтра
-        /// </summary>
-        /// <param name="isChecked">Указатель о проверке имеющихся текущих сведений о фильтре</param>
-        private ToolStripMenuItem CreateCheckItem(bool isChecked)
-        {
-            ToolStripMenuItem checkItem = new ()
-            {
-                CheckOnClick = true,
-                Checked = isChecked,
-                CheckState = isChecked ? CheckState.Checked : CheckState.Unchecked
-            };
-
-            UpdateCheckItemAppearance(checkItem);
-            return checkItem;
-        }
-
-        /// <summary>
-        /// Обновление чекита о включения фильтра
-        /// </summary>
-        /// <param name="checkItem">Чекит включения фильтра</param>
-        private void UpdateCheckItemAppearance(ToolStripMenuItem checkItem)
-        {
-            if (checkItem.Checked)
-            {
-                checkItem.Text = "Выключить";
-                checkItem.ToolTipText = "Исключить из параметров поиска";
-                checkItem.BackColor = filterOnColor;
-            }
-            else
-            {
-                checkItem.Text = "Включить";
-                checkItem.ToolTipText = "Включить в параметры поиска";
-                checkItem.BackColor = filterOffColor;
-            }
-        }
-
-        /// <summary>
-        /// Формирование выпадающего списка фильтрации
-        /// </summary>
-        /// <typeparam name="TOperation">Тип <see cref="Enum"/> пеерчисления</typeparam>
-        /// <param name="isEnable">Информация о видимости</param>
-        /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
-        /// <param name="toolText">Подсказка</param>
-        private ToolStripComboBox ComboBoxFilterLoad<TOperation>(bool isEnable, ConditionsParametr searchParametr, string toolText = "") where TOperation : Enum
-        {
-            ToolStripComboBox comboBox = new()
-            { 
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                Enabled = isEnable,
-                ToolTipText = toolText
-            };
-            Dictionary<TOperation, string> dicOper = Extensions.GetCommitEnumDictionary<TOperation>();
-            string selectedItem = null;
-
-            comboBox.Items.AddRange(dicOper.Values.Distinct().ToArray());
-
-            if (isEnable)
-            {
-                TOperation operationKey = (TOperation)typeof(ConditionsParametr).GetProperties()
-                    .First(i => i.PropertyType.Equals(typeof(TOperation))).GetValue(searchParametr);
-                selectedItem = dicOper[operationKey];
-            }
-
-            if (selectedItem is null) comboBox.SelectedIndex = 0;
-            else comboBox.SelectedItem = selectedItem;
-
-            return comboBox;
-        }
-
-        /// <summary>
         /// Получение выбранного оператора
         /// </summary>
         /// <param name="comboBox">Выпаадющий список</param>
@@ -285,13 +221,11 @@ namespace WinFormsComponents.Classes.Services
             bool shouldCheck = isChecked &&
                 (operators == ConditionalOperators.MoreOrEqual || operators == ConditionalOperators.LessOrEqual);
 
-            ToolStripMenuItem checkItem = CreateOptionItem(
-                "Учитывать равенство",
-                "Если эта галочка отмечена, будет дополнительно применено условие равенства",
-                shouldCheck);
-
-            checkItem.CheckedChanged += (sender, e) =>
-                checkItem.BackColor = checkItem.Checked ? filterOnColor : filterOffColor;
+            ToolStripMenuItem checkItem = new Dictionary<bool, (string, string, Color)>()
+            {
+                { false, ("Учитывать равенство", "Если эта галочка снята, будет отменено дополнительное условие равенства", filterOffColor) },
+                { true, ("Учитывать равенство", "Если эта галочка отмечена, будет дополнительно применено условие равенства", filterOnColor) }
+            }.CreateOptionItem(shouldCheck);
 
             return checkItem;
         }
@@ -309,47 +243,19 @@ namespace WinFormsComponents.Classes.Services
             bool isExact = isChecked &&
                 (operators == ConditionalOperators.ExactILike || operators == ConditionalOperators.ExactLike);
 
-            ToolStripMenuItem caseSensitiveItem = CreateOptionItem(
-                "Регистрозависимый",
-                "Если эта галочка отмечена, будет дополнительно применено условие регистрозависимости",
-                isCaseSensitive);
+            ToolStripMenuItem caseSensitiveItem = new Dictionary<bool, (string, string, Color)>()
+            {
+                { false, ("Регистрозависимый", "Если эта галочка отмечена, будет дополнительно применено условие регистрозависимости", filterOffColor) },
+                { true, ("Регистрозависимый", "Если эта галочка снята, будет отменено дополнительное условие регистрозависимости", filterOnColor) }
+            }.CreateOptionItem(isCaseSensitive);
 
-            ToolStripMenuItem exactItem = CreateOptionItem(
-                "Точное совпадение",
-                "Если эта галочка отмечена, будет дополнительно применено условие точного поиска(без исключения пробелов)",
-                isExact);
+            ToolStripMenuItem exactItem = new Dictionary<bool, (string, string, Color)>()
+            {
+                { false, ("Точное совпадение", "Если эта галочка отмечена, будет дополнительно применено условие точного поиска(без исключения пробелов)", filterOffColor) },
+                { true, ("Точное совпадение", "Если эта галочка снята, будет отменено дополнительное условие точного поиска(игнорирование пробелов)", filterOnColor) }
+            }.CreateOptionItem(isExact);
 
             return new[] { caseSensitiveItem, exactItem };
-        }
-
-        /// <summary>
-        /// Создание чекита для меню
-        /// </summary>
-        /// <param name="text">Подпись</param>
-        /// <param name="tooltip">Подсказка</param>
-        /// <param name="isChecked">Состояние</param>
-        /// <returns>Чекит для меню</returns>
-        private ToolStripMenuItem CreateOptionItem(string text, string tooltip, bool isChecked)
-        {
-            ToolStripMenuItem item = new (text)
-            {
-                CheckOnClick = true,
-                ToolTipText = tooltip,
-                Checked = isChecked,
-                CheckState = CheckState.Unchecked,
-                BackColor = filterOffColor
-            };
-
-            if (isChecked)
-            {
-                item.CheckState = CheckState.Checked;
-                item.BackColor = filterOnColor;
-            }
-
-            item.CheckedChanged += (sender, e) =>
-                item.BackColor = item.Checked ? filterOnColor : filterOffColor;
-
-            return item;
         }
 
         /// <summary>

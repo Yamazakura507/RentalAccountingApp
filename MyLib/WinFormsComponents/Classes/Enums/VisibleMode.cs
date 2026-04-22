@@ -14,10 +14,12 @@ namespace WinFormsComponents.Classes.Enums
         /// <summary>
         /// Отображение плиткой
         /// </summary>
+        /// <value>0</value>
         Tile = 0,
         /// <summary>
         /// Отображение строками
         /// </summary>
+        /// <value>1</value>
         Row = 1
     }
 }

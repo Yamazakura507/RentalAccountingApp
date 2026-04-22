@@ -33,7 +33,7 @@
             tsbAdd = new ToolStripButton();
             tsbDel = new ToolStripButton();
             tsbRepair = new ToolStripButton();
-            toolStripSeparator1 = new ToolStripSeparator();
+            tssFilter = new ToolStripSeparator();
             tstbSearh = new ToolStripTextBox();
             tsbSearh = new ToolStripButton();
             tsddbFilter = new ToolStripDropDownButton();
@@ -43,32 +43,38 @@
             tsmiShowAlways = new ToolStripMenuItem();
             tsmiShowExacRemoving = new ToolStripMenuItem();
             tsmiShowExacNotRemoving = new ToolStripMenuItem();
+            tsddbSettingsListView = new ToolStripDropDownButton();
+            tsmiPager = new ToolStripMenuItem();
+            tsmiPagerCheckit = new ToolStripMenuItem();
+            tslPager = new ToolStripLabel();
+            tsmitbLimitPage = new ToolStripTextBox();
+            tsmiRepairLimitPage = new ToolStripMenuItem();
             tsbTileMode = new ToolStripButton();
             tsbRowMode = new ToolStripButton();
             tsbGrid = new ToolStripButton();
             tsbNonGrid = new ToolStripButton();
-            lvModel = new ListView();
-            cmsModel = new ContextMenuStrip(components);
-            tsmiAdd = new ToolStripMenuItem();
-            tsmiDel = new ToolStripMenuItem();
-            tsmiRepair = new ToolStripMenuItem();
-            toolStripSeparator2 = new ToolStripSeparator();
+            tssPager = new ToolStripSeparator();
             tsbStartPage = new ToolStripButton();
             tsbBackPage = new ToolStripButton();
             tstbActualPage = new ToolStripTextBox();
             tslCountPages = new ToolStripLabel();
             tsbNextPage = new ToolStripButton();
             tsbEndPage = new ToolStripButton();
+            lvModel = new ListView();
+            cmsModel = new ContextMenuStrip(components);
+            tsmiAdd = new ToolStripMenuItem();
+            tsmiDel = new ToolStripMenuItem();
+            tsmiRepair = new ToolStripMenuItem();
             tsListMenu.SuspendLayout();
             cmsModel.SuspendLayout();
             SuspendLayout();
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, toolStripSeparator1, tstbSearh, tsbSearh, tsddbFilter, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, toolStripSeparator2, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
-            tsListMenu.Size = new Size(900, 25);
+            tsListMenu.Size = new Size(900, 31);
             tsListMenu.TabIndex = 2;
             tsListMenu.Text = "toolStrip1";
             // 
@@ -78,7 +84,7 @@
             tsbAdd.Image = Properties.Resources.add;
             tsbAdd.ImageTransparentColor = Color.Magenta;
             tsbAdd.Name = "tsbAdd";
-            tsbAdd.Size = new Size(23, 22);
+            tsbAdd.Size = new Size(23, 28);
             tsbAdd.Text = "Добавить";
             tsbAdd.ToolTipText = "Добавить(Insert)";
             // 
@@ -88,7 +94,7 @@
             tsbDel.Image = Properties.Resources.delete;
             tsbDel.ImageTransparentColor = Color.Magenta;
             tsbDel.Name = "tsbDel";
-            tsbDel.Size = new Size(23, 22);
+            tsbDel.Size = new Size(23, 28);
             tsbDel.Text = "Удалить";
             tsbDel.ToolTipText = "Удалить(Delete)";
             tsbDel.Visible = false;
@@ -100,22 +106,22 @@
             tsbRepair.Image = Properties.Resources.undelete;
             tsbRepair.ImageTransparentColor = Color.Magenta;
             tsbRepair.Name = "tsbRepair";
-            tsbRepair.Size = new Size(23, 22);
+            tsbRepair.Size = new Size(23, 28);
             tsbRepair.Text = "Востановить";
             tsbRepair.ToolTipText = "Востановить(Ctrl+R)";
             tsbRepair.Visible = false;
             tsbRepair.Click += tsbDelOrRepairOnClick;
             // 
-            // toolStripSeparator1
+            // tssFilter
             // 
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 25);
+            tssFilter.Name = "tssFilter";
+            tssFilter.Size = new Size(6, 31);
             // 
             // tstbSearh
             // 
             tstbSearh.BorderStyle = BorderStyle.FixedSingle;
             tstbSearh.Name = "tstbSearh";
-            tstbSearh.Size = new Size(100, 25);
+            tstbSearh.Size = new Size(100, 31);
             tstbSearh.ToolTipText = "Поиск(Enter)";
             tstbSearh.KeyPress += tstbSearhOnKeyPress;
             // 
@@ -125,7 +131,7 @@
             tsbSearh.Image = Properties.Resources.searh;
             tsbSearh.ImageTransparentColor = Color.Magenta;
             tsbSearh.Name = "tsbSearh";
-            tsbSearh.Size = new Size(23, 22);
+            tsbSearh.Size = new Size(23, 28);
             tsbSearh.Text = "Поиск";
             tsbSearh.ToolTipText = "Поиск";
             tsbSearh.Click += tsbSearhOnClick;
@@ -137,7 +143,7 @@
             tsddbFilter.Image = Properties.Resources.filter;
             tsddbFilter.ImageTransparentColor = Color.Magenta;
             tsddbFilter.Name = "tsddbFilter";
-            tsddbFilter.Size = new Size(29, 22);
+            tsddbFilter.Size = new Size(29, 28);
             tsddbFilter.Text = "Фильтр";
             tsddbFilter.ToolTipText = "Фильтр(Поиск/Фильтрация/Сортировка)";
             // 
@@ -199,6 +205,63 @@
             tsmiShowExacNotRemoving.ToolTipText = "Отобразить только не удаленные(Ctrl+S+V)";
             tsmiShowExacNotRemoving.Click += tsmiRemoveModeShowOnClick;
             // 
+            // tsddbSettingsListView
+            // 
+            tsddbSettingsListView.Alignment = ToolStripItemAlignment.Right;
+            tsddbSettingsListView.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsddbSettingsListView.DropDownItems.AddRange(new ToolStripItem[] { tsmiPager });
+            tsddbSettingsListView.Image = Properties.Resources.setings;
+            tsddbSettingsListView.ImageTransparentColor = Color.Magenta;
+            tsddbSettingsListView.Name = "tsddbSettingsListView";
+            tsddbSettingsListView.Size = new Size(29, 28);
+            tsddbSettingsListView.Text = "Настройки и расширения списка";
+            // 
+            // tsmiPager
+            // 
+            tsmiPager.DropDownItems.AddRange(new ToolStripItem[] { tsmiPagerCheckit, tslPager, tsmitbLimitPage, tsmiRepairLimitPage });
+            tsmiPager.Image = Properties.Resources.pager;
+            tsmiPager.Name = "tsmiPager";
+            tsmiPager.Size = new Size(141, 22);
+            tsmiPager.Text = "Страничник";
+            tsmiPager.ToolTipText = "Страничник";
+            // 
+            // tsmiPagerCheckit
+            // 
+            tsmiPagerCheckit.BackColor = Color.MistyRose;
+            tsmiPagerCheckit.CheckOnClick = true;
+            tsmiPagerCheckit.Image = Properties.Resources.uncheckible;
+            tsmiPagerCheckit.Name = "tsmiPagerCheckit";
+            tsmiPagerCheckit.Size = new Size(171, 22);
+            tsmiPagerCheckit.Text = "Включить(Ctrl+P)";
+            tsmiPagerCheckit.ToolTipText = "Включить постраничный вывод(Ctrl+P)";
+            tsmiPagerCheckit.CheckedChanged += tsmiPagerCheckitOnCheckedChanged;
+            // 
+            // tslPager
+            // 
+            tslPager.Name = "tslPager";
+            tslPager.Size = new Size(106, 15);
+            tslPager.Text = "Количество строк";
+            tslPager.Visible = false;
+            // 
+            // tsmitbLimitPage
+            // 
+            tsmitbLimitPage.BorderStyle = BorderStyle.FixedSingle;
+            tsmitbLimitPage.Name = "tsmitbLimitPage";
+            tsmitbLimitPage.Size = new Size(100, 23);
+            tsmitbLimitPage.ToolTipText = "Укажите количество выводимых строк или плиток на одной странице";
+            tsmitbLimitPage.Visible = false;
+            tsmitbLimitPage.KeyPress += tsmitbLimitPageOnKeyPress;
+            // 
+            // tsmiRepairLimitPage
+            // 
+            tsmiRepairLimitPage.Image = Properties.Resources.repair_setting;
+            tsmiRepairLimitPage.Name = "tsmiRepairLimitPage";
+            tsmiRepairLimitPage.Size = new Size(171, 22);
+            tsmiRepairLimitPage.Text = "Востановить";
+            tsmiRepairLimitPage.ToolTipText = "Востановить значение из настроек";
+            tsmiRepairLimitPage.Visible = false;
+            tsmiRepairLimitPage.Click += tsmiRepairLimitPageOnClick;
+            // 
             // tsbTileMode
             // 
             tsbTileMode.Alignment = ToolStripItemAlignment.Right;
@@ -206,7 +269,7 @@
             tsbTileMode.Image = Properties.Resources.tile_mode;
             tsbTileMode.ImageTransparentColor = Color.Magenta;
             tsbTileMode.Name = "tsbTileMode";
-            tsbTileMode.Size = new Size(23, 22);
+            tsbTileMode.Size = new Size(23, 28);
             tsbTileMode.Tag = "0";
             tsbTileMode.Text = "Отображать плиткой";
             tsbTileMode.ToolTipText = "Отображать плиткой(Ctrl+U)";
@@ -219,7 +282,7 @@
             tsbRowMode.Image = Properties.Resources.row_mode;
             tsbRowMode.ImageTransparentColor = Color.Magenta;
             tsbRowMode.Name = "tsbRowMode";
-            tsbRowMode.Size = new Size(23, 22);
+            tsbRowMode.Size = new Size(23, 28);
             tsbRowMode.Tag = "1";
             tsbRowMode.Text = "Отображать строками";
             tsbRowMode.ToolTipText = "Отображать строками(Ctrl+U)";
@@ -233,7 +296,7 @@
             tsbGrid.Image = Properties.Resources.grid;
             tsbGrid.ImageTransparentColor = Color.Magenta;
             tsbGrid.Name = "tsbGrid";
-            tsbGrid.Size = new Size(23, 22);
+            tsbGrid.Size = new Size(23, 28);
             tsbGrid.Text = "Отобразить сетку";
             tsbGrid.ToolTipText = "Отобразить сетку(Ctrl+G)";
             tsbGrid.Visible = false;
@@ -246,10 +309,81 @@
             tsbNonGrid.Image = Properties.Resources.non_grid;
             tsbNonGrid.ImageTransparentColor = Color.Magenta;
             tsbNonGrid.Name = "tsbNonGrid";
-            tsbNonGrid.Size = new Size(23, 22);
+            tsbNonGrid.Size = new Size(23, 28);
             tsbNonGrid.Text = "Скрыть сетку";
             tsbNonGrid.ToolTipText = "Скрыть сетку(Ctrl+G)";
             tsbNonGrid.Click += tsbGridOnClick;
+            // 
+            // tssPager
+            // 
+            tssPager.Name = "tssPager";
+            tssPager.Size = new Size(6, 31);
+            // 
+            // tsbStartPage
+            // 
+            tsbStartPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbStartPage.Image = Properties.Resources.left_dou_arrow;
+            tsbStartPage.ImageTransparentColor = Color.Magenta;
+            tsbStartPage.Name = "tsbStartPage";
+            tsbStartPage.Size = new Size(23, 28);
+            tsbStartPage.Tag = "2";
+            tsbStartPage.Text = "В начало списка(Ctrl+H)";
+            tsbStartPage.Click += tsbActionPageOnClick;
+            // 
+            // tsbBackPage
+            // 
+            tsbBackPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbBackPage.Image = Properties.Resources.left_arrow;
+            tsbBackPage.ImageTransparentColor = Color.Magenta;
+            tsbBackPage.Name = "tsbBackPage";
+            tsbBackPage.Size = new Size(23, 28);
+            tsbBackPage.Tag = "1";
+            tsbBackPage.Text = "Предыдущая страница(Ctrl+B)";
+            tsbBackPage.Click += tsbActionPageOnClick;
+            // 
+            // tstbActualPage
+            // 
+            tstbActualPage.BorderStyle = BorderStyle.FixedSingle;
+            tstbActualPage.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            tstbActualPage.Margin = new Padding(1, 0, 1, 2);
+            tstbActualPage.Name = "tstbActualPage";
+            tstbActualPage.Size = new Size(40, 29);
+            tstbActualPage.Tag = "0";
+            tstbActualPage.Text = "1";
+            tstbActualPage.TextBoxTextAlign = HorizontalAlignment.Center;
+            tstbActualPage.ToolTipText = "Текущая старница(Enter)";
+            tstbActualPage.KeyPress += tstbActualPageOnKeyPress;
+            // 
+            // tslCountPages
+            // 
+            tslCountPages.Font = new Font("Segoe UI", 12F);
+            tslCountPages.Name = "tslCountPages";
+            tslCountPages.Size = new Size(37, 28);
+            tslCountPages.Text = "/cnt";
+            tslCountPages.ToolTipText = "Всего cnt страниц";
+            // 
+            // tsbNextPage
+            // 
+            tsbNextPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbNextPage.Image = Properties.Resources.right_arrow;
+            tsbNextPage.ImageTransparentColor = Color.Magenta;
+            tsbNextPage.Name = "tsbNextPage";
+            tsbNextPage.Size = new Size(23, 28);
+            tsbNextPage.Tag = "0";
+            tsbNextPage.Text = "Следующая страница(Ctrl+N)";
+            tsbNextPage.ToolTipText = "Следующая страница(Ctrl+N)";
+            tsbNextPage.Click += tsbActionPageOnClick;
+            // 
+            // tsbEndPage
+            // 
+            tsbEndPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbEndPage.Image = Properties.Resources.right_dou_arrow;
+            tsbEndPage.ImageTransparentColor = Color.Magenta;
+            tsbEndPage.Name = "tsbEndPage";
+            tsbEndPage.Size = new Size(23, 28);
+            tsbEndPage.Tag = "3";
+            tsbEndPage.Text = "Последняя страница(Ctrl+E)";
+            tsbEndPage.Click += tsbActionPageOnClick;
             // 
             // lvModel
             // 
@@ -257,9 +391,9 @@
             lvModel.Dock = DockStyle.Fill;
             lvModel.FullRowSelect = true;
             lvModel.GridLines = true;
-            lvModel.Location = new Point(0, 25);
+            lvModel.Location = new Point(0, 31);
             lvModel.Name = "lvModel";
-            lvModel.Size = new Size(900, 451);
+            lvModel.Size = new Size(900, 445);
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;
@@ -300,61 +434,6 @@
             tsmiRepair.Visible = false;
             tsmiRepair.Click += tsbDelOrRepairOnClick;
             // 
-            // toolStripSeparator2
-            // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new Size(6, 25);
-            // 
-            // tsbStartPage
-            // 
-            tsbStartPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbStartPage.Image = Properties.Resources.left_dou_arrow;
-            tsbStartPage.ImageTransparentColor = Color.Magenta;
-            tsbStartPage.Name = "tsbStartPage";
-            tsbStartPage.Size = new Size(23, 22);
-            tsbStartPage.Text = "В начало списка(Ctrl+Home)";
-            // 
-            // tsbBackPage
-            // 
-            tsbBackPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbBackPage.Image = Properties.Resources.left_arrow;
-            tsbBackPage.ImageTransparentColor = Color.Magenta;
-            tsbBackPage.Name = "tsbBackPage";
-            tsbBackPage.Size = new Size(23, 22);
-            tsbBackPage.Text = "Предыдущая страница(Ctrl+←)";
-            // 
-            // tstbActualPage
-            // 
-            tstbActualPage.BorderStyle = BorderStyle.FixedSingle;
-            tstbActualPage.Name = "tstbActualPage";
-            tstbActualPage.Size = new Size(40, 25);
-            tstbActualPage.ToolTipText = "Текщая старница(Enter)";
-            // 
-            // tslCountPages
-            // 
-            tslCountPages.Name = "tslCountPages";
-            tslCountPages.Size = new Size(29, 22);
-            tslCountPages.Text = "/cnt";
-            tslCountPages.ToolTipText = "Всего cnt страниц";
-            // 
-            // tsbNextPage
-            // 
-            tsbNextPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbNextPage.Image = Properties.Resources.right_arrow;
-            tsbNextPage.ImageTransparentColor = Color.Magenta;
-            tsbNextPage.Name = "tsbNextPage";
-            tsbNextPage.Size = new Size(23, 22);
-            tsbNextPage.Text = "Следующая страница(Ctrl+→)";
-            // 
-            // tsbEndPage
-            // 
-            tsbEndPage.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbEndPage.Image = Properties.Resources.right_dou_arrow;
-            tsbEndPage.ImageTransparentColor = Color.Magenta;
-            tsbEndPage.Name = "tsbEndPage";
-            tsbEndPage.Size = new Size(23, 22);
-            tsbEndPage.Text = "Последняя страница(Ctrl+End)";
-            // 
             // DBModelListView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -376,7 +455,7 @@
         private ToolStrip tsListMenu;
         private ToolStripButton tsbAdd;
         private ToolStripButton tsbDel;
-        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator tssFilter;
         private ToolStripTextBox tstbSearh;
         private ToolStripButton tsbSearh;
         private ToolStripDropDownButton tsddbFilter;
@@ -396,12 +475,18 @@
         private ToolStripButton tsbRowMode;
         private ToolStripButton tsbGrid;
         private ToolStripButton tsbNonGrid;
-        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripSeparator tssPager;
         private ToolStripButton tsbStartPage;
         private ToolStripButton tsbBackPage;
         private ToolStripTextBox tstbActualPage;
         private ToolStripLabel tslCountPages;
         private ToolStripButton tsbNextPage;
         private ToolStripButton tsbEndPage;
+        private ToolStripDropDownButton tsddbSettingsListView;
+        private ToolStripMenuItem tsmiPager;
+        private ToolStripMenuItem tsmiPagerCheckit;
+        private ToolStripLabel tslPager;
+        private ToolStripTextBox tsmitbLimitPage;
+        private ToolStripMenuItem tsmiRepairLimitPage;
     }
 }

@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 
 namespace DataBaseProvaider
 {
@@ -191,11 +192,7 @@ namespace DataBaseProvaider
         /// </returns>
         async public static Task<BindingList<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod)
         {
-            MethodInfo method = typeof(DBProvider).GetMethod(nameMethod);
-            MethodInfo genericMethod = method.MakeGenericMethod(type);
-
-            Task task = genericMethod.Invoke(null, parametrs) as Task;
-            await task.ConfigureAwait(false);
+            Task task = await type.InvokeMethodByType(parametrs, nameMethod);
 
             IEnumerable<T> collection = ((dynamic)task).Result;
 
@@ -209,13 +206,32 @@ namespace DataBaseProvaider
         /// <param name="parametrs">Параметры вызываемого метода</param>
         /// <param name="nameMethod">Наименование метода</param>
         /// <returns>Процес</returns>
-        async public static Task InvokeMethodByType(this Type type, object[] parametrs, string nameMethod)
+        async public static Task<Task> InvokeMethodByType(this Type type, object[] parametrs, string nameMethod)
         {
             MethodInfo method = typeof(DBProvider).GetMethod(nameMethod);
             MethodInfo genericMethod = method.MakeGenericMethod(type);
 
             Task task = genericMethod.Invoke(null, parametrs) as Task;
             await task.ConfigureAwait(false);
+
+            return task;
+        }
+
+        /// <summary>
+        /// Вызов метода возращающего значение запрашиваемого типа
+        /// </summary>
+        /// <typeparam name="T">Запрашиваемый тип</typeparam>
+        /// <param name="type">Тип модели</param>
+        /// <param name="parametrs">Параметры вызываемого метода</param>
+        /// <param name="nameMethod">Наименование метода</param>
+        /// <returns>Значение запрашиваемого типа</returns>
+        async public static Task<T> GetResultByType<T>(this Type type, object[] parametrs, string nameMethod)
+        {
+            Task task = await type.InvokeMethodByType(parametrs, nameMethod);
+
+            T result = (T)((dynamic)task).Result;
+
+            return result;
         }
 
         /// <summary>
@@ -312,7 +328,7 @@ namespace DataBaseProvaider
         {
             string limitStr = String.Empty;
 
-            if (collection.Limit != 0)
+            if (collection.Limit > 0)
             {
                 limitStr = String.Format(" LIMIT {0}", collection.Limit);
             }
@@ -329,7 +345,7 @@ namespace DataBaseProvaider
         {
             string offsetStr = String.Empty;
 
-            if (collection.Offset != 0)
+            if (collection.Offset > 0)
             {
                 offsetStr = String.Format(" OFFSET {0}", collection.Offset);
             }
