@@ -65,6 +65,8 @@
             tsmiAdd = new ToolStripMenuItem();
             tsmiDel = new ToolStripMenuItem();
             tsmiRepair = new ToolStripMenuItem();
+            tsmiAllCountShow = new ToolStripMenuItem();
+            tsmiEnterCountShow = new ToolStripMenuItem();
             tsListMenu.SuspendLayout();
             cmsModel.SuspendLayout();
             SuspendLayout();
@@ -209,7 +211,7 @@
             // 
             tsddbSettingsListView.Alignment = ToolStripItemAlignment.Right;
             tsddbSettingsListView.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsddbSettingsListView.DropDownItems.AddRange(new ToolStripItem[] { tsmiPager });
+            tsddbSettingsListView.DropDownItems.AddRange(new ToolStripItem[] { tsmiPager, tsmiAllCountShow, tsmiEnterCountShow });
             tsddbSettingsListView.Image = Properties.Resources.setings;
             tsddbSettingsListView.ImageTransparentColor = Color.Magenta;
             tsddbSettingsListView.Name = "tsddbSettingsListView";
@@ -221,7 +223,7 @@
             tsmiPager.DropDownItems.AddRange(new ToolStripItem[] { tsmiPagerCheckit, tslPager, tsmitbLimitPage, tsmiRepairLimitPage });
             tsmiPager.Image = Properties.Resources.pager;
             tsmiPager.Name = "tsmiPager";
-            tsmiPager.Size = new Size(141, 22);
+            tsmiPager.Size = new Size(269, 22);
             tsmiPager.Text = "Страничник";
             tsmiPager.ToolTipText = "Страничник";
             // 
@@ -435,6 +437,24 @@
             tsmiRepair.Visible = false;
             tsmiRepair.Click += tsbDelOrRepairOnClick;
             // 
+            // tsmiAllCountShow
+            // 
+            tsmiAllCountShow.BackColor = Color.MistyRose;
+            tsmiAllCountShow.Image = Properties.Resources.uncheckible;
+            tsmiAllCountShow.Name = "tsmiAllCountShow";
+            tsmiAllCountShow.Size = new Size(269, 22);
+            tsmiAllCountShow.Text = "Отобразить общее количество";
+            tsmiAllCountShow.ToolTipText = "Отобразить общее количество строк";
+            // 
+            // tsmiEnterCountShow
+            // 
+            tsmiEnterCountShow.BackColor = Color.MistyRose;
+            tsmiEnterCountShow.Image = Properties.Resources.uncheckible;
+            tsmiEnterCountShow.Name = "tsmiEnterCountShow";
+            tsmiEnterCountShow.Size = new Size(269, 22);
+            tsmiEnterCountShow.Text = "Отобразить количество выделений";
+            tsmiEnterCountShow.ToolTipText = "Отобразить количество выделеных строк";
+            // 
             // DBModelListView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -489,5 +509,7 @@
         private ToolStripLabel tslPager;
         private ToolStripTextBox tsmitbLimitPage;
         private ToolStripMenuItem tsmiRepairLimitPage;
+        private ToolStripMenuItem tsmiAllCountShow;
+        private ToolStripMenuItem tsmiEnterCountShow;
     }
 }

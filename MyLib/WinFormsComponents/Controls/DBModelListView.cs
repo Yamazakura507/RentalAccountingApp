@@ -103,10 +103,22 @@ namespace WinFormsComponents.Controls
         public bool IsGridLines { get; set; } = true;
 
         /// <summary>
+        /// Отображение общего количества строк
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsShowCountAll { get; set; } = true;
+
+        /// <summary>
+        /// Отображение количества выделеных строк
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsShowCountEnter { get; set; } = true;
+
+        /// <summary>
         /// Включить постраничный вывод
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public int PageLimit { get; set; } = 0; 
+        public int PageLimit { get; set; } = 0;
 
         /// <summary>
         /// Настройка взаимодействия с БД(Удаление/Оновление)
@@ -606,16 +618,16 @@ namespace WinFormsComponents.Controls
                 { true, ("Выключить(Ctrl+P)", "Выключить постраничный вывод(Ctrl+P)", FilterOnColor) }
             };
 
-            FilterFunction.CheckedChangedItemMenu(tsmiPagerCheckit,parametrs);
+            FilterFunction.CheckedChangedItemMenu(tsmiPagerCheckit, parametrs);
             tslPager.Visible = tsmitbLimitPage.Visible = tsmiPagerCheckit.Checked;
             tsmiRepairLimitPage.Visible = tsmiPagerCheckit.Checked && Properties.Settings.Default.Limit != 0;
 
             if (tsmiPagerCheckit.Checked)
             {
-                tsmitbLimitPage.Text = Properties.Settings.Default.Limit != 0 && PageLimit == 0 
-                                        ? Properties.Settings.Default.Limit.ToString() 
-                                        : PageLimit == 0 
-                                            ? "100" 
+                tsmitbLimitPage.Text = Properties.Settings.Default.Limit != 0 && PageLimit == 0
+                                        ? Properties.Settings.Default.Limit.ToString()
+                                        : PageLimit == 0
+                                            ? "100"
                                             : PageLimit.ToString();
             }
         }
