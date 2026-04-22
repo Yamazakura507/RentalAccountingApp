@@ -392,8 +392,9 @@
             lvModel.FullRowSelect = true;
             lvModel.GridLines = true;
             lvModel.Location = new Point(0, 31);
+            lvModel.MinimumSize = new Size(900, 450);
             lvModel.Name = "lvModel";
-            lvModel.Size = new Size(900, 445);
+            lvModel.Size = new Size(900, 450);
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;

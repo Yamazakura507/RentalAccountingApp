@@ -18,6 +18,7 @@ namespace WinFormsComponents.Controls
         private readonly IFilter searchFilter;
         private readonly IListViewLoader listViewLoader;
         private string parametrRemovingName = null;
+        private Loader loader = new();
 
         /// <summary>
         /// Колекция элементов списка
@@ -122,6 +123,7 @@ namespace WinFormsComponents.Controls
             Parameters ??= new();
             TermsOfInteractionDB ??= new();
             tsmiPager.DropDown.Closing += PagerDropDownOnClosing;
+            loader.AutoSetup(this);
         }
 
         /// <summary>
@@ -131,13 +133,18 @@ namespace WinFormsComponents.Controls
         {
             lvModel.GroupImageList = lvModel.StateImageList = lvModel.LargeImageList = lvModel.SmallImageList = ImageList;
             parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false)?.Name;
+            loader.Visible = true;
             tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
 
             CreateParametrShowRemoving();
-            await UpdateCountPage(PageLimit == 0 ? Properties.Settings.Default.Limit : PageLimit);
             ShowVisibleMode(VisibleMode);
             ShowGridVisible(IsGridLines);
             CheckSearch();
+
+            if (!await UpdateCountPage(PageLimit == 0 ? Properties.Settings.Default.Limit : PageLimit))
+            {
+                await LoadListAsync();
+            }
         }
 
         /// <summary>
@@ -302,6 +309,7 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private async Task LoadListAsync()
         {
+            loader.StartAnimation();
             lvModel.SelectedItems.Clear();
 
             foreach (ConditionsParametr condition in Parameters.Conditions.Where(i => i?.IsSerhing ?? false))
@@ -312,6 +320,7 @@ namespace WinFormsComponents.Controls
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
             listViewLoader.PopulateListView(lvModel, modelType, Items);
+            loader.StopAnimation();
         }
 
         /// <summary>
@@ -358,7 +367,7 @@ namespace WinFormsComponents.Controls
         /// </summary>
         /// <param name="limit">Ограничитель вывода страницы</param>
         /// <returns>Процес</returns>
-        private async Task UpdateCountPage(int limit)
+        private async Task<bool> UpdateCountPage(int limit)
         {
             bool isLimiter = limit != 0;
             tsbStartPage.Visible = tsbEndPage.Visible
@@ -381,6 +390,8 @@ namespace WinFormsComponents.Controls
                 if (nowPage > count) await UpdatePager(ActionPager.End);
                 else await UpdatePager(ActionPager.Enter);
             }
+
+            return isLimiter;
         }
 
         /// <summary>
@@ -447,9 +458,10 @@ namespace WinFormsComponents.Controls
         {
             if (!this.Enabled) return;
 
-            await LoadInfo();
+            loader.StartAnimation();
+
             ColumnLoad();
-            await LoadListAsync();
+            await LoadInfo().ContinueWith(_ => this.Invoke(() => loader.StopAnimation()));
         }
 
         private async void tstbSearhOnKeyPress(object sender, KeyPressEventArgs e)

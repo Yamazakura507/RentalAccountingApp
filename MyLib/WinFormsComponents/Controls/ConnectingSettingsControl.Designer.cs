@@ -42,8 +42,6 @@
             tsbDelete = new ToolStripButton();
             tsbConnect = new ToolStripButton();
             toolStripSeparator1 = new ToolStripSeparator();
-            tspbProgress = new ToolStripProgressBar();
-            tslProgress = new ToolStripLabel();
             btLockPassword = new Button();
             tbPassword = new TextBox();
             tbLogin = new TextBox();
@@ -117,7 +115,7 @@
             // 
             // tsMenu
             // 
-            tsMenu.Items.AddRange(new ToolStripItem[] { tsbSave, tsbAdd, tsbDelete, tsbConnect, toolStripSeparator1, tspbProgress, tslProgress });
+            tsMenu.Items.AddRange(new ToolStripItem[] { tsbSave, tsbAdd, tsbDelete, tsbConnect, toolStripSeparator1 });
             tsMenu.Location = new Point(0, 0);
             tsMenu.Name = "tsMenu";
             tsMenu.Size = new Size(966, 25);
@@ -169,22 +167,6 @@
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
             toolStripSeparator1.Size = new Size(6, 25);
-            // 
-            // tspbProgress
-            // 
-            tspbProgress.MarqueeAnimationSpeed = 30;
-            tspbProgress.Name = "tspbProgress";
-            tspbProgress.Size = new Size(100, 22);
-            tspbProgress.Style = ProgressBarStyle.Marquee;
-            tspbProgress.Visible = false;
-            tspbProgress.VisibleChanged += tspbProgressOnVisibleChanged;
-            // 
-            // tslProgress
-            // 
-            tslProgress.Name = "tslProgress";
-            tslProgress.Size = new Size(64, 22);
-            tslProgress.Text = "tslProgress";
-            tslProgress.Visible = false;
             // 
             // btLockPassword
             // 
@@ -345,8 +327,6 @@
         private ToolStripButton tsbDelete;
         private ToolStripButton tsbConnect;
         private ToolStripSeparator toolStripSeparator1;
-        private ToolStripProgressBar tspbProgress;
-        private ToolStripLabel tslProgress;
         private Button btLockPassword;
         private TextBox tbPassword;
         private TextBox tbLogin;

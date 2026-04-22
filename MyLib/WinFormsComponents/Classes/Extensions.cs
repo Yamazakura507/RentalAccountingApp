@@ -2,6 +2,7 @@
 using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Objects;
 using System.Reflection;
+using WinFormsComponents.Controls;
 
 namespace WinFormsComponents.Classes
 {
@@ -15,11 +16,10 @@ namespace WinFormsComponents.Classes
         /// </summary>
         /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceLock(this Control loaderControl, ToolStripProgressBar progress = null)
+        public static void InterfaceLock(this Control loaderControl, Loader loader)
         {
             loaderControl.Enabled = false;
-            progress?.Visible = true;
-            progress?.Enabled = true;
+            loader.Visible = true;
         }
 
         /// <summary>
@@ -27,35 +27,10 @@ namespace WinFormsComponents.Classes
         /// </summary>
         /// <param name="loaderControl">Форма</param>
         /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceUnlock(this Control loaderControl, ToolStripProgressBar progress = null)
+        public static void InterfaceUnlock(this Control loaderControl, Loader loader)
         {
             loaderControl.Enabled = true;
-            progress?.Visible = false;
-            progress?.Enabled = false;
-        }
-
-        /// <summary>
-        /// Блокировка интерфейса формы
-        /// </summary>
-        /// <param name="loaderControl">Форма</param>
-        /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceLock(this Control loaderControl, ProgressBar progress = null)
-        {
-            loaderControl.Enabled = false;
-            progress?.Visible = true;
-            progress?.Enabled = true;
-        }
-
-        /// <summary>
-        /// Разблокировка интерфейса формы
-        /// </summary>
-        /// <param name="loaderControl">Форма</param>
-        /// <param name="progress">Исключить прогрес бар</param>
-        public static void InterfaceUnlock(this Control loaderControl, ProgressBar progress = null)
-        {
-            loaderControl.Enabled = true;
-            progress?.Visible = false;
-            progress?.Enabled = false;
+            loader.Visible = false;
         }
 
         /// <summary>
@@ -140,6 +115,19 @@ namespace WinFormsComponents.Classes
             countPage = countPage / limit;
 
             return Convert.ToInt32(Math.Ceiling(countPage));
+        }
+
+        /// <summary>
+        /// Получение случайного цвета
+        /// </summary>
+        /// <returns>Цвет</returns>
+        public static Color RandomColor()
+        {
+            KnownColor[] names = (KnownColor[])Enum.GetValues(typeof(KnownColor));
+            KnownColor randomName = names[Random.Shared.Next(names.Length)];
+            Color randomColor = Color.FromKnownColor(randomName);
+
+            return randomColor;
         }
     }
 }

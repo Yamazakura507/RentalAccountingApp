@@ -1,21 +1,24 @@
-﻿using WinFormsComponents.Classes.Model;
-using WinFormsComponents.Classes;
+﻿using WinFormsComponents.Classes;
+using WinFormsComponents.Classes.Model;
+using WinFormsComponents.Controls;
 
 namespace WinFormsComponents
 {
     public partial class ConnectingSettingsControl : UserControl
     {
         private List<ConnectionElement> Connections { get; set; }
-        private Form ThisForm { get; set; }
+
+        private Loader loader = new();
 
         public ConnectingSettingsControl()
         {
             InitializeComponent();
+            loader.AutoSetup(this);
         }
 
         private void SettingsConnectControlOnLoad(object sender, EventArgs e)
         {
-            ThisForm = this.GetForm();
+            loader.StartAnimation();
 
             if (!File.Exists("connection_list.json"))
             {
@@ -25,6 +28,7 @@ namespace WinFormsComponents
             }
 
             LoadConnectionList();
+            loader.StopAnimation();
         }
 
         /// <summary>
@@ -98,14 +102,12 @@ namespace WinFormsComponents
         /// <param name="actionSave">Действие при сохранении: 0 - Изменение, 1 - Добавление, 2 - Удаление</param>
         private void SaveConnections(int actionSave = 0)
         {
-            ThisForm.InterfaceLock(tspbProgress);
-            tslProgress.Text = "Проверка соединения...";
+            loader.StopAnimation();
 
             ConnectionElement connection = new(true, tbHost.Text, Convert.ToInt32(tbPort.Text), tbLogin.Text, tbPassword.Text, tbDataBase.Text);
 
             if (actionSave != 2 && !connection.ConnectionBuilder.IsCheckConection())
             {
-                tslProgress.Text = "Соединение не установлено!";
                 DialogResult result = InfoViewer.QuestionMessege("Соединение не установлено!\nСохранить соединение?", MessageBoxButtons.YesNoCancel);
 
                 switch (result)
@@ -116,12 +118,9 @@ namespace WinFormsComponents
                         break;
                     case DialogResult.Cancel:
                     case DialogResult.No:
-                        ThisForm.InterfaceUnlock(tspbProgress);
                         return;
                 }
             }
-
-            tslProgress.Text = "Сохранение...";
 
             Connections.ForEach(i => i.IsActive = false);
 
@@ -149,15 +148,10 @@ namespace WinFormsComponents
             Connections.ToArray().Save();
             LoadConnectionList();
 
-            ThisForm.InterfaceUnlock(tspbProgress);
+            loader.StopAnimation();
         }
 
         private void tbPortOnKeyPress(object sender, KeyPressEventArgs e) => e.NumRestrictionTextBox();
-
-        private void tspbProgressOnVisibleChanged(object sender, EventArgs e)
-        {
-            tslProgress.Enabled = tslProgress.Visible = tspbProgress.Visible;
-        }
 
         private void btLockPasswordOnEnabledChanged(object sender, EventArgs e)
         {
