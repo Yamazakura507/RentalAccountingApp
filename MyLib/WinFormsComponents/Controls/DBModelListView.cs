@@ -147,6 +147,8 @@ namespace WinFormsComponents.Controls
             parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false)?.Name;
             loader.Visible = true;
             tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
+            tsmiAllCountShow.Checked = IsShowCountAll;
+            tsmiEnterCountShow.Checked = IsShowCountEnter;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
@@ -238,7 +240,10 @@ namespace WinFormsComponents.Controls
             ShowDeleted = showRemooving;
             Parameters.Conditions -= Parameters.Conditions.FirstOrDefault(i => i.ColumnName.Equals(parametrRemovingName));
             CreateParametrShowRemoving();
-            await UpdateCountPage(Parameters.Limit);
+
+            if (Parameters.Limit == 0) await LoadListAsync();
+            else await UpdateCountPage(Parameters.Limit);
+            
         }
 
         /// <summary>
@@ -332,6 +337,12 @@ namespace WinFormsComponents.Controls
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
             listViewLoader.PopulateListView(lvModel, modelType, Items);
+
+            if (IsShowCountAll)
+            {
+                tslAllCount.Text = String.Format("Всего: {0}", await modelType.GetResultByType<int>([Parameters.Conditions], "Count"));
+            }
+
             loader.StopAnimation();
         }
 
@@ -466,6 +477,31 @@ namespace WinFormsComponents.Controls
                 }).Unwrap();
         }
 
+        /// <summary>
+        /// Проверка на наличие отображаемой информации
+        /// </summary>
+        private void IsInformationBar() => tsIformationBar.Visible = IsShowCountAll || IsShowCountEnter;
+
+        /// <summary>
+        /// Заполнение/Скрытие иформации списка
+        /// </summary>
+        /// <param name="tsmiInformationShow">Элемент меню отвечающий за доступность информации</param>
+        /// <param name="parametrs">Набор параметров для элемента меню</param>
+        /// <param name="info">Кортеж с выводимой информацией (информаци, формат вывода, элемент вывода)</param>
+        private void InformationChecket(ToolStripMenuItem tsmiInformationShow, Dictionary<bool, (string, string, Color)> parametrs, (int valueInfo, string valueFormat, ToolStripLabel lbInfo) info)
+        {
+            info.lbInfo.Visible = tsmiInformationShow.Checked;
+
+            if (tsmiInformationShow.Checked)
+            {
+                info.lbInfo.Text = String.Format(info.valueFormat, info.valueInfo);
+            }
+
+            FilterFunction.CheckedChangedItemMenu(tsmiInformationShow, parametrs);
+
+            IsInformationBar();
+        }
+
         private async void DBModelListViewOnLoad(object sender, EventArgs e)
         {
             if (!this.Enabled) return;
@@ -514,6 +550,7 @@ namespace WinFormsComponents.Controls
 
             tsbDel.Visible = isRemove;
             tsbRepair.Visible = isRepair;
+            tslEnterCount.Text = String.Format("Выбрано: {0}", lvModel.SelectedItems.Count);
         }
 
         private void cmsModelOnOpening(object sender, CancelEventArgs e)
@@ -576,7 +613,13 @@ namespace WinFormsComponents.Controls
                     break;
                 case Keys.P when e.Control:
                     tsmiPagerCheckit.Checked = !tsmiPagerCheckit.Checked;
-                    PagerDropDownOnClosing(null, null);
+                    tsmiPager.DropDown.Close();
+                    break;
+                case Keys.Q when e.Control:
+                    tsmiAllCountShow.Checked = !tsmiAllCountShow.Checked;
+                    break;
+                case Keys.F when e.Control:
+                    tsmiEnterCountShow.Checked = !tsmiEnterCountShow.Checked;
                     break;
             }
 
@@ -598,11 +641,13 @@ namespace WinFormsComponents.Controls
 
         private async void PagerDropDownOnClosing(object? sender, ToolStripDropDownClosingEventArgs e)
         {
-            if (e is not null && e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
+            if (e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
             else
             {
                 tsmitbLimitPage.Text = String.IsNullOrEmpty(tsmitbLimitPage.Text) ? "100" : tsmitbLimitPage.Text;
                 await UpdateCountPage(tsmiPagerCheckit.Checked ? Convert.ToInt32(tsmitbLimitPage.Text) : 0);
+
+                if (!tsmiPagerCheckit.Checked) await LoadListAsync();
             }
         }
 
@@ -630,6 +675,30 @@ namespace WinFormsComponents.Controls
                                             ? "100"
                                             : PageLimit.ToString();
             }
+        }
+
+        private void tsmiEnterCountShowOnCheckedChanged(object sender, EventArgs e)
+        {
+            IsShowCountEnter = tsmiEnterCountShow.Checked;
+            Dictionary<bool, (string, string, Color)> parametrs = new()
+            {
+                { false, ("Отобразить выбраное количество(Ctrl+Q)", "Отобразить выбраное количество строк(Ctrl+Q)", FilterOffColor) },
+                { true, ("Скрыть выбраное количество(Ctrl+Q)", "Скрыть выбраное количество строк(Ctrl+Q)", FilterOnColor) }
+            };
+
+            InformationChecket(tsmiEnterCountShow, parametrs, (lvModel.SelectedItems.Count, "Выбрано: {0}", tslEnterCount));
+        }
+
+        private async void tsmiAllCountShowOnCheckedChanged(object sender, EventArgs e)
+        {
+            IsShowCountAll = tsmiAllCountShow.Checked;
+            Dictionary<bool, (string, string, Color)> parametrs = new()
+            {
+                { false, ("Отобразить общее количество(Ctrl+F)", "Отобразить общее количество строк(Ctrl+F)", FilterOffColor) },
+                { true, ("Скрыть общее количество(Ctrl+F)", "Скрыть общее количество строк(Ctrl+F)", FilterOnColor) }
+            };
+
+            InformationChecket(tsmiAllCountShow, parametrs, (await modelType.GetResultByType<int>([Parameters.Conditions], "Count"), "Всего: {0}", tslAllCount));
         }
     }
 }

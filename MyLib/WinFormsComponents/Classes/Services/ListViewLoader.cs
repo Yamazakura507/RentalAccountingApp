@@ -1,7 +1,11 @@
-﻿using DataBaseProvaider.Attributes;
+﻿using DataBaseProvaider;
+using DataBaseProvaider.Attributes;
 using System.ComponentModel;
 using System.Reflection;
+using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Interface;
+using WinFormsComponents.Classes.Model;
+using WinFormsComponents.Controls;
 
 namespace WinFormsComponents.Classes.Services
 {

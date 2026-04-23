@@ -94,29 +94,5 @@ namespace WinFormsComponents.Properties {
                 this["Limit"] = value;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsShowCountAll {
-            get {
-                return ((bool)(this["IsShowCountAll"]));
-            }
-            set {
-                this["IsShowCountAll"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsShowEnterCount {
-            get {
-                return ((bool)(this["IsShowEnterCount"]));
-            }
-            set {
-                this["IsShowEnterCount"] = value;
-            }
-        }
     }
 }

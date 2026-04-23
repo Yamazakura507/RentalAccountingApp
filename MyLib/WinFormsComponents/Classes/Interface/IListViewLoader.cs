@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using WinFormsComponents.Classes.Enums;
+using WinFormsComponents.Controls;
 
 namespace WinFormsComponents.Classes.Interface
 {

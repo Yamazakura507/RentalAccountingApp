@@ -49,6 +49,9 @@
             tslPager = new ToolStripLabel();
             tsmitbLimitPage = new ToolStripTextBox();
             tsmiRepairLimitPage = new ToolStripMenuItem();
+            tsmiAllCountShow = new ToolStripMenuItem();
+            tsmiEnterCountShow = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
             tsbTileMode = new ToolStripButton();
             tsbRowMode = new ToolStripButton();
             tsbGrid = new ToolStripButton();
@@ -65,18 +68,22 @@
             tsmiAdd = new ToolStripMenuItem();
             tsmiDel = new ToolStripMenuItem();
             tsmiRepair = new ToolStripMenuItem();
-            tsmiAllCountShow = new ToolStripMenuItem();
-            tsmiEnterCountShow = new ToolStripMenuItem();
+            tsIformationBar = new ToolStrip();
+            tslAllCount = new ToolStripLabel();
+            tslEnterCount = new ToolStripLabel();
+            tlp = new TableLayoutPanel();
             tsListMenu.SuspendLayout();
             cmsModel.SuspendLayout();
+            tsIformationBar.SuspendLayout();
+            tlp.SuspendLayout();
             SuspendLayout();
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, toolStripSeparator1, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
-            tsListMenu.Size = new Size(900, 31);
+            tsListMenu.Size = new Size(750, 31);
             tsListMenu.TabIndex = 2;
             tsListMenu.Text = "toolStrip1";
             // 
@@ -223,7 +230,7 @@
             tsmiPager.DropDownItems.AddRange(new ToolStripItem[] { tsmiPagerCheckit, tslPager, tsmitbLimitPage, tsmiRepairLimitPage });
             tsmiPager.Image = Properties.Resources.pager;
             tsmiPager.Name = "tsmiPager";
-            tsmiPager.Size = new Size(269, 22);
+            tsmiPager.Size = new Size(307, 22);
             tsmiPager.Text = "Страничник";
             tsmiPager.ToolTipText = "Страничник";
             // 
@@ -263,6 +270,34 @@
             tsmiRepairLimitPage.ToolTipText = "Востановить значение из настроек";
             tsmiRepairLimitPage.Visible = false;
             tsmiRepairLimitPage.Click += tsmiRepairLimitPageOnClick;
+            // 
+            // tsmiAllCountShow
+            // 
+            tsmiAllCountShow.BackColor = Color.MistyRose;
+            tsmiAllCountShow.CheckOnClick = true;
+            tsmiAllCountShow.Image = Properties.Resources.uncheckible;
+            tsmiAllCountShow.Name = "tsmiAllCountShow";
+            tsmiAllCountShow.Size = new Size(307, 22);
+            tsmiAllCountShow.Text = "Отобразить общее количество(Ctrl+F)";
+            tsmiAllCountShow.ToolTipText = "Отобразить общее количество строк(Ctrl+F)";
+            tsmiAllCountShow.CheckedChanged += tsmiAllCountShowOnCheckedChanged;
+            // 
+            // tsmiEnterCountShow
+            // 
+            tsmiEnterCountShow.BackColor = Color.MistyRose;
+            tsmiEnterCountShow.CheckOnClick = true;
+            tsmiEnterCountShow.Image = Properties.Resources.uncheckible;
+            tsmiEnterCountShow.Name = "tsmiEnterCountShow";
+            tsmiEnterCountShow.Size = new Size(307, 22);
+            tsmiEnterCountShow.Text = "Отобразить выбраное количество(Ctrl+Q)";
+            tsmiEnterCountShow.ToolTipText = "Отобразить выбраное количество строк(Ctrl+Q)";
+            tsmiEnterCountShow.CheckedChanged += tsmiEnterCountShowOnCheckedChanged;
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Alignment = ToolStripItemAlignment.Right;
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(6, 31);
             // 
             // tsbTileMode
             // 
@@ -393,10 +428,9 @@
             lvModel.Dock = DockStyle.Fill;
             lvModel.FullRowSelect = true;
             lvModel.GridLines = true;
-            lvModel.Location = new Point(0, 31);
-            lvModel.MinimumSize = new Size(900, 450);
+            lvModel.Location = new Point(3, 3);
             lvModel.Name = "lvModel";
-            lvModel.Size = new Size(900, 450);
+            lvModel.Size = new Size(744, 338);
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;
@@ -437,36 +471,68 @@
             tsmiRepair.Visible = false;
             tsmiRepair.Click += tsbDelOrRepairOnClick;
             // 
-            // tsmiAllCountShow
+            // tsIformationBar
             // 
-            tsmiAllCountShow.BackColor = Color.MistyRose;
-            tsmiAllCountShow.Image = Properties.Resources.uncheckible;
-            tsmiAllCountShow.Name = "tsmiAllCountShow";
-            tsmiAllCountShow.Size = new Size(269, 22);
-            tsmiAllCountShow.Text = "Отобразить общее количество";
-            tsmiAllCountShow.ToolTipText = "Отобразить общее количество строк";
+            tsIformationBar.Dock = DockStyle.Bottom;
+            tsIformationBar.Items.AddRange(new ToolStripItem[] { tslAllCount, tslEnterCount });
+            tsIformationBar.Location = new Point(0, 344);
+            tsIformationBar.Name = "tsIformationBar";
+            tsIformationBar.Size = new Size(750, 25);
+            tsIformationBar.TabIndex = 4;
+            tsIformationBar.Visible = false;
             // 
-            // tsmiEnterCountShow
+            // tslAllCount
             // 
-            tsmiEnterCountShow.BackColor = Color.MistyRose;
-            tsmiEnterCountShow.Image = Properties.Resources.uncheckible;
-            tsmiEnterCountShow.Name = "tsmiEnterCountShow";
-            tsmiEnterCountShow.Size = new Size(269, 22);
-            tsmiEnterCountShow.Text = "Отобразить количество выделений";
-            tsmiEnterCountShow.ToolTipText = "Отобразить количество выделеных строк";
+            tslAllCount.Alignment = ToolStripItemAlignment.Right;
+            tslAllCount.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            tslAllCount.Name = "tslAllCount";
+            tslAllCount.Size = new Size(71, 22);
+            tslAllCount.Text = "Всего: 0";
+            tslAllCount.ToolTipText = "Количество строк в списке всего";
+            tslAllCount.Visible = false;
+            // 
+            // tslEnterCount
+            // 
+            tslEnterCount.Alignment = ToolStripItemAlignment.Right;
+            tslEnterCount.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            tslEnterCount.Name = "tslEnterCount";
+            tslEnterCount.Size = new Size(99, 22);
+            tslEnterCount.Text = "Выбрано: 0";
+            tslEnterCount.ToolTipText = "Количество выбраных строк";
+            tslEnterCount.Visible = false;
+            // 
+            // tlp
+            // 
+            tlp.ColumnCount = 1;
+            tlp.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tlp.Controls.Add(lvModel, 0, 0);
+            tlp.Controls.Add(tsIformationBar, 0, 1);
+            tlp.Dock = DockStyle.Fill;
+            tlp.Location = new Point(0, 31);
+            tlp.Name = "tlp";
+            tlp.RowCount = 2;
+            tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 25F));
+            tlp.Size = new Size(750, 369);
+            tlp.TabIndex = 5;
             // 
             // DBModelListView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            Controls.Add(lvModel);
+            Controls.Add(tlp);
             Controls.Add(tsListMenu);
+            MinimumSize = new Size(530, 130);
             Name = "DBModelListView";
-            Size = new Size(900, 476);
+            Size = new Size(750, 400);
             Load += DBModelListViewOnLoad;
             tsListMenu.ResumeLayout(false);
             tsListMenu.PerformLayout();
             cmsModel.ResumeLayout(false);
+            tsIformationBar.ResumeLayout(false);
+            tsIformationBar.PerformLayout();
+            tlp.ResumeLayout(false);
+            tlp.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -504,12 +570,17 @@
         private ToolStripButton tsbNextPage;
         private ToolStripButton tsbEndPage;
         private ToolStripDropDownButton tsddbSettingsListView;
-        private ToolStripMenuItem tsmiPager;
         private ToolStripMenuItem tsmiPagerCheckit;
         private ToolStripLabel tslPager;
         private ToolStripTextBox tsmitbLimitPage;
         private ToolStripMenuItem tsmiRepairLimitPage;
-        private ToolStripMenuItem tsmiAllCountShow;
-        private ToolStripMenuItem tsmiEnterCountShow;
+        private ToolStrip tsIformationBar;
+        private ToolStripLabel tslAllCount;
+        private ToolStripLabel tslEnterCount;
+        private ToolStripSeparator toolStripSeparator1;
+        public ToolStripMenuItem tsmiAllCountShow;
+        public ToolStripMenuItem tsmiEnterCountShow;
+        public ToolStripMenuItem tsmiPager;
+        private TableLayoutPanel tlp;
     }
 }
