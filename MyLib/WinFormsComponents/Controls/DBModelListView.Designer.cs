@@ -52,6 +52,7 @@
             tsmiRepairLimitPage = new ToolStripMenuItem();
             tsmiAllCountShow = new ToolStripMenuItem();
             tsmiEnterCountShow = new ToolStripMenuItem();
+            tsmiNumeretorVisible = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
             tsbTileMode = new ToolStripButton();
             tsbRowMode = new ToolStripButton();
@@ -233,7 +234,7 @@
             // 
             tsddbSettingsListView.Alignment = ToolStripItemAlignment.Right;
             tsddbSettingsListView.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsddbSettingsListView.DropDownItems.AddRange(new ToolStripItem[] { tsmiPager, tsmiAllCountShow, tsmiEnterCountShow });
+            tsddbSettingsListView.DropDownItems.AddRange(new ToolStripItem[] { tsmiPager, tsmiAllCountShow, tsmiEnterCountShow, tsmiNumeretorVisible });
             tsddbSettingsListView.Image = Properties.Resources.setings;
             tsddbSettingsListView.ImageTransparentColor = Color.Magenta;
             tsddbSettingsListView.Name = "tsddbSettingsListView";
@@ -307,6 +308,17 @@
             tsmiEnterCountShow.Text = "Отобразить выбраное количество(Ctrl+Q)";
             tsmiEnterCountShow.ToolTipText = "Отобразить выбраное количество строк(Ctrl+Q)";
             tsmiEnterCountShow.CheckedChanged += tsmiEnterCountShowOnCheckedChanged;
+            // 
+            // tsmiNumeretorVisible
+            // 
+            tsmiNumeretorVisible.BackColor = Color.MistyRose;
+            tsmiNumeretorVisible.CheckOnClick = true;
+            tsmiNumeretorVisible.Image = Properties.Resources.uncheckible;
+            tsmiNumeretorVisible.Name = "tsmiNumeretorVisible";
+            tsmiNumeretorVisible.Size = new Size(307, 22);
+            tsmiNumeretorVisible.Text = "Включить нумерацию строк(Ctrl+I)";
+            tsmiNumeretorVisible.ToolTipText = "Отобразить колонку с номерами строк(Ctrl+I)";
+            tsmiNumeretorVisible.CheckedChanged += tsmiNumeretorVisibleOnCheckedChanged;
             // 
             // toolStripSeparator1
             // 
@@ -456,7 +468,7 @@
             // 
             cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair, tsmiEdit });
             cmsModel.Name = "cmsModel";
-            cmsModel.Size = new Size(190, 92);
+            cmsModel.Size = new Size(190, 114);
             cmsModel.Opening += cmsModelOnOpening;
             // 
             // tsmiAdd
@@ -610,5 +622,6 @@
         private TableLayoutPanel tlp;
         private ToolStripMenuItem tsmiEdit;
         private ToolStripButton tsbEdit;
+        private ToolStripMenuItem tsmiNumeretorVisible;
     }
 }

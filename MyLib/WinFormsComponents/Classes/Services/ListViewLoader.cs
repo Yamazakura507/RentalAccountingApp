@@ -39,11 +39,14 @@ namespace WinFormsComponents.Classes.Services
             listView.Items.Clear();
 
             PropertyInfo[] propertyCache = modelType.GetProperties();
+            bool isNum = listView.Columns[0].Name == "numColumn";
+            int num = isNum ? (int)listView.Columns[0].Tag : 0;
 
             foreach (object item in items)
             {
-                ListViewItem lvItem = CreateListViewItem(item, propertyCache);
+                ListViewItem lvItem = CreateListViewItem(item, propertyCache, num);
                 listView.Items.Add(lvItem);
+                if(isNum) num++;
             }
 
             listView.EndUpdate();
@@ -56,9 +59,12 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="item">Компонент примезки</param>
         /// <param name="properties">Список свойств модели</param>
         /// <returns>Элемент <see cref="ListView"/></returns>
-        private ListViewItem CreateListViewItem(object item, PropertyInfo[] properties)
+        private ListViewItem CreateListViewItem(object item, PropertyInfo[] properties, int num)
         {
             ListViewItem lvItem = new ();
+            bool isNum = num != 0;
+
+            if (isNum) lvItem.Text = num.ToString(); 
 
             foreach (PropertyInfo property in properties)
             {
@@ -68,7 +74,10 @@ namespace WinFormsComponents.Classes.Services
                 {
                     if (vmAttribute.Headline)
                     {
-                        lvItem.Text = property.GetValue(item)?.ToString() ?? string.Empty;
+                        string value = property.GetValue(item)?.ToString() ?? string.Empty;
+
+                        if (isNum) lvItem.SubItems.Add(value);
+                        else lvItem.Text = value;
                     }
                     else if (vmAttribute.Image)
                     {

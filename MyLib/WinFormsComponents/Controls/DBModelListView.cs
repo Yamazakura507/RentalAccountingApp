@@ -9,6 +9,7 @@ using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Interface;
 using WinFormsComponents.Classes.Model;
 using WinFormsComponents.Classes.Services;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsComponents.Controls
 {
@@ -115,6 +116,12 @@ namespace WinFormsComponents.Controls
         public bool IsShowCountEnter { get; set; } = true;
 
         /// <summary>
+        /// Отображение количества выделеных строк
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsShowNum { get; set; } = false;
+
+        /// <summary>
         /// Включить постраничный вывод
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -159,6 +166,7 @@ namespace WinFormsComponents.Controls
             tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
             tsmiAllCountShow.Checked = IsShowCountAll;
             tsmiEnterCountShow.Checked = IsShowCountEnter;
+            tsmiNumeretorVisible.Checked = IsShowNum;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
@@ -390,6 +398,9 @@ namespace WinFormsComponents.Controls
 
             Parameters.Offset = (nowPage - 1) * Parameters.Limit;
 
+            if (lvModel.Columns[0].Name == "numColumn") 
+                lvModel.Columns[0].Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1;
+
             tstbActualPage.Text = nowPage.ToString();
             IsCheckPager(nowPage, count);
             await LoadListAsync();
@@ -510,6 +521,22 @@ namespace WinFormsComponents.Controls
             FilterFunction.CheckedChangedItemMenu(tsmiInformationShow, parametrs);
 
             IsInformationBar();
+        }
+
+        /// <summary>
+        /// Отображени/Скрытие колонки нумерации
+        /// </summary>
+        private void ShowNumerate()
+        {
+            if (IsShowNum) lvModel.Columns.Insert(0, new ColumnHeader() { Text = "№", Name = "numColumn", Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1});
+            else lvModel.Columns.RemoveAt(0);
+
+            if ((Items?.Count ?? 0) > 0)
+            {
+                loader.StartAnimation();
+                listViewLoader.PopulateListView(lvModel, modelType, Items);
+                loader.StopAnimation();
+            }
         }
 
         private async void DBModelListViewOnLoad(object sender, EventArgs e)
@@ -642,7 +669,7 @@ namespace WinFormsComponents.Controls
                 case Keys.P when e.Control:
                     isComand = true;
                     tsmiPagerCheckit.Checked = !tsmiPagerCheckit.Checked;
-                    tsmiPager.DropDown.Close();
+                    PagerDropDownOnClosing(null, null);
                     break;
                 case Keys.Q when e.Control:
                     isComand = true;
@@ -651,6 +678,10 @@ namespace WinFormsComponents.Controls
                 case Keys.F when e.Control:
                     isComand = true;
                     tsmiEnterCountShow.Checked = !tsmiEnterCountShow.Checked;
+                    break;
+                case Keys.I when e.Control:
+                    isComand = true;
+                    tsmiNumeretorVisible.Checked = !tsmiNumeretorVisible.Checked;
                     break;
             }
 
@@ -672,13 +703,19 @@ namespace WinFormsComponents.Controls
 
         private async void PagerDropDownOnClosing(object? sender, ToolStripDropDownClosingEventArgs e)
         {
-            if (e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
+            if (e is not null && e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
             else
             {
                 tsmitbLimitPage.Text = String.IsNullOrEmpty(tsmitbLimitPage.Text) ? "100" : tsmitbLimitPage.Text;
                 await UpdateCountPage(tsmiPagerCheckit.Checked ? Convert.ToInt32(tsmitbLimitPage.Text) : 0);
 
-                if (!tsmiPagerCheckit.Checked) await LoadListAsync();
+                if (!tsmiPagerCheckit.Checked)
+                {
+                    if (lvModel.Columns[0].Name == "numColumn")
+                        lvModel.Columns[0].Tag = 1;
+
+                    await LoadListAsync();
+                } 
             }
         }
 
@@ -747,5 +784,19 @@ namespace WinFormsComponents.Controls
         private void tsbInsertOnClick(object sender, EventArgs e) => OnInsertChanged();
 
         private void tsbEditOnClick(object sender, EventArgs e) => OnUpdateChanged(lvModel.SelectedItems[0].Tag);
+
+        private void tsmiNumeretorVisibleOnCheckedChanged(object sender, EventArgs e)
+        {
+            IsShowNum = tsmiNumeretorVisible.Checked;
+            ShowNumerate();
+
+            Dictionary<bool, (string, string, Color)> parametrs = new()
+            {
+                { false, ("Включить нумерацию строк(Ctrl+I)", "Отобразить колонку с номерами строк(Ctrl+I)", FilterOffColor) },
+                { true, ("Выключить нумерацию строк(Ctrl+I)", "Скрыть колонку с номерами строк(Ctrl+I)", FilterOnColor) }
+            };
+
+            FilterFunction.CheckedChangedItemMenu(tsmiNumeretorVisible, parametrs);
+        }
     }
 }
