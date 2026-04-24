@@ -105,16 +105,27 @@
             dbmlvMaterials.FilterOffColor = Color.MistyRose;
             dbmlvMaterials.FilterOnColor = Color.LightGreen;
             dbmlvMaterials.ImageList = ilTabMenu;
+            dbmlvMaterials.IsFilter = true;
+            dbmlvMaterials.IsGridLines = true;
+            dbmlvMaterials.IsSearch = true;
+            dbmlvMaterials.IsShowCountAll = true;
+            dbmlvMaterials.IsShowCountEnter = true;
             dbmlvMaterials.Location = new Point(3, 3);
+            dbmlvMaterials.MinimumSize = new Size(530, 130);
             dbmlvMaterials.ModelType = null;
             dbmlvMaterials.Name = "dbmlvMaterials";
+            dbmlvMaterials.PageLimit = 0;
             collectionParametrs1.Limit = 0;
             collectionParametrs1.Offset = 0;
             collectionParametrs1.SerhingParametrsCount = 0;
             dbmlvMaterials.Parameters = collectionParametrs1;
             dbmlvMaterials.RemovingRowColor = Color.MistyRose;
+            dbmlvMaterials.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dbmlvMaterials.Size = new Size(786, 391);
             dbmlvMaterials.TabIndex = 0;
+            dbmlvMaterials.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
+            dbmlvMaterials.InsertChanged += dbmlvMaterialsOnInsertChanged;
+            dbmlvMaterials.UpdateChanged += dbmlvMaterialsOnUpdateChanged;
             // 
             // ilTabMenu
             // 
@@ -147,7 +158,6 @@
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ПРОКАТ";
-            Load += MainFormOnLoad;
             tsMainMenu.ResumeLayout(false);
             tsMainMenu.PerformLayout();
             tcDBViewr.ResumeLayout(false);

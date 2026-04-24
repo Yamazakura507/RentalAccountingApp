@@ -190,9 +190,9 @@ namespace DataBaseProvaider
         /// <para>Коллекцию типа</para>
         /// <para>-Рекомендуется в качестве T указывать <see cref="object"/> или dynamic.</para>
         /// </returns>
-        async public static Task<BindingList<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod)
+        async public static Task<BindingList<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
-            Task task = await type.InvokeMethodByType(parametrs, nameMethod);
+            Task task = await type.InvokeMethodByType(parametrs, nameMethod, classType);
 
             IEnumerable<T> collection = ((dynamic)task).Result;
 
@@ -206,9 +206,9 @@ namespace DataBaseProvaider
         /// <param name="parametrs">Параметры вызываемого метода</param>
         /// <param name="nameMethod">Наименование метода</param>
         /// <returns>Процес</returns>
-        async public static Task<Task> InvokeMethodByType(this Type type, object[] parametrs, string nameMethod)
+        async public static Task<Task> InvokeMethodByType(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
-            MethodInfo method = typeof(DBProvider).GetMethod(nameMethod);
+            MethodInfo method = (classType ?? typeof(DBProvider)).GetMethod(nameMethod);
             MethodInfo genericMethod = method.MakeGenericMethod(type);
 
             Task task = genericMethod.Invoke(null, parametrs) as Task;
@@ -225,9 +225,9 @@ namespace DataBaseProvaider
         /// <param name="parametrs">Параметры вызываемого метода</param>
         /// <param name="nameMethod">Наименование метода</param>
         /// <returns>Значение запрашиваемого типа</returns>
-        async public static Task<T> GetResultByType<T>(this Type type, object[] parametrs, string nameMethod)
+        async public static Task<T> GetResultByType<T>(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
-            Task task = await type.InvokeMethodByType(parametrs, nameMethod);
+            Task task = await type.InvokeMethodByType(parametrs, nameMethod, classType);
 
             T result = (T)((dynamic)task).Result;
 

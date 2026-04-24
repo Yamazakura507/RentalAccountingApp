@@ -33,6 +33,7 @@
             tsbAdd = new ToolStripButton();
             tsbDel = new ToolStripButton();
             tsbRepair = new ToolStripButton();
+            tsbEdit = new ToolStripButton();
             tssFilter = new ToolStripSeparator();
             tstbSearh = new ToolStripTextBox();
             tsbSearh = new ToolStripButton();
@@ -68,6 +69,7 @@
             tsmiAdd = new ToolStripMenuItem();
             tsmiDel = new ToolStripMenuItem();
             tsmiRepair = new ToolStripMenuItem();
+            tsmiEdit = new ToolStripMenuItem();
             tsIformationBar = new ToolStrip();
             tslAllCount = new ToolStripLabel();
             tslEnterCount = new ToolStripLabel();
@@ -80,7 +82,7 @@
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, toolStripSeparator1, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tsbEdit, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, toolStripSeparator1, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
             tsListMenu.Size = new Size(750, 31);
@@ -96,6 +98,7 @@
             tsbAdd.Size = new Size(23, 28);
             tsbAdd.Text = "Добавить";
             tsbAdd.ToolTipText = "Добавить(Insert)";
+            tsbAdd.Click += tsbInsertOnClick;
             // 
             // tsbDel
             // 
@@ -120,6 +123,18 @@
             tsbRepair.ToolTipText = "Востановить(Ctrl+R)";
             tsbRepair.Visible = false;
             tsbRepair.Click += tsbDelOrRepairOnClick;
+            // 
+            // tsbEdit
+            // 
+            tsbEdit.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbEdit.Image = Properties.Resources.editor;
+            tsbEdit.ImageTransparentColor = Color.Magenta;
+            tsbEdit.Name = "tsbEdit";
+            tsbEdit.Size = new Size(23, 28);
+            tsbEdit.Text = "Редактировать(Enter)";
+            tsbEdit.ToolTipText = "Редактировать(Enter)";
+            tsbEdit.Visible = false;
+            tsbEdit.Click += tsbEditOnClick;
             // 
             // tssFilter
             // 
@@ -430,33 +445,34 @@
             lvModel.GridLines = true;
             lvModel.Location = new Point(3, 3);
             lvModel.Name = "lvModel";
-            lvModel.Size = new Size(744, 338);
+            lvModel.Size = new Size(744, 363);
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;
             lvModel.SelectedIndexChanged += lvModelOnSelectedIndexChanged;
-            lvModel.KeyDown += lvModelOnKeyDown;
+            lvModel.MouseDoubleClick += lvModelOnMouseDoubleClick;
             // 
             // cmsModel
             // 
-            cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair });
+            cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair, tsmiEdit });
             cmsModel.Name = "cmsModel";
-            cmsModel.Size = new Size(186, 70);
+            cmsModel.Size = new Size(190, 92);
             cmsModel.Opening += cmsModelOnOpening;
             // 
             // tsmiAdd
             // 
             tsmiAdd.Image = Properties.Resources.add;
             tsmiAdd.Name = "tsmiAdd";
-            tsmiAdd.Size = new Size(185, 22);
+            tsmiAdd.Size = new Size(189, 22);
             tsmiAdd.Text = "Добавить(Insert)";
             tsmiAdd.ToolTipText = "Добавить(Insert)";
+            tsmiAdd.Click += tsbInsertOnClick;
             // 
             // tsmiDel
             // 
             tsmiDel.Image = Properties.Resources.delete;
             tsmiDel.Name = "tsmiDel";
-            tsmiDel.Size = new Size(185, 22);
+            tsmiDel.Size = new Size(189, 22);
             tsmiDel.Text = "Удалить(Delete)";
             tsmiDel.ToolTipText = "Удалить(Delete)";
             tsmiDel.Click += tsbDelOrRepairOnClick;
@@ -465,11 +481,21 @@
             // 
             tsmiRepair.Image = Properties.Resources.undelete;
             tsmiRepair.Name = "tsmiRepair";
-            tsmiRepair.Size = new Size(185, 22);
+            tsmiRepair.Size = new Size(189, 22);
             tsmiRepair.Text = "Востановить(Ctrl+R)";
             tsmiRepair.ToolTipText = "Востановить(Ctrl+R)";
             tsmiRepair.Visible = false;
             tsmiRepair.Click += tsbDelOrRepairOnClick;
+            // 
+            // tsmiEdit
+            // 
+            tsmiEdit.Image = Properties.Resources.editor;
+            tsmiEdit.Name = "tsmiEdit";
+            tsmiEdit.Size = new Size(189, 22);
+            tsmiEdit.Text = "Редактировать(Enter)";
+            tsmiEdit.ToolTipText = "Редактировать(Enter)";
+            tsmiEdit.Visible = false;
+            tsmiEdit.Click += tsbEditOnClick;
             // 
             // tsIformationBar
             // 
@@ -512,7 +538,7 @@
             tlp.Name = "tlp";
             tlp.RowCount = 2;
             tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tlp.RowStyles.Add(new RowStyle(SizeType.Absolute, 25F));
+            tlp.RowStyles.Add(new RowStyle());
             tlp.Size = new Size(750, 369);
             tlp.TabIndex = 5;
             // 
@@ -582,5 +608,7 @@
         public ToolStripMenuItem tsmiEnterCountShow;
         public ToolStripMenuItem tsmiPager;
         private TableLayoutPanel tlp;
+        private ToolStripMenuItem tsmiEdit;
+        private ToolStripButton tsbEdit;
     }
 }

@@ -30,9 +30,9 @@ namespace DataBaseProvaider
                                         : String.Format("RETURNING  {0}",
                                         returningColumns is null ? "\"Id\"" : String.Join(", ", returningColumns.Select(x => $"\"{x}\"")));
             string command = String.Format(
-                @"INSERT INTO {0} ({1}) VALUES ({2}); {3};",
+                "INSERT INTO \"{0}\" ({1}) VALUES ({2}) {3};",
                 tableName,
-                String.Join(", ", parametrs.Select(x => $"{x.Key}")),
+                String.Join(", ", parametrs.Select(x => $"\"{x.Key}\"")),
                 String.Join(", ", parametrs.Select(x => $"@{x.Key}")),
                 returningString);
 
@@ -64,24 +64,25 @@ namespace DataBaseProvaider
 
             DataRow returningValue = null;
             string tableName = typeof(TModel).Name;
-            (string conditionsStr, NpgsqlParameter[] npgSqlParameters) = new CollectionParametrs() { Conditions = conditions }.ToStringConditions();
+            (string conditionsStr, NpgsqlParameter[] npgSqlParametersReturning) = new CollectionParametrs() { Conditions = conditions }.ToStringConditions();
             string returningString = returningColumns != null && returningColumns.Length == 0
                                         ? String.Empty
-                                        : String.Format("SELECT {0} FROM \"{1}\" t{2}",
-                                        returningColumns is null ? "*" : String.Join(", ", returningColumns.Select(x => $"t.\"{x}\"")),
-                                        tableName,
-                                        conditionsStr);
+                                        : String.Format("RETURNING {0}",
+                                        returningColumns is null ? "\"Id\"" : String.Join(", ", returningColumns.Select(x => $"\"{x}\"")));
             string command = String.Format(
-                "UPDATE \"{0}\" t SET {1}{2}; {3};",
+                "UPDATE \"{0}\" t SET {1}{2} {3};",
                 tableName,
-                String.Join(", ", parametrs.Select(x => $"t.\"{x.Key}\" = @{x.Key}")),
+                String.Join(", ", parametrs.Select(x => $"\"{x.Key}\" = @{x.Key}")),
                 conditionsStr,
                 returningString);
+
+            List<NpgsqlParameter> npgSqlParameters = parametrs.Select(x => new NpgsqlParameter($"@{x.Key}", x.Value ?? DBNull.Value)).ToList();
+            npgSqlParameters.AddRange(npgSqlParametersReturning);
 
             using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
             {
                 npgSqlProviderClone = msProvider;
-                returningValue = await msProvider.GetRowAsync(command, npgSqlParameters);
+                returningValue = await msProvider.GetRowAsync(command, npgSqlParameters.ToArray());
             }
 
 

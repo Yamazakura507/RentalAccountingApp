@@ -111,7 +111,7 @@ namespace WinFormsComponents.Classes
         /// <returns>Количество страниц записей</returns>
         public async static Task<int> GetCountPage(this Type model, IEnumerable<ConditionsParametr> conditions, int limit)
         {
-            double countPage = await model.GetResultByType<int>([conditions], "Count");
+            double countPage = await model.GetResultByType<int>([conditions], nameof(DBProvider.Count));
             countPage = countPage / limit;
 
             return Convert.ToInt32(Math.Ceiling(countPage));

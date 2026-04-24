@@ -1,22 +1,18 @@
 ﻿using DataBaseProvaider.Attributes;
-using RentalDBModels.Models.Interface;
+using RentalDBModels.Views.Abstract;
 using System.ComponentModel;
 
 namespace RentalDBModels.Views
 {
-    public class Materials : IModel
+    public class Materials : BaseView
     {
-        [ViewModel(ViewHide = true)]
-        public int Id { get; set; }
-
-        [ViewModel(ViewHide = true, RemovingFlag = true)]
-        public bool Flag { get; set; }
-
         [ViewModel(Headline = true)]
         [Description("Материал")]
         public string Name { get; set; }
 
         [ViewModel(ViewHide = true, Image = true)]
         public string ImageKey { get; set; } = "materials.png";
+
+        public override Type ModelType { get => typeof(Models.Materials); }
     }
 }

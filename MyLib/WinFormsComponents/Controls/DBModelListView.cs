@@ -121,10 +121,20 @@ namespace WinFormsComponents.Controls
         public int PageLimit { get; set; } = 0;
 
         /// <summary>
+        /// Событие при добавлении
+        /// </summary>
+        public event EventHandler<Action<object>> InsertChanged;
+
+        /// <summary>
+        /// Событие при обновлении
+        /// </summary>
+        public event EventHandler<object, Action<object>> UpdateChanged;
+
+        /// <summary>
         /// Настройка взаимодействия с БД(Удаление/Оновление)
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        TermsOfInteractionDB TermsOfInteractionDB { get; set; }
+        private TermsOfInteractionDB TermsOfInteractionDB { get; set; }
 
         public DBModelListView()
         {
@@ -243,7 +253,7 @@ namespace WinFormsComponents.Controls
 
             if (Parameters.Limit == 0) await LoadListAsync();
             else await UpdateCountPage(Parameters.Limit);
-            
+
         }
 
         /// <summary>
@@ -322,7 +332,7 @@ namespace WinFormsComponents.Controls
         }
 
         /// <summary>
-        /// Асинхронная загрузка списка элементов
+        /// Загрузка списка элементов
         /// </summary>
         private async Task LoadListAsync()
         {
@@ -340,7 +350,7 @@ namespace WinFormsComponents.Controls
 
             if (IsShowCountAll)
             {
-                tslAllCount.Text = String.Format("Всего: {0}", await modelType.GetResultByType<int>([Parameters.Conditions], "Count"));
+                tslAllCount.Text = String.Format("Всего: {0}", await modelType.GetResultByType<int>([Parameters.Conditions], nameof(DBProvider.Count)));
             }
 
             loader.StopAnimation();
@@ -435,8 +445,8 @@ namespace WinFormsComponents.Controls
         /// <returns>Процес</returns>
         private async Task UpdateSearch()
         {
-            await LoadListAsync();
-            await UpdateCountPage(Parameters.Limit);
+            if (Parameters.Limit == 0) await LoadListAsync();
+            else await UpdateCountPage(Parameters.Limit);
         }
 
         /// <summary>
@@ -550,6 +560,7 @@ namespace WinFormsComponents.Controls
 
             tsbDel.Visible = isRemove;
             tsbRepair.Visible = isRepair;
+            tsbEdit.Visible = lvModel.SelectedItems.Count == 1;
             tslEnterCount.Text = String.Format("Выбрано: {0}", lvModel.SelectedItems.Count);
         }
 
@@ -559,6 +570,7 @@ namespace WinFormsComponents.Controls
 
             tsmiDel.Visible = isRemove;
             tsmiRepair.Visible = isRepair;
+            tsmiEdit.Visible = lvModel.SelectedItems.Count == 1;
         }
 
         private void tsbVisibleModeOnClick(object sender, EventArgs e) => ShowVisibleMode(((ToolStripButton)sender).Tag.ToString().StringToEnum<VisibleMode>());
@@ -567,63 +579,82 @@ namespace WinFormsComponents.Controls
 
         private async void tsbDelOrRepairOnClick(object sender, EventArgs e) => await DeleteOrRepair();
 
-        private async void lvModelOnKeyDown(object sender, KeyEventArgs e)
+        public async void lvModelOnKeyDown(object sender, KeyEventArgs e)
         {
+            bool isComand = false;
             (bool isRemove, bool isRepair) = SelectedCheck();
 
             switch (e.KeyCode)
             {
                 case Keys.Delete
                 when isRemove:
+                    isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Enter:
+                case Keys.Enter when lvModel.SelectedItems.Count == 1:
+                    isComand = true;
+                    OnUpdateChanged(lvModel.SelectedItems[0].Tag);
                     break;
                 case Keys.R when e.Control && isRepair:
+                    isComand = true;
                     await DeleteOrRepair();
                     break;
                 case Keys.Insert:
+                    isComand = true;
+                    OnInsertChanged();
                     break;
                 case Keys.A when e.Control && ShowDeleted != ShowRemooving.Always:
+                    isComand = true;
                     await ShowRemoving(ShowRemooving.Always);
                     break;
                 case Keys.D when e.Control && ShowDeleted != ShowRemooving.ExecRemoving:
+                    isComand = true;
                     await ShowRemoving(ShowRemooving.ExecRemoving);
                     break;
                 case Keys.V when e.Control && ShowDeleted != ShowRemooving.ExecNotRemoving:
+                    isComand = true;
                     await ShowRemoving(ShowRemooving.ExecNotRemoving);
                     break;
                 case Keys.G when e.Control && VisibleMode != VisibleMode.Tile:
+                    isComand = true;
                     ShowGridVisible(!IsGridLines);
                     break;
                 case Keys.U when e.Control:
+                    isComand = true;
                     ShowVisibleMode(VisibleMode == VisibleMode.Tile ? VisibleMode.Row : VisibleMode.Tile);
                     break;
                 case Keys.E when e.Control && tsbEndPage.Enabled && tsbEndPage.Visible:
+                    isComand = true;
                     await UpdatePager(ActionPager.End);
                     break;
                 case Keys.H when e.Control && tsbStartPage.Enabled && tsbStartPage.Visible:
+                    isComand = true;
                     await UpdatePager(ActionPager.Start);
                     break;
                 case Keys.B when e.Control && tsbBackPage.Enabled && tsbBackPage.Visible:
+                    isComand = true;
                     await UpdatePager(ActionPager.Back);
                     break;
                 case Keys.N when e.Control && tsbNextPage.Enabled && tsbNextPage.Visible:
+                    isComand = true;
                     await UpdatePager(ActionPager.Next);
                     break;
                 case Keys.P when e.Control:
+                    isComand = true;
                     tsmiPagerCheckit.Checked = !tsmiPagerCheckit.Checked;
                     tsmiPager.DropDown.Close();
                     break;
                 case Keys.Q when e.Control:
+                    isComand = true;
                     tsmiAllCountShow.Checked = !tsmiAllCountShow.Checked;
                     break;
                 case Keys.F when e.Control:
+                    isComand = true;
                     tsmiEnterCountShow.Checked = !tsmiEnterCountShow.Checked;
                     break;
             }
 
-            e.SuppressKeyPress = true;
+            e.SuppressKeyPress = isComand;
         }
 
         private async void tstbActualPageOnKeyPress(object sender, KeyPressEventArgs e)
@@ -698,7 +729,23 @@ namespace WinFormsComponents.Controls
                 { true, ("Скрыть общее количество(Ctrl+F)", "Скрыть общее количество строк(Ctrl+F)", FilterOnColor) }
             };
 
-            InformationChecket(tsmiAllCountShow, parametrs, (await modelType.GetResultByType<int>([Parameters.Conditions], "Count"), "Всего: {0}", tslAllCount));
+            InformationChecket(tsmiAllCountShow, parametrs, (await modelType.GetResultByType<int>([Parameters.Conditions], nameof(DBProvider.Count)), "Всего: {0}", tslAllCount));
         }
+
+        private void lvModelOnMouseDoubleClick(object sender, MouseEventArgs e) => OnUpdateChanged(lvModel.SelectedItems[0].Tag);
+
+        protected virtual void OnInsertChanged()
+        {
+            InsertChanged?.Invoke(this, async (m) => { await LoadListAsync(); });
+        }
+
+        protected virtual void OnUpdateChanged(object modelUpdate)
+        {
+            UpdateChanged?.Invoke(modelUpdate, async (m) => { await LoadListAsync(); });
+        }
+
+        private void tsbInsertOnClick(object sender, EventArgs e) => OnInsertChanged();
+
+        private void tsbEditOnClick(object sender, EventArgs e) => OnUpdateChanged(lvModel.SelectedItems[0].Tag);
     }
 }

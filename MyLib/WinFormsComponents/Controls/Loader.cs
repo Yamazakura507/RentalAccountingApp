@@ -95,11 +95,18 @@ namespace WinFormsComponents.Controls
         /// <param name="arc">Объект арки</param>
         private void DrawArc(PaintEventArgs e, Pen pen, ref int size, ArcLoaderElement arc)
         {
-            arc.RepaintPen(pen);
-            arc.Resize(ref size);
+            try
+            {
+                arc.RepaintPen(pen);
+                arc.Resize(ref size);
 
-            Rectangle rect = new((this.Width - size) / 2, (this.Height - size) / 2, size, size);
-            e.Graphics.DrawArc(pen, rect, arc.Angle, arc.Arc);
+                Rectangle rect = new((this.Width - size) / 2, (this.Height - size) / 2, size, size);
+                e.Graphics.DrawArc(pen, rect, arc.Angle, arc.Arc);
+            }
+            catch (Exception)
+            {
+                return;
+            }
         }
 
         /// <summary>

@@ -9,19 +9,16 @@ namespace RentalAccountingApp
         public MainForm()
         {
             InitializeComponent();
+            tcDBViewr.KeyDown += dbmlvMaterials.lvModelOnKeyDown;
 
             ConnectionInfo.ConnectDB();
             dbmlvMaterials.ModelType = typeof(Materials);
         }
 
-        private void tsbSetingsOnClick(object sender, EventArgs e)
-        {
-            new SettingsForm().Show();
-        }
+        private void dbmlvMaterialsOnUpdateChanged(object sender, Action<object> e) => new DBModelLookupEditor(sender, e).Show();
 
-        private void MainFormOnLoad(object sender, EventArgs e)
-        {
-            
-        }
+        private void dbmlvMaterialsOnInsertChanged(object sender, Action<object> e) => new DBModelLookupEditor(typeof(Materials), e).Show();
+
+        private void tsbSetingsOnClick(object sender, EventArgs e) => new SettingsForm().Show();
     }
 }
