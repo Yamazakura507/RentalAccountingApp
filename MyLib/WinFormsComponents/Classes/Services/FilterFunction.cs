@@ -1,4 +1,5 @@
-﻿using DataBaseProvaider.Objects;
+﻿using DataBaseProvaider.Classes.Abstract;
+using DataBaseProvaider.Objects;
 
 namespace WinFormsComponents.Classes.Services
 {
@@ -54,9 +55,9 @@ namespace WinFormsComponents.Classes.Services
         /// </summary>
         /// <typeparam name="TOperation">Тип <see cref="Enum"/> пеерчисления</typeparam>
         /// <param name="isEnable">Информация о видимости</param>
-        /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
+        /// <param name="parametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
         /// <param name="toolText">Подсказка</param>
-        public static ToolStripComboBox ComboBoxFilterLoad<TOperation>(bool isEnable, ConditionsParametr searchParametr, string toolText = "") where TOperation : Enum
+        public static ToolStripComboBox ComboBoxFilterLoad<TOperation>(bool isEnable, BaseParametrCollection parametr, string toolText = "", int skip = 0) where TOperation : Enum
         {
             ToolStripComboBox comboBox = new()
             {
@@ -67,12 +68,12 @@ namespace WinFormsComponents.Classes.Services
             Dictionary<TOperation, string> dicOper = Extensions.GetCommitEnumDictionary<TOperation>();
             string selectedItem = null;
 
-            comboBox.Items.AddRange(dicOper.Values.Distinct().ToArray());
+            comboBox.Items.AddRange(dicOper.Values.Distinct().Skip(skip).ToArray());
 
             if (isEnable)
             {
-                TOperation operationKey = (TOperation)typeof(ConditionsParametr).GetProperties()
-                    .First(i => i.PropertyType.Equals(typeof(TOperation))).GetValue(searchParametr);
+                TOperation operationKey = (TOperation)parametr.GetType().GetProperties()
+                    .First(i => i.PropertyType.Equals(typeof(TOperation))).GetValue(parametr);
                 selectedItem = dicOper[operationKey];
             }
 

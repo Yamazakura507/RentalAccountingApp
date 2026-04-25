@@ -1,11 +1,12 @@
-﻿using DataBaseProvaider.Enums;
+﻿using DataBaseProvaider.Classes.Abstract;
+using DataBaseProvaider.Enums;
 
 namespace DataBaseProvaider.Objects
 {
     /// <summary>
     /// Объект сортировки колонки
     /// </summary>
-    public class OrderParametr : IDisposable
+    public class OrderParametr : BaseParametrCollection, IDisposable
     {
         /// <summary>
         /// Наименование сортируемой колонки
@@ -51,5 +52,37 @@ namespace DataBaseProvaider.Objects
         /// Деструктор/Очистка памяти от объекта
         /// </summary>
         public void Dispose() => GC.SuppressFinalize(this);
+
+        public static IEnumerable<OrderParametr> operator +(IEnumerable<OrderParametr> parametrs, OrderParametr condition)
+        {
+            return parametrs.Append(condition);
+        }
+
+        public static IEnumerable<OrderParametr> operator -(IEnumerable<OrderParametr> parametrs, OrderParametr condition)
+        {
+            return parametrs.Except([condition]);
+        }
+
+        /// <summary>
+        /// Сравнение объектов только по Id
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as OrderParametr);
+        }
+
+        /// <summary>
+        /// Сравнение объектов только по Id (типизированная версия)
+        /// </summary>
+        public bool Equals(OrderParametr other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Id == other.Id;
+        }
     }
 }

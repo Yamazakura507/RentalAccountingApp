@@ -1,4 +1,5 @@
-﻿using DataBaseProvaider.Enums;
+﻿using DataBaseProvaider.Classes.Abstract;
+using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.Reflection;
 using WinFormsComponents.Classes.Interface;
@@ -42,9 +43,10 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="columnName">Наименование параметра фильтрации</param>
         /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
         /// <param name="onFilterChanged">Обработчик включения фильтра</param>
-        public ToolStripMenuItem CreateFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null)
+        public ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection searchParametr, FilterChangedHandler onFilterChanged = null)
         {
-            baseParametr = searchParametr;
+            baseParametr = (ConditionsParametr)searchParametr;
+            ConditionsParametr searchParametrConditions = (ConditionsParametr)searchParametr;
             ToolStripMenuItem menuItem = new(columnText, Properties.Resources.searh);
 
             Dictionary<bool, (string, string, Color)> checkItemParametrs = new()
@@ -74,8 +76,8 @@ namespace WinFormsComponents.Classes.Services
             {
                 menuItem.DropDownItems.CutToolStripCollection(2, 1);
 
-                ConditionalOperators operators = GetSelectedOperator(comboBoxSearchType, searchParametr);
-                List<ToolStripItem> settingItems = CreateAdvancedFilterItems(checkItem.Checked, searchParametr, operators);
+                ConditionalOperators operators = GetSelectedOperator(comboBoxSearchType, searchParametrConditions);
+                List<ToolStripItem> settingItems = CreateAdvancedFilterItems(checkItem.Checked, searchParametrConditions, operators);
                 comboBoxSearchType.EnabledChanged += (s, e) => settingItems.ForEach(i => i.Visible = comboBoxSearchType.Enabled);
 
                 for (int i = 0; i < settingItems.Count; i++)
@@ -91,7 +93,7 @@ namespace WinFormsComponents.Classes.Services
             comboBoxSearchType.GetType()
                 .GetMethod("OnSelectedIndexChanged", BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.Invoke(comboBoxSearchType, new object[] { EventArgs.Empty });
-            searchParametr = null;
+            searchParametr = searchParametrConditions = null;
 
             return menuItem;
         }
@@ -100,9 +102,9 @@ namespace WinFormsComponents.Classes.Services
         /// Обновление текущего действия параметра
         /// </summary>
         /// <param name="baseParametr">Текущий параметр</param>
-        private void UpdateInfoBaseParametr(ConditionsParametr baseParametr)
+        private void UpdateInfoBaseParametr(BaseParametrCollection baseParametr)
         { 
-            this.baseParametr = baseParametr;
+            this.baseParametr = (ConditionsParametr)baseParametr;
         }
 
         /// <summary>

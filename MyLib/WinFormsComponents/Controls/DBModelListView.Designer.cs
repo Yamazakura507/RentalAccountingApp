@@ -44,6 +44,7 @@
             tsmiShowAlways = new ToolStripMenuItem();
             tsmiShowExacRemoving = new ToolStripMenuItem();
             tsmiShowExacNotRemoving = new ToolStripMenuItem();
+            tsmiSorted = new ToolStripMenuItem();
             tsddbSettingsListView = new ToolStripDropDownButton();
             tsmiPager = new ToolStripMenuItem();
             tsmiPagerCheckit = new ToolStripMenuItem();
@@ -75,6 +76,7 @@
             tslAllCount = new ToolStripLabel();
             tslEnterCount = new ToolStripLabel();
             tlp = new TableLayoutPanel();
+            cmsSorted = new ContextMenuStrip(components);
             tsListMenu.SuspendLayout();
             cmsModel.SuspendLayout();
             tsIformationBar.SuspendLayout();
@@ -164,7 +166,7 @@
             // tsddbFilter
             // 
             tsddbFilter.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsddbFilter.DropDownItems.AddRange(new ToolStripItem[] { tsmiSearh, tsmiFilter, tsmiShowDeleted });
+            tsddbFilter.DropDownItems.AddRange(new ToolStripItem[] { tsmiSearh, tsmiFilter, tsmiShowDeleted, tsmiSorted });
             tsddbFilter.Image = Properties.Resources.filter;
             tsddbFilter.ImageTransparentColor = Color.Magenta;
             tsddbFilter.Name = "tsddbFilter";
@@ -229,6 +231,14 @@
             tsmiShowExacNotRemoving.Text = "Только не удаленные(Ctrl+V)";
             tsmiShowExacNotRemoving.ToolTipText = "Отобразить только не удаленные(Ctrl+S+V)";
             tsmiShowExacNotRemoving.Click += tsmiRemoveModeShowOnClick;
+            // 
+            // tsmiSorted
+            // 
+            tsmiSorted.Image = Properties.Resources.order;
+            tsmiSorted.Name = "tsmiSorted";
+            tsmiSorted.Size = new Size(187, 22);
+            tsmiSorted.Text = "Сортировка";
+            tsmiSorted.ToolTipText = "Сортировка";
             // 
             // tsddbSettingsListView
             // 
@@ -468,7 +478,7 @@
             // 
             cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair, tsmiEdit });
             cmsModel.Name = "cmsModel";
-            cmsModel.Size = new Size(190, 114);
+            cmsModel.Size = new Size(190, 92);
             cmsModel.Opening += cmsModelOnOpening;
             // 
             // tsmiAdd
@@ -554,6 +564,11 @@
             tlp.Size = new Size(750, 369);
             tlp.TabIndex = 5;
             // 
+            // cmsSorted
+            // 
+            cmsSorted.Name = "cmsSorted";
+            cmsSorted.Size = new Size(61, 4);
+            // 
             // DBModelListView
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -623,5 +638,7 @@
         private ToolStripMenuItem tsmiEdit;
         private ToolStripButton tsbEdit;
         private ToolStripMenuItem tsmiNumeretorVisible;
+        private ToolStripMenuItem tsmiSorted;
+        private ContextMenuStrip cmsSorted;
     }
 }

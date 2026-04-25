@@ -13,12 +13,18 @@ namespace RentalAccountingApp
 
             ConnectionInfo.ConnectDB();
             dbmlvMaterials.ModelType = typeof(Materials);
+            dmlvCategories.ModelType = typeof(Categories);
         }
 
-        private void dbmlvMaterialsOnUpdateChanged(object sender, Action<object> e) => new DBModelLookupEditor(sender, e).Show();
+        private void dbmlvLookupOnUpdateChanged(object sender, Action<object> e) => new DBModelLookupEditor(sender, e).Show();
 
-        private void dbmlvMaterialsOnInsertChanged(object sender, Action<object> e) => new DBModelLookupEditor(typeof(Materials), e).Show();
+        private void dbmlvLookupOnInsertChanged(object sender, Action<object> e) => new DBModelLookupEditor(((WinFormsComponents.Controls.DBModelListView)sender).ModelType, e).Show();
 
         private void tsbSetingsOnClick(object sender, EventArgs e) => new SettingsForm().Show();
+
+        private void dbmlvLookupOnInsertChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

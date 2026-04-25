@@ -1,17 +1,18 @@
-﻿using DataBaseProvaider.Objects;
+﻿using DataBaseProvaider.Classes.Abstract;
+using DataBaseProvaider.Objects;
 
 namespace WinFormsComponents.Classes.Interface
 {
     /// <summary>
     /// Делегат для обработки изменения состояния фильтра
     /// </summary>
-    public delegate void FilterChangedHandler(ConditionsParametr newSearchParametr, ConditionsParametr baseSearhParametr, UpdateParametrChangedHandler updateParametr);
+    public delegate void FilterChangedHandler(BaseParametrCollection newSearchParametr, BaseParametrCollection baseSearhParametr, UpdateParametrChangedHandler updateParametr);
 
     /// <summary>
     /// Делегат для обрабоки обновления текущего параметра
     /// </summary>
     /// <param name="baseSearhParametr">текущий параметр</param>
-    public delegate void UpdateParametrChangedHandler(ConditionsParametr baseSearhParametr);
+    public delegate void UpdateParametrChangedHandler(BaseParametrCollection baseSearhParametr);
 
     /// <summary>
     /// Инерфейс сервиса создания фильтров
@@ -23,8 +24,8 @@ namespace WinFormsComponents.Classes.Interface
         /// </summary>
         /// <param name="columnText">Текст свойства фильтрации</param>
         /// <param name="columnName">Наименование параметра фильтрации</param>
-        /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
+        /// <param name="parametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
         /// <param name="onFilterChanged">Обработчик включения фильтра</param>
-        ToolStripMenuItem CreateFilter(string columnText, string columnName, ConditionsParametr searchParametr, FilterChangedHandler onFilterChanged = null);
+        ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection parametr, FilterChangedHandler onFilterChanged = null);
     }
 }

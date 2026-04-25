@@ -1,4 +1,6 @@
-﻿namespace DataBaseProvaider.Enums
+﻿using DataBaseProvaider.Attributes;
+
+namespace DataBaseProvaider.Enums
 {
     /// <summary>
     /// Перечесление для сортировки
@@ -12,12 +14,14 @@
         /// <summary>
         /// Повозрастанию
         /// </summary>
-        /// <value>1</value>
-        Asc = 1,
+        /// <value>0</value>
+        [Comment("По возрастанию")]
+        Asc = 0,
         /// <summary>
         /// Поубыванию
         /// </summary>
-        /// <value>0</value>
-        Desc = 0
+        /// <value>1</value>
+        [Comment("По убыванию")]
+        Desc = 1
     }
 }

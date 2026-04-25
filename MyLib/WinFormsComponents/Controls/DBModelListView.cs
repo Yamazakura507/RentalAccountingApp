@@ -1,5 +1,6 @@
 ﻿using DataBaseProvaider;
 using DataBaseProvaider.Attributes;
+using DataBaseProvaider.Classes.Abstract;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.ComponentModel;
@@ -9,7 +10,6 @@ using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Interface;
 using WinFormsComponents.Classes.Model;
 using WinFormsComponents.Classes.Services;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsComponents.Controls
 {
@@ -17,6 +17,7 @@ namespace WinFormsComponents.Controls
     {
         private Type modelType;
         private readonly IFilter searchFilter;
+        private readonly IFilter orderFilter;
         private readonly IListViewLoader listViewLoader;
         private string parametrRemovingName = null;
         private Loader loader = new();
@@ -98,6 +99,12 @@ namespace WinFormsComponents.Controls
         public bool IsSearch { get; set; } = true;
 
         /// <summary>
+        /// Включить сортировку
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsSorted { get; set; } = true;
+
+        /// <summary>
         /// Включить cетку
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -147,7 +154,9 @@ namespace WinFormsComponents.Controls
         {
             InitializeComponent();
 
+            loader.Visible = this.Enabled = ModelType is not null;
             searchFilter = new SearhFilterLoader(FilterOffColor, FilterOnColor);
+            orderFilter = new OrderFilterLoader(FilterOffColor, FilterOnColor);
             listViewLoader = new ListViewLoader(RemovingRowColor);
             Parameters ??= new();
             TermsOfInteractionDB ??= new();
@@ -206,9 +215,12 @@ namespace WinFormsComponents.Controls
         {
             tsmiSearh.Visible = IsSearch;
             tsmiFilter.Visible = IsFilter;
-            tssFilter.Visible = IsSearch || IsFilter;
+            tsmiSorted.Visible = IsSorted;
+            tssFilter.Visible = IsSearch || IsFilter || IsSorted;
+
             tsmiSearh.DropDownItems.Clear();
             tsmiFilter.DropDownItems.Clear();
+            tsmiSorted.DropDownItems.Clear();
 
             IEnumerable<ConditionsParametr> searchParameters = Parameters.Conditions.Where(i => i.IsSerhing);
             IEnumerable<PropertyInfo> properties = ModelType.GetProperties().Where(i => !i.GetCustomAttribute<ViewModelAttribute>()?.ViewHide ?? true);
@@ -228,6 +240,15 @@ namespace WinFormsComponents.Controls
                         this.tsmiSearh.DropDownItems.Add(tsmiSearh);
                     }
 
+                    if (IsSorted)
+                    {
+                        ToolStripMenuItem tsmiSorted = orderFilter.CreateFilter(titleMenu, property.Name,
+                        Parameters.Orders.FirstOrDefault(i => i.ColumnName.Equals(property.Name)),
+                        UpdateOrdersParametrs);
+
+                        this.tsmiSorted.DropDownItems.Add(tsmiSorted);
+                    }
+
                     if (IsFilter && (property.GetCustomAttribute<ViewModelAttribute>()?.FilterOn ?? false))
                     {
                         ToolStripMenuItem tsmiFilter = new(titleMenu, Properties.Resources.filter);
@@ -239,6 +260,7 @@ namespace WinFormsComponents.Controls
 
             tsmiSearh.Enabled = tsmiSearh.DropDownItems.Count > 0;
             tsmiFilter.Enabled = tsmiFilter.DropDownItems.Count > 0;
+            tsmiSorted.Enabled = tsmiSorted.DropDownItems.Count > 0;
         }
 
         /// <summary>
@@ -321,13 +343,13 @@ namespace WinFormsComponents.Controls
         /// <param name="newParametr">Новый параметр</param>
         /// <param name="baseParametr">Текущий параметр</param>
         /// <param name="updateParametr">Делегат вызова события для обновления значения текущего фильтра</param>
-        private async void UpdateSearhParametrs(ConditionsParametr newParametr, ConditionsParametr baseParametr, UpdateParametrChangedHandler updateParametr = null)
+        private async void UpdateSearhParametrs(BaseParametrCollection newParametr, BaseParametrCollection baseParametr, UpdateParametrChangedHandler updateParametr = null)
         {
-            Parameters.Conditions -= baseParametr;
+            Parameters.Conditions -= (ConditionsParametr)baseParametr;
 
             if (newParametr is not null)
             {
-                Parameters.Conditions += newParametr;
+                Parameters.Conditions += (ConditionsParametr)newParametr;
             }
 
             if (baseParametr != newParametr)
@@ -335,7 +357,30 @@ namespace WinFormsComponents.Controls
                 updateParametr?.Invoke(newParametr);
 
                 CheckSearch();
-                await UpdateCountPage(Parameters.Limit);
+                await UpdateSearch();
+            }
+        }
+
+        /// <summary>
+        /// Обновление списка параметров в ссответствии сортировочному фильтру (срабатывает при закрытии фильтра)
+        /// </summary>
+        /// <param name="newParametr">Новый параметр</param>
+        /// <param name="baseParametr">Текущий параметр</param>
+        /// <param name="updateParametr">Делегат вызова события для обновления значения текущего фильтра</param>
+        private async void UpdateOrdersParametrs(BaseParametrCollection newParametr, BaseParametrCollection baseParametr, UpdateParametrChangedHandler updateParametr = null)
+        {
+            Parameters.Orders -= (OrderParametr)baseParametr;
+
+            if (newParametr is not null)
+            {
+                Parameters.Orders += (OrderParametr)newParametr;
+            }
+
+            if (baseParametr != newParametr)
+            {
+                updateParametr?.Invoke(newParametr);
+
+                await UpdateSearch();
             }
         }
 
@@ -398,7 +443,7 @@ namespace WinFormsComponents.Controls
 
             Parameters.Offset = (nowPage - 1) * Parameters.Limit;
 
-            if (lvModel.Columns[0].Name == "numColumn") 
+            if (lvModel.Columns[0].Name == "numColumn")
                 lvModel.Columns[0].Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1;
 
             tstbActualPage.Text = nowPage.ToString();
@@ -528,7 +573,7 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private void ShowNumerate()
         {
-            if (IsShowNum) lvModel.Columns.Insert(0, new ColumnHeader() { Text = "№", Name = "numColumn", Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1});
+            if (IsShowNum) lvModel.Columns.Insert(0, new ColumnHeader() { Text = "№", Name = "numColumn", Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1 });
             else lvModel.Columns.RemoveAt(0);
 
             if ((Items?.Count ?? 0) > 0)
@@ -715,7 +760,7 @@ namespace WinFormsComponents.Controls
                         lvModel.Columns[0].Tag = 1;
 
                     await LoadListAsync();
-                } 
+                }
             }
         }
 
