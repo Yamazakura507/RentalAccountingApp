@@ -9,11 +9,11 @@ namespace RentalAccountingApp
         public MainForm()
         {
             InitializeComponent();
-            tcDBViewr.KeyDown += dbmlvMaterials.lvModelOnKeyDown;
 
             ConnectionInfo.ConnectDB();
             dbmlvMaterials.ModelType = typeof(Materials);
             dmlvCategories.ModelType = typeof(Categories);
+            dmlvInventory.ModelType = typeof(Inventory);
         }
 
         private void dbmlvLookupOnUpdateChanged(object sender, Action<object> e) => new DBModelLookupEditor(sender, e).Show();
@@ -22,9 +22,34 @@ namespace RentalAccountingApp
 
         private void tsbSetingsOnClick(object sender, EventArgs e) => new SettingsForm().Show();
 
-        private void dbmlvLookupOnInsertChanged(object sender, EventArgs e)
+        private void tcDBViewrOnKeyDown(object sender, KeyEventArgs e)
         {
+            bool isComand = false;
 
+            switch (e.KeyCode)
+            {
+                case Keys.S when e.Control:
+                    isComand = true;
+                    new SettingsForm().Show();
+                    e.SuppressKeyPress = true;
+                    break;
+            }
+
+            if (!isComand)
+            {
+                switch (tcDBViewr.SelectedIndex)
+                {
+                    case 0:
+                        dmlvInventory.lvModelOnKeyDown(sender, e);
+                        break;
+                    case 1:
+                        dbmlvMaterials.lvModelOnKeyDown(sender, e);
+                        break;
+                    case 2:
+                        dmlvCategories.lvModelOnKeyDown(sender, e);
+                        break;
+                }
+            }
         }
     }
 }

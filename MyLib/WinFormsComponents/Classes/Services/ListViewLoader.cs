@@ -1,5 +1,6 @@
 ﻿using DataBaseProvaider.Attributes;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using WinFormsComponents.Classes.Interface;
 
@@ -69,12 +70,13 @@ namespace WinFormsComponents.Classes.Services
             foreach (PropertyInfo property in properties)
             {
                 ViewModelAttribute vmAttribute = property.GetCustomAttribute<ViewModelAttribute>();
+                DisplayFormatAttribute dfAttribute = property.GetCustomAttribute<DisplayFormatAttribute>();
 
                 if (vmAttribute != null)
                 {
                     if (vmAttribute.Headline)
                     {
-                        string value = property.GetValue(item)?.ToString() ?? string.Empty;
+                        string value = property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString);
 
                         if (isNum) lvItem.SubItems.Add(value);
                         else lvItem.Text = value;
@@ -90,7 +92,7 @@ namespace WinFormsComponents.Classes.Services
                 }
                 else
                 {
-                    lvItem.SubItems.Add(property.GetValue(item)?.ToString() ?? string.Empty);
+                    lvItem.SubItems.Add(property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString));
                 }
 
                 lvItem.Tag = item;

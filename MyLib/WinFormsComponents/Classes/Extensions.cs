@@ -129,5 +129,21 @@ namespace WinFormsComponents.Classes
 
             return randomColor;
         }
+
+        /// <summary>
+        /// Форматирование объекта в строку по формату
+        /// </summary>
+        /// <param name="obj">Объект</param>
+        /// <param name="format">Формат вывода</param>
+        /// <returns>Строка</returns>
+        public static string StringOutDBFormated(this object? obj, string format = null)
+        {
+            if (!String.IsNullOrEmpty(format))
+            {
+                if (obj is double) return Convert.ToDouble(obj).ToString(format);
+            }
+
+            return obj?.ToString() ?? string.Empty;
+        }
     }
 }

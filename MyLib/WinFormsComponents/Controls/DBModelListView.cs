@@ -176,6 +176,8 @@ namespace WinFormsComponents.Controls
             tsmiAllCountShow.Checked = IsShowCountAll;
             tsmiEnterCountShow.Checked = IsShowCountEnter;
             tsmiNumeretorVisible.Checked = IsShowNum;
+            tsmiAdd.Enabled = tsbAdd.Enabled = InsertChanged is not null;
+            tsmiEdit.Enabled = tsbEdit.Enabled = UpdateChanged is not null;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
@@ -653,6 +655,8 @@ namespace WinFormsComponents.Controls
 
         public async void lvModelOnKeyDown(object sender, KeyEventArgs e)
         {
+            if (!this.Enabled) return;
+
             bool isComand = false;
             (bool isRemove, bool isRepair) = SelectedCheck();
 
@@ -663,7 +667,7 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Enter when lvModel.SelectedItems.Count == 1:
+                case Keys.Enter when lvModel.SelectedItems.Count == 1 && UpdateChanged is not null:
                     isComand = true;
                     OnUpdateChanged(lvModel.SelectedItems[0].Tag);
                     break;
@@ -671,7 +675,7 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Insert:
+                case Keys.Insert when InsertChanged is not null:
                     isComand = true;
                     OnInsertChanged();
                     break;

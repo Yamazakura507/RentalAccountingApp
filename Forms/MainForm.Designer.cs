@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs3 = new DataBaseProvaider.Objects.CollectionParametrs();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
             tsMainMenu = new ToolStrip();
             tsbSetings = new ToolStripButton();
@@ -41,10 +42,12 @@
             tpMaterial = new TabPage();
             dbmlvMaterials = new WinFormsComponents.Controls.DBModelListView();
             tpInventory = new TabPage();
+            dmlvInventory = new WinFormsComponents.Controls.DBModelListView();
             tsMainMenu.SuspendLayout();
             tpCategory.SuspendLayout();
             tcDBViewr.SuspendLayout();
             tpMaterial.SuspendLayout();
+            tpInventory.SuspendLayout();
             SuspendLayout();
             // 
             // tsMainMenu
@@ -64,6 +67,7 @@
             tsbSetings.ImageTransparentColor = Color.Magenta;
             tsbSetings.Name = "tsbSetings";
             tsbSetings.Size = new Size(23, 22);
+            tsbSetings.ToolTipText = "Настройки(Ctrl+S)";
             tsbSetings.Click += tsbSetingsOnClick;
             // 
             // tpCategory
@@ -106,6 +110,8 @@
             dmlvCategories.Size = new Size(786, 391);
             dmlvCategories.TabIndex = 0;
             dmlvCategories.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
+            dmlvCategories.InsertChanged += dbmlvLookupOnInsertChanged;
+            dmlvCategories.UpdateChanged += dbmlvLookupOnUpdateChanged;
             // 
             // ilTabMenu
             // 
@@ -118,9 +124,9 @@
             // 
             // tcDBViewr
             // 
+            tcDBViewr.Controls.Add(tpInventory);
             tcDBViewr.Controls.Add(tpMaterial);
             tcDBViewr.Controls.Add(tpCategory);
-            tcDBViewr.Controls.Add(tpInventory);
             tcDBViewr.Dock = DockStyle.Fill;
             tcDBViewr.ImageList = ilTabMenu;
             tcDBViewr.Location = new Point(0, 25);
@@ -128,6 +134,7 @@
             tcDBViewr.SelectedIndex = 0;
             tcDBViewr.Size = new Size(800, 425);
             tcDBViewr.TabIndex = 1;
+            tcDBViewr.KeyDown += tcDBViewrOnKeyDown;
             // 
             // tpMaterial
             // 
@@ -160,10 +167,10 @@
             dbmlvMaterials.ModelType = null;
             dbmlvMaterials.Name = "dbmlvMaterials";
             dbmlvMaterials.PageLimit = 0;
-            collectionParametrs2.Limit = 0;
-            collectionParametrs2.Offset = 0;
-            collectionParametrs2.SerhingParametrsCount = 0;
-            dbmlvMaterials.Parameters = collectionParametrs2;
+            collectionParametrs3.Limit = 0;
+            collectionParametrs3.Offset = 0;
+            collectionParametrs3.SerhingParametrsCount = 0;
+            dbmlvMaterials.Parameters = collectionParametrs3;
             dbmlvMaterials.RemovingRowColor = Color.MistyRose;
             dbmlvMaterials.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dbmlvMaterials.Size = new Size(786, 391);
@@ -174,6 +181,7 @@
             // 
             // tpInventory
             // 
+            tpInventory.Controls.Add(dmlvInventory);
             tpInventory.ImageKey = "inventory.png";
             tpInventory.Location = new Point(4, 24);
             tpInventory.Name = "tpInventory";
@@ -182,6 +190,35 @@
             tpInventory.TabIndex = 2;
             tpInventory.Text = "Инвентарь";
             tpInventory.UseVisualStyleBackColor = true;
+            // 
+            // dmlvInventory
+            // 
+            dmlvInventory.Dock = DockStyle.Fill;
+            dmlvInventory.Enabled = false;
+            dmlvInventory.FilterOffColor = Color.MistyRose;
+            dmlvInventory.FilterOnColor = Color.LightGreen;
+            dmlvInventory.ImageList = ilTabMenu;
+            dmlvInventory.IsFilter = true;
+            dmlvInventory.IsGridLines = true;
+            dmlvInventory.IsSearch = true;
+            dmlvInventory.IsShowCountAll = true;
+            dmlvInventory.IsShowCountEnter = true;
+            dmlvInventory.IsShowNum = false;
+            dmlvInventory.IsSorted = true;
+            dmlvInventory.Location = new Point(3, 3);
+            dmlvInventory.MinimumSize = new Size(530, 130);
+            dmlvInventory.ModelType = null;
+            dmlvInventory.Name = "dmlvInventory";
+            dmlvInventory.PageLimit = 0;
+            collectionParametrs2.Limit = 0;
+            collectionParametrs2.Offset = 0;
+            collectionParametrs2.SerhingParametrsCount = 0;
+            dmlvInventory.Parameters = collectionParametrs2;
+            dmlvInventory.RemovingRowColor = Color.MistyRose;
+            dmlvInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
+            dmlvInventory.Size = new Size(786, 391);
+            dmlvInventory.TabIndex = 0;
+            dmlvInventory.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
             // 
             // MainForm
             // 
@@ -199,6 +236,7 @@
             tpCategory.ResumeLayout(false);
             tcDBViewr.ResumeLayout(false);
             tpMaterial.ResumeLayout(false);
+            tpInventory.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -214,5 +252,6 @@
         private TabPage tpInventory;
         private WinFormsComponents.Controls.DBModelListView dbmlvMaterials;
         private WinFormsComponents.Controls.DBModelListView dmlvCategories;
+        private WinFormsComponents.Controls.DBModelListView dmlvInventory;
     }
 }
