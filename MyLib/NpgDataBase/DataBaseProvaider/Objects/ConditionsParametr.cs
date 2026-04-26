@@ -34,6 +34,11 @@ namespace DataBaseProvaider.Objects
         public virtual bool IsSerhing { get; set; } = false;
 
         /// <summary>
+        /// Тип сравниваемого параметра
+        /// </summary>
+        public virtual Type Type { get; set; } = typeof(string);
+
+        /// <summary>
         /// Создание объекта по наименовании колонки, условному оператору и искомому/сравниваемому значению
         /// </summary>
         /// <param name="columnName">Наименование колонки</param>

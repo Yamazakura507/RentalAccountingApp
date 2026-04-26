@@ -1,5 +1,6 @@
 ﻿using DataBaseProvaider.Classes.Abstract;
 using DataBaseProvaider.Objects;
+using WinFormsComponents.Classes.Model;
 
 namespace WinFormsComponents.Classes.Interface
 {
@@ -25,7 +26,8 @@ namespace WinFormsComponents.Classes.Interface
         /// <param name="columnText">Текст свойства фильтрации</param>
         /// <param name="columnName">Наименование параметра фильтрации</param>
         /// <param name="parametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
+        /// <param name="parametrType">Тип значения параметра</param>
         /// <param name="onFilterChanged">Обработчик включения фильтра</param>
-        ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection parametr, FilterChangedHandler onFilterChanged = null);
+        ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection parametr, Type parametrType, FilterChangedHandler onFilterChanged = null, SettingFilter settingFilter = null);
     }
 }

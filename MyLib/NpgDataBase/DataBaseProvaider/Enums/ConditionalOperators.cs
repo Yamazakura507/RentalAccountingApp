@@ -100,6 +100,16 @@ namespace DataBaseProvaider.Enums
         /// <value>10</value>
         [Comment("По левенштейну")]
         [Description("levenshtein_less_equal")]
-        Levenshtein = 10
+        Levenshtein = 10,
+        /// <summary>
+        /// Ограничитель диапазона
+        /// </summary>
+        /// <remarks>
+        /// Этот ограничитель используеться для фильтрации выставляя диапазон значения от и до
+        /// </remarks>
+        /// <value>11</value>
+        [Comment("Ограничитель диапазона")]
+        [Description("BETWEEN")]
+        Between = 11
     }
 }

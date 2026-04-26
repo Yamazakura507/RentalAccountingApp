@@ -18,6 +18,7 @@ namespace WinFormsComponents.Controls
         private Type modelType;
         private readonly IFilter searchFilter;
         private readonly IFilter orderFilter;
+        private readonly IFilter filterFilter;
         private readonly IListViewLoader listViewLoader;
         private string parametrRemovingName = null;
         private Loader loader = new();
@@ -157,6 +158,7 @@ namespace WinFormsComponents.Controls
             loader.Visible = this.Enabled = ModelType is not null;
             searchFilter = new SearhFilterLoader(FilterOffColor, FilterOnColor);
             orderFilter = new OrderFilterLoader(FilterOffColor, FilterOnColor);
+            filterFilter = new FilterLoader(FilterOffColor, FilterOnColor);
             listViewLoader = new ListViewLoader(RemovingRowColor);
             Parameters ??= new();
             TermsOfInteractionDB ??= new();
@@ -213,7 +215,7 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Загрузка фильтра
         /// </summary>
-        private void FilterLoad()
+        private async void FilterLoad()
         {
             tsmiSearh.Visible = IsSearch;
             tsmiFilter.Visible = IsFilter;
@@ -224,7 +226,6 @@ namespace WinFormsComponents.Controls
             tsmiFilter.DropDownItems.Clear();
             tsmiSorted.DropDownItems.Clear();
 
-            IEnumerable<ConditionsParametr> searchParameters = Parameters.Conditions.Where(i => i.IsSerhing);
             IEnumerable<PropertyInfo> properties = ModelType.GetProperties().Where(i => !i.GetCustomAttribute<ViewModelAttribute>()?.ViewHide ?? true);
 
             foreach (PropertyInfo property in properties)
@@ -235,8 +236,10 @@ namespace WinFormsComponents.Controls
                 {
                     if (IsSearch)
                     {
+                        IEnumerable<ConditionsParametr> searchParameters = Parameters.Conditions.Where(i => i.IsSerhing);
+
                         ToolStripMenuItem tsmiSearh = searchFilter.CreateFilter(titleMenu, property.Name,
-                        searchParameters.FirstOrDefault(i => i.ColumnName.Equals(property.Name)),
+                        searchParameters.FirstOrDefault(i => i.ColumnName.Equals(property.Name)), property.PropertyType,
                         UpdateSearhParametrs);
 
                         this.tsmiSearh.DropDownItems.Add(tsmiSearh);
@@ -245,7 +248,7 @@ namespace WinFormsComponents.Controls
                     if (IsSorted)
                     {
                         ToolStripMenuItem tsmiSorted = orderFilter.CreateFilter(titleMenu, property.Name,
-                        Parameters.Orders.FirstOrDefault(i => i.ColumnName.Equals(property.Name)),
+                        Parameters.Orders.FirstOrDefault(i => i.ColumnName.Equals(property.Name)), property.PropertyType,
                         UpdateOrdersParametrs);
 
                         this.tsmiSorted.DropDownItems.Add(tsmiSorted);
@@ -253,7 +256,15 @@ namespace WinFormsComponents.Controls
 
                     if (IsFilter && (property.GetCustomAttribute<ViewModelAttribute>()?.FilterOn ?? false))
                     {
-                        ToolStripMenuItem tsmiFilter = new(titleMenu, Properties.Resources.filter);
+                        IEnumerable<ConditionsParametr> filterParameters = Parameters.Conditions.Where(i => !i.IsSerhing);
+                        object max = await modelType.GetResultByType<object>([property.Name, null], nameof(DBProvider.Max));
+                        object min = await modelType.GetResultByType<object>([property.Name, null], nameof(DBProvider.Min));
+
+                        SettingFilter settingFilter = new SettingFilter(max, min);
+
+                        ToolStripMenuItem tsmiFilter = filterFilter.CreateFilter(titleMenu, property.Name,
+                        filterParameters.FirstOrDefault(i => i.ColumnName.Equals(property.Name)), property.PropertyType,
+                        UpdateSearhParametrs, settingFilter);
 
                         this.tsmiFilter.DropDownItems.Add(tsmiFilter);
                     }
@@ -396,7 +407,14 @@ namespace WinFormsComponents.Controls
 
             foreach (ConditionsParametr condition in Parameters.Conditions.Where(i => i?.IsSerhing ?? false))
             {
-                condition.Value = tstbSearh.Text;
+                try
+                {
+                    condition.Value = Convert.ChangeType(tstbSearh.Text, condition.Type);
+                }
+                catch (Exception)
+                {
+                    condition.Value = null;
+                }
             }
 
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));

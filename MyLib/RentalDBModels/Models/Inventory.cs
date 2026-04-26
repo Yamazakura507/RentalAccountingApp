@@ -7,7 +7,7 @@ using System.Data;
 
 namespace RentalDBModels.Models
 {
-    public class Materials : BaseLookupModel
+    public class Inventory : BaseLookupModel
     {
         public override async Task Delete()
         {

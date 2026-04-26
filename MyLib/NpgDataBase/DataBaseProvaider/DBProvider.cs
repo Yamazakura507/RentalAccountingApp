@@ -239,6 +239,55 @@ namespace DataBaseProvaider
         }
 
         /// <summary>
+        /// Получение максимального значения по колонке в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <param name="columnName">Наименование колонки поиска</param>
+        /// <returns>Максимальное значение колонки</returns>
+        async public static Task<object> Max<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "max", conditions);
+
+        /// <summary>
+        /// Получение минимального значения по колонке в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <param name="columnName">Наименование колонки поиска</param>
+        /// <returns>Минимальное значение колонки</returns>
+        async public static Task<object> Min<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "min", conditions);
+
+        /// <summary>
+        /// Получение значения агрегатной функции по колонке в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <param name="columnName">Наименование колонки поиска</param>
+        /// <param name="nameFunc">Наименование агрегатной функции</param>
+        /// <returns>Результат функции</returns>
+        async private static Task<object> AgregateFunc<TModel>(string columnName, string nameFunc, IEnumerable<ConditionsParametr> conditions = null)
+        {
+            ConectionCheck();
+
+            CollectionParametrs parametrs = new() { Conditions = conditions };
+            (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
+
+            string tableName = typeof(TModel).Name;
+            string command = String.Format("SELECT {3}(t.\"{2}\") FROM \"{0}\" t{1};", tableName, conditionsCommand.quary, columnName, nameFunc.ToUpper());
+
+            object agregateVal = null;
+
+            using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
+            {
+                npgSqlProviderClone = msProvider;
+                agregateVal = await msProvider.GetValueAsync<object>(command, conditionsCommand.parametrs);
+            }
+
+            npgSqlProviderClone = null;
+
+            return agregateVal;
+        }
+
+        /// <summary>
         /// Проверка объекта подключения
         /// </summary>
         /// <exception cref="Exception">Сообщение исключение, если отсутствует объект подключения</exception>

@@ -29,7 +29,7 @@ namespace RentalDBModels.Models.Abstract
         {
             DataRow row = await this.GetType().GetResultByType<DataRow>(
                                             [
-                                                ModelToDictinory(), 
+                                                ModelToDictionary(), 
                                                 this.GetType().GetProperties().Select(i => i.Name).ToArray()
                                             ], nameof(DBProvider.Insert));
 
@@ -45,7 +45,7 @@ namespace RentalDBModels.Models.Abstract
         {
             DataRow row = await this.GetType().GetResultByType<DataRow>(
                                             [
-                                                ModelToDictinory(),
+                                                ModelToDictionary(),
                                                 new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id),
                                                 this.GetType().GetProperties().Select(i => i.Name).ToArray()
                                             ], nameof(DBProvider.Update));
@@ -58,7 +58,7 @@ namespace RentalDBModels.Models.Abstract
             return null;
         }
 
-        protected Dictionary<string, object> ModelToDictinory()
+        protected Dictionary<string, object> ModelToDictionary()
         {
             Dictionary<string, object> parametrs = new ();
             PropertyInfo[] propertiesBase = typeof(BaseModel).GetProperties();

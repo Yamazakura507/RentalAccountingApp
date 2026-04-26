@@ -2,6 +2,7 @@
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using WinFormsComponents.Classes.Interface;
+using WinFormsComponents.Classes.Model;
 
 namespace WinFormsComponents.Classes.Services
 {
@@ -18,11 +19,6 @@ namespace WinFormsComponents.Classes.Services
         /// Цвет включенного фильтра
         /// </summary>
         private readonly Color filterOnColor;
-
-        /// <summary>
-        /// Хранилище текущего параметра
-        /// </summary>
-        private OrderParametr baseParametr;
 
         /// <summary>
         /// Конструктор сервиса визуализации сортировок
@@ -42,9 +38,10 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="columnName">Наименование параметра сортировки</param>
         /// <param name="orderParametr">Имеющиеся сведенья о сортировке по выбраному параметру</param>
         /// <param name="onFilterChanged">Обработчик включения сортировки</param>
-        public ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection orderParametr, FilterChangedHandler onFilterChanged = null)
+        /// <param name="settingFilter">Настройка фильтра</param>
+        public ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection orderParametr, Type parametrType, FilterChangedHandler onFilterChanged = null, SettingFilter settingFilter = null)
         {
-            baseParametr = (OrderParametr)orderParametr;
+            OrderParametr baseParametr = (OrderParametr)orderParametr;
 
             ToolStripMenuItem menuItem = new(columnText, 
                                                 baseParametr is null 
@@ -73,7 +70,7 @@ namespace WinFormsComponents.Classes.Services
                 if (e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
                 else
                 {
-                    onFilterChanged?.Invoke(checkItem.Checked ? CreateOrderParametr(menuItem, columnName) : null, baseParametr, UpdateInfoBaseParametr);
+                    onFilterChanged?.Invoke(checkItem.Checked ? CreateOrderParametr(menuItem, columnName) : null, baseParametr, (p) => baseParametr = (OrderParametr)p);
                     checkItem.Checked = checkItem.Checked && checkTemp.Checked;
                 }
             };
@@ -101,15 +98,6 @@ namespace WinFormsComponents.Classes.Services
             menuItem.DropDownItems.Add(checkTemp);
 
             return menuItem;
-        }
-
-        /// <summary>
-        /// Обновление текущего действия параметра
-        /// </summary>
-        /// <param name="baseParametr">Текущий параметр</param>
-        private void UpdateInfoBaseParametr(BaseParametrCollection baseParametr)
-        {
-            this.baseParametr = (OrderParametr)baseParametr;
         }
 
         /// <summary>

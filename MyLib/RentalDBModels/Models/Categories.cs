@@ -23,7 +23,7 @@ namespace RentalDBModels.Models
 
         public override async Task<IModel> Insert()
         {
-            DataRow dataRow = await DBProvider.Insert<Categories>(ModelToDictinory(), this.GetType().GetProperties().Select(i => i.Name).ToArray());
+            DataRow dataRow = await DBProvider.Insert<Categories>(ModelToDictionary(), this.GetType().GetProperties().Select(i => i.Name).ToArray());
 
             if (dataRow != null)
             {
@@ -36,7 +36,7 @@ namespace RentalDBModels.Models
         public override async Task<IModel> Update()
         {
             DataRow dataRow = await DBProvider.Update<Categories>(
-                                        ModelToDictinory(), 
+                                        ModelToDictionary(), 
                                         [new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id)], 
                                         this.GetType().GetProperties().Select(i => i.Name).ToArray());
 

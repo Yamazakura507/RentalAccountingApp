@@ -3,6 +3,7 @@ using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.Reflection;
 using WinFormsComponents.Classes.Interface;
+using WinFormsComponents.Classes.Model;
 
 namespace WinFormsComponents.Classes.Services
 {
@@ -12,6 +13,11 @@ namespace WinFormsComponents.Classes.Services
     public class SearhFilterLoader : IFilter
     {
         /// <summary>
+        /// Значения операторов которые используются только при поиске по строковым значениям
+        /// </summary>
+        private readonly ConditionalOperators[] coExacStringTypeFilter = [ConditionalOperators.ILike, ConditionalOperators.Like, ConditionalOperators.ExactILike, ConditionalOperators.ExactLike, ConditionalOperators.Levenshtein];
+
+        /// <summary>
         /// Цвет отключенного фильтра
         /// </summary>
         private readonly Color filterOffColor;
@@ -19,11 +25,6 @@ namespace WinFormsComponents.Classes.Services
         /// Цвет включенного фильтра
         /// </summary>
         private readonly Color filterOnColor;
-
-        /// <summary>
-        /// Хранилище текущего параметра
-        /// </summary>
-        private ConditionsParametr baseParametr;
 
         /// <summary>
         /// Конструктор сервиса визуализации фильтров
@@ -43,10 +44,10 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="columnName">Наименование параметра фильтрации</param>
         /// <param name="searchParametr">Имеющиеся сведенья о фильтрации по выбраному параметру</param>
         /// <param name="onFilterChanged">Обработчик включения фильтра</param>
-        public ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection searchParametr, FilterChangedHandler onFilterChanged = null)
+        /// <param name="settingFilter">Настройка фильтра</param>
+        public ToolStripMenuItem CreateFilter(string columnText, string columnName, BaseParametrCollection searchParametr, Type parametrType, FilterChangedHandler onFilterChanged = null, SettingFilter settingFilter = null)
         {
-            baseParametr = (ConditionsParametr)searchParametr;
-            ConditionsParametr searchParametrConditions = (ConditionsParametr)searchParametr;
+            ConditionsParametr baseParametr = (ConditionsParametr)searchParametr;
             ToolStripMenuItem menuItem = new(columnText, Properties.Resources.searh);
 
             Dictionary<bool, (string, string, Color)> checkItemParametrs = new()
@@ -59,12 +60,14 @@ namespace WinFormsComponents.Classes.Services
             ToolStripComboBox comboBoxSearchType = FilterFunction.ComboBoxFilterLoad<ConditionalOperators>(checkItem.Checked, searchParametr, "Условие поиска");
             ToolStripComboBox comboBoxLogicType = FilterFunction.ComboBoxFilterLoad<LogicOperators>(checkItem.Checked, searchParametr, "Логическое соединение условий поиска");
 
+            ComboBoxSearhCheckTypeOut(comboBoxSearchType, parametrType);
+
             menuItem.DropDown.Closing += (s, e) =>
             {
                 if (e.CloseReason.Equals(ToolStripDropDownCloseReason.ItemClicked)) e.Cancel = true;
                 else
                 {
-                    onFilterChanged?.Invoke(checkItem.Checked ? CreateConditionSearhParametr(menuItem, columnName) : null, baseParametr, UpdateInfoBaseParametr);
+                    onFilterChanged?.Invoke(checkItem.Checked ? CreateConditionSearhParametr(menuItem, columnName, parametrType) : null, baseParametr, (p) => baseParametr = (ConditionsParametr)p);
                 }
             };
             checkItem.CheckedChanged += (s, e) =>
@@ -76,8 +79,8 @@ namespace WinFormsComponents.Classes.Services
             {
                 menuItem.DropDownItems.CutToolStripCollection(2, 1);
 
-                ConditionalOperators operators = GetSelectedOperator(comboBoxSearchType, searchParametrConditions);
-                List<ToolStripItem> settingItems = CreateAdvancedFilterItems(checkItem.Checked, searchParametrConditions, operators);
+                ConditionalOperators operators = GetSelectedOperator(comboBoxSearchType, (ConditionsParametr)searchParametr);
+                List<ToolStripItem> settingItems = CreateAdvancedFilterItems(checkItem.Checked, (ConditionsParametr)searchParametr, operators);
                 comboBoxSearchType.EnabledChanged += (s, e) => settingItems.ForEach(i => i.Visible = comboBoxSearchType.Enabled);
 
                 for (int i = 0; i < settingItems.Count; i++)
@@ -93,18 +96,9 @@ namespace WinFormsComponents.Classes.Services
             comboBoxSearchType.GetType()
                 .GetMethod("OnSelectedIndexChanged", BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.Invoke(comboBoxSearchType, new object[] { EventArgs.Empty });
-            searchParametr = searchParametrConditions = null;
+            searchParametr = searchParametr = null;
 
             return menuItem;
-        }
-
-        /// <summary>
-        /// Обновление текущего действия параметра
-        /// </summary>
-        /// <param name="baseParametr">Текущий параметр</param>
-        private void UpdateInfoBaseParametr(BaseParametrCollection baseParametr)
-        { 
-            this.baseParametr = (ConditionsParametr)baseParametr;
         }
 
         /// <summary>
@@ -112,8 +106,9 @@ namespace WinFormsComponents.Classes.Services
         /// </summary>
         /// <param name="menuItem">Элемент меню к которому относится поисковой фильтр</param>
         /// <param name="columnName">Наименование параметра поиска</param>
+        /// <param name="typeParametr">Тип фильтруемого параметар</param>
         /// <returns></returns>
-        private ConditionsParametr CreateConditionSearhParametr(ToolStripMenuItem menuItem, string columnName)
+        private ConditionsParametr CreateConditionSearhParametr(ToolStripMenuItem menuItem, string columnName, Type typeParametr)
         {
             string valOper = ((ToolStripComboBox)menuItem.DropDownItems[1]).SelectedItem.ToString();
             string valLogic = ((ToolStripComboBox)menuItem.DropDownItems[menuItem.DropDownItems.Count-1]).SelectedItem.ToString();
@@ -153,7 +148,8 @@ namespace WinFormsComponents.Classes.Services
             return levenshteinLen is null
                 ? new ConditionsParametr(columnName, operators, logic, null) 
                 { 
-                    IsSerhing = true 
+                    IsSerhing = true,
+                    Type = typeParametr
                 }
                 : new LevenshteinSupplement()
                 {
@@ -281,6 +277,25 @@ namespace WinFormsComponents.Classes.Services
             textBox.KeyPress += (sender, e) => e.NumRestrictionTextBox();
 
             return new ToolStripItem[] { label, textBox };
+        }
+
+        /// <summary>
+        /// Проверка доступного поискового набора фильра на соответствие типу параметра
+        /// </summary>
+        /// <param name="comboBox">Выпадающий список с вариантами фильтраций</param>
+        /// <param name="valueFilterType">Тип параметра</param>
+        private void ComboBoxSearhCheckTypeOut(ToolStripComboBox comboBox, Type valueFilterType)
+        {
+            Dictionary<ConditionalOperators, string> operators = Extensions.GetCommitEnumDictionary<ConditionalOperators>();
+
+            comboBox.Items.Remove(operators.First(i => i.Key == ConditionalOperators.Between).Value);
+
+            if (valueFilterType.Equals(typeof(string))) return;
+
+            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => coExacStringTypeFilter.Contains(i.Key)))
+            {
+                comboBox.Items.Remove(kvp.Value);
+            }
         }
     }
 }

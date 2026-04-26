@@ -140,7 +140,7 @@ namespace WinFormsComponents.Classes
         {
             if (!String.IsNullOrEmpty(format))
             {
-                if (obj is double) return Convert.ToDouble(obj).ToString(format);
+                return String.Format(format, obj);
             }
 
             return obj?.ToString() ?? string.Empty;

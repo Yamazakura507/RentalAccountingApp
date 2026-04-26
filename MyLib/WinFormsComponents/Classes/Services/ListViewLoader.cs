@@ -89,6 +89,10 @@ namespace WinFormsComponents.Classes.Services
                     {
                         lvItem.BackColor = removingRowColor;
                     }
+                    else
+                    {
+                        lvItem.SubItems.Add(property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString));
+                    }
                 }
                 else
                 {

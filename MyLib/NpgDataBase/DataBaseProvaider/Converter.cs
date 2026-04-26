@@ -255,7 +255,7 @@ namespace DataBaseProvaider
                 {
                     ConditionsParametr condition = conditions.ElementAt(i);
 
-                    condition.LogicOperator = i + 1 == cntCondition 
+                    LogicOperators logic = i + 1 == cntCondition 
                                                 ? LogicOperators.None 
                                                 : condition.LogicOperator == LogicOperators.None 
                                                     ? LogicOperators.And 
@@ -268,7 +268,7 @@ namespace DataBaseProvaider
                         conditionsStr += String.Format("{1}(t.\"{0}\",@{0}{3},@maxDistance{0}{3}) <= @maxDistance{0}{3} {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
-                                         condition.LogicOperator.GetDescription(), 
+                                         logic.GetDescription(), 
                                          condition.Id);
 
                         conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id), condition.Value));
@@ -277,12 +277,23 @@ namespace DataBaseProvaider
 
                         levenshteinCondition.LevenshteinSetOrders(collection);
                     }
+                    else if (condition.Operator.Equals(ConditionalOperators.Between))
+                    {
+                        conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3}1 AND @{0}{3}2 {2} ",
+                                         condition.ColumnName,
+                                         condition.Operator.GetDescription(),
+                                         logic.GetDescription(),
+                                         condition.Id);
+
+                        conditionsParametr.Add(new(String.Format("@{0}{1}1", condition.ColumnName, condition.Id), ((object[])condition.Value)[0]));
+                        conditionsParametr.Add(new(String.Format("@{0}{1}2", condition.ColumnName, condition.Id), ((object[])condition.Value)[1]));
+                    }
                     else
                     {
                         conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3} {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
-                                         condition.LogicOperator.GetDescription(), 
+                                         logic.GetDescription(), 
                                          condition.Id);
 
                         conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id),

@@ -1,5 +1,4 @@
 ﻿using DataBaseProvaider.Classes.Abstract;
-using DataBaseProvaider.Objects;
 
 namespace WinFormsComponents.Classes.Services
 {

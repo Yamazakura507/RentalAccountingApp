@@ -11,13 +11,14 @@ namespace RentalDBModels.Views
         [Description("Инвентарь")]
         public string Name { get; set; }
 
-        [Description("Цена")]
-        [DisplayFormat(DataFormatString = "N2")]
+        [ViewModel(FilterOn = true)]
+        [Description("Цена(₽)")]
+        [DisplayFormat(DataFormatString = "{0:N2} ₽")]
         public double Price { get; set; }
 
         [ViewModel(ViewHide = true, Image = true)]
         public string ImageKey { get; set; } = "inventory.png";
 
-        public override Type ModelType { get => typeof(Models.Categories); }
+        public override Type ModelType { get => typeof(Models.Inventory); }
     }
 }
