@@ -26,6 +26,10 @@ namespace DataBaseProvaider.Objects
         /// <summary>
         /// Сравнивоемое/Искомое значение
         /// </summary>
+        /// <remarks>
+        /// Для оператора Beetwen - значением будет <see cref="object"/>[] из двух значений от и до
+        /// Для оператора In - значением будет <see cref="IList"/>
+        /// </remarks>
         public object Value { get; set; } = null;
 
         /// <summary>
@@ -43,7 +47,18 @@ namespace DataBaseProvaider.Objects
         /// </summary>
         /// <param name="columnName">Наименование колонки</param>
         /// <param name="operators">Условный оператор</param>
-        /// <param name="value">Искомое/Сравниваемое значение</param>
+        /// <param name="value">Искомое/Сравниваемое значение<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.Between"/> - 
+        /// значением <paramref name="value"/> будет <see cref="object"/>[] из двух значений от и до<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.In"/> - 
+        /// значением <paramref name="value"/> будет <see cref="IList"/>
+        /// </param>
+        /// <remarks>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.Between"/> - 
+        /// значением <paramref name="value"/> будет <see cref="object"/>[] из двух значений от и до<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.In"/> - 
+        /// значением <paramref name="value"/> будет <see cref="IList"/>
+        /// </remarks>
         public ConditionsParametr(string columnName, ConditionalOperators operators, object value = null) 
         { 
             ColumnName = columnName;
@@ -57,7 +72,18 @@ namespace DataBaseProvaider.Objects
         /// <param name="columnName">Наименование колонки</param>
         /// <param name="operators">Условный оператор</param>
         /// <param name="logic">Логический оператор</param>
-        /// <param name="value">Искомое/Сравниваемое значение</param>
+        /// <param name="value">Искомое/Сравниваемое значение<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.Between"/> - 
+        /// значением <paramref name="value"/> будет <see cref="object"/>[] из двух значений от и до<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.In"/> - 
+        /// значением <paramref name="value"/> будет <see cref="IList"/>
+        /// </param>
+        /// <remarks>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.Between"/> - 
+        /// значением <paramref name="value"/> будет <see cref="object"/>[] из двух значений от и до<br/>
+        /// Для оператора <paramref name="operators"/> <see cref="ConditionalOperators.In"/> - 
+        /// значением <paramref name="value"/> будет <see cref="IList"/>
+        /// </remarks>
         public ConditionsParametr(string columnName, ConditionalOperators operators, LogicOperators logic, object value = null)
         {
             ColumnName = columnName;

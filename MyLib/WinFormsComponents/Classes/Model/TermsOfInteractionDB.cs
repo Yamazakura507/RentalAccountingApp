@@ -26,7 +26,7 @@ namespace WinFormsComponents.Classes.Model
         /// <param name="items">Список строк на удаление</param>
         /// <param name="modelType">Тип модели</param>
         /// <returns>Список параметров</returns>
-        public IEnumerable<ConditionsParametr> GetDeleteParamers(SelectedListViewItemCollection items, Type modelType) => CreateParametrs(DeleteConditions, items, modelType);
+        public IEnumerable<ConditionsParametr> GetSelectedParamers(SelectedListViewItemCollection items, Type modelType) => CreateParametrs(DeleteConditions, items, modelType);
         /// <summary>
         /// Получение списка параметров фильтрации для операции обновления
         /// </summary>

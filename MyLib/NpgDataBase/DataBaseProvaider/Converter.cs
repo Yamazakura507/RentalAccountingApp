@@ -2,13 +2,12 @@
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using Npgsql;
+using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 
 namespace DataBaseProvaider
 {
@@ -192,7 +191,7 @@ namespace DataBaseProvaider
         /// </returns>
         async public static Task<BindingList<T>> GetCollectionByType<T>(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
-            Task task = await type.InvokeMethodByType(parametrs, nameMethod, classType);
+            Task task = await type.InvokeMethodByType(parametrs, nameMethod, classType) as Task;
 
             IEnumerable<T> collection = ((dynamic)task).Result;
 
@@ -206,15 +205,20 @@ namespace DataBaseProvaider
         /// <param name="parametrs">Параметры вызываемого метода</param>
         /// <param name="nameMethod">Наименование метода</param>
         /// <returns>Процес</returns>
-        async public static Task<Task> InvokeMethodByType(this Type type, object[] parametrs, string nameMethod, Type classType = null)
+        async public static Task<object> InvokeMethodByType(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
             MethodInfo method = (classType ?? typeof(DBProvider)).GetMethod(nameMethod);
             MethodInfo genericMethod = method.MakeGenericMethod(type);
 
-            Task task = genericMethod.Invoke(null, parametrs) as Task;
-            await task.ConfigureAwait(false);
+            bool isTaskReturn = typeof(Task).IsAssignableFrom(genericMethod.ReturnType);
+            object result = genericMethod.Invoke(null, parametrs);
 
-            return task;
+            if (isTaskReturn)
+            {
+                await (result as Task).ConfigureAwait(false);
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -227,11 +231,9 @@ namespace DataBaseProvaider
         /// <returns>Значение запрашиваемого типа</returns>
         async public static Task<T> GetResultByType<T>(this Type type, object[] parametrs, string nameMethod, Type classType = null)
         {
-            Task task = await type.InvokeMethodByType(parametrs, nameMethod, classType);
+            object result = await type.InvokeMethodByType(parametrs, nameMethod, classType);
 
-            T result = (T)((dynamic)task).Result;
-
-            return result;
+            return result is Task ? (T)((dynamic)result).Result : (T)result;
         }
 
         /// <summary>
@@ -261,43 +263,58 @@ namespace DataBaseProvaider
                                                     ? LogicOperators.And 
                                                     : condition.LogicOperator;
 
-                    if (condition.Operator.Equals(ConditionalOperators.Levenshtein))
+                    switch (condition.Operator)
                     {
-                        LevenshteinSupplement levenshteinCondition = (LevenshteinSupplement)condition;
+                        case ConditionalOperators.Levenshtein:
+                            LevenshteinSupplement levenshteinCondition = (LevenshteinSupplement)condition;
 
-                        conditionsStr += String.Format("{1}(t.\"{0}\",@{0}{3},@maxDistance{0}{3}) <= @maxDistance{0}{3} {2} ",
-                                         condition.ColumnName,
-                                         condition.Operator.GetDescription(),
-                                         logic.GetDescription(), 
-                                         condition.Id);
+                            conditionsStr += String.Format("{1}(t.\"{0}\",@{0}{3},@maxDistance{0}{3}) <= @maxDistance{0}{3} {2} ",
+                                             condition.ColumnName,
+                                             condition.Operator.GetDescription(),
+                                             logic.GetDescription(),
+                                             condition.Id);
 
-                        conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id), condition.Value));
-                        conditionsParametr.Add(new(String.Format("@maxDistance{0}{1}", condition.ColumnName, condition.Id),
-                                                                       levenshteinCondition.MaxDistance ?? 3));
+                            conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id), condition.Value));
+                            conditionsParametr.Add(new(String.Format("@maxDistance{0}{1}", condition.ColumnName, condition.Id),
+                                                                           levenshteinCondition.MaxDistance ?? 3));
 
-                        levenshteinCondition.LevenshteinSetOrders(collection);
-                    }
-                    else if (condition.Operator.Equals(ConditionalOperators.Between))
-                    {
-                        conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3}1 AND @{0}{3}2 {2} ",
+                            levenshteinCondition.LevenshteinSetOrders(collection);
+                            break;
+                        case ConditionalOperators.Between:
+                            conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3}1 AND @{0}{3}2 {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
                                          logic.GetDescription(),
                                          condition.Id);
 
-                        conditionsParametr.Add(new(String.Format("@{0}{1}1", condition.ColumnName, condition.Id), ((object[])condition.Value)[0]));
-                        conditionsParametr.Add(new(String.Format("@{0}{1}2", condition.ColumnName, condition.Id), ((object[])condition.Value)[1]));
-                    }
-                    else
-                    {
-                        conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3} {2} ",
+                            conditionsParametr.Add(new(String.Format("@{0}{1}1", condition.ColumnName, condition.Id), ((object[])condition.Value)[0]));
+                            conditionsParametr.Add(new(String.Format("@{0}{1}2", condition.ColumnName, condition.Id), ((object[])condition.Value)[1]));
+                            break;
+                        case ConditionalOperators.In:
+                        case ConditionalOperators.NotIn:
+                            IList inObjects = (IList)condition.Value;
+
+                            conditionsStr += String.Format("t.\"{0}\" {1} ({3}) {2} ",
+                                             condition.ColumnName,
+                                             condition.Operator.GetDescription(),
+                                             logic.GetDescription(),
+                                             String.Join(",", inObjects.Cast<object>().Select((i, index) => $"@{condition.ColumnName}_{condition.Id}_{index}")));
+
+                            for (int j = 0; j < inObjects.Count; j++)
+                            {
+                                conditionsParametr.Add(new(String.Format("@{0}_{1}_{2}", condition.ColumnName, condition.Id, j), inObjects[j]));
+                            }
+                            break;
+                        default:
+                            conditionsStr += String.Format("t.\"{0}\" {1} @{0}{3} {2} ",
                                          condition.ColumnName,
                                          condition.Operator.GetDescription(),
-                                         logic.GetDescription(), 
+                                         logic.GetDescription(),
                                          condition.Id);
 
-                        conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id),
-                                                                       condition.Operator.CheckLikeOperation(condition.Value ?? DBNull.Value)));
+                            conditionsParametr.Add(new(String.Format("@{0}{1}", condition.ColumnName, condition.Id),
+                                                                           condition.Operator.CheckLikeOperation(condition.Value ?? DBNull.Value)));
+                            break;
                     }
                 }
 
@@ -408,5 +425,6 @@ namespace DataBaseProvaider
                     p => p.Attribute.Description
                 );
         }
+
     }
 }

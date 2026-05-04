@@ -167,10 +167,7 @@ namespace DataBaseProvaider
         /// Получение списка объектов модели
         /// </summary>
         /// <typeparam name="TModel">Тип модели</typeparam>
-        /// <param name="conditions">Набор условных параметров списка объектов модели (Key: [Имя колонки], Value: ([Условна операция], [Логическая операция], [Значение]))</param>
-        /// <param name="orders">Набор сортировочных параметров списка объектов модели (Key: [Имя колонки], Value: [Тип сортировки])</param>
-        /// <param name="limit">Ограничение вывода с конца/лимит</param>
-        /// <param name="offset">Ограничение вывода с начала/пропуск</param>
+        /// <param name="parametrs">Набор различных паарметров фильтрации сортировки запрпоса</param>
         /// <returns>Динамическую коллекцию типа модели</returns>
         async public static Task<BindingList<TModel>> GetCollectionModel<TModel>(CollectionParametrs parametrs = null) where TModel : new()
         {
@@ -207,6 +204,37 @@ namespace DataBaseProvaider
             npgSqlProviderClone = null;
 
             return collection;
+        }
+
+        /// <summary>
+        /// Получение колонки из таблицы модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <typeparam name="TValue">Тип возврата</typeparam>
+        /// <param name="columnName">Имя колонки таблицы</param>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <returns>Список значений колонки</returns>
+        async public static Task<IEnumerable<TValue>> GetColumnModel<TValue,TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) where TModel : new()
+        {
+            ConectionCheck();
+
+            CollectionParametrs parametrs = new() { Conditions = conditions };
+            (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
+
+            string tableName = typeof(TModel).Name;
+            string command = String.Format("SELECT t.\"{2}\" FROM \"{0}\" t{1};", tableName, conditionsCommand.quary, columnName);
+
+            IEnumerable<TValue> columnModel = null;
+
+            using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
+            {
+                npgSqlProviderClone = msProvider;
+                columnModel = await msProvider.GetColumnAsync<TValue>(command, conditionsCommand.parametrs);
+            }
+
+            npgSqlProviderClone = null;
+
+            return columnModel;
         }
 
         /// <summary>

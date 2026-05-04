@@ -34,18 +34,17 @@ namespace WinFormsComponents.Classes.Services
         /// <summary>
         /// Заполнение ListView данными
         /// </summary>
-        public void PopulateListView(ListView listView, Type modelType, BindingList<object> items)
+        public void PopulateListView(ListView listView, BindingList<object> items)
         {
             listView.BeginUpdate();
             listView.Items.Clear();
 
-            PropertyInfo[] propertyCache = modelType.GetProperties();
             bool isNum = listView.Columns[0].Name == "numColumn";
             int num = isNum ? (int)listView.Columns[0].Tag : 0;
 
             foreach (object item in items)
             {
-                ListViewItem lvItem = CreateListViewItem(item, propertyCache, num);
+                ListViewItem lvItem = CreateListViewItem(item, num);
                 listView.Items.Add(lvItem);
                 if(isNum) num++;
             }
@@ -60,10 +59,11 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="item">Компонент примезки</param>
         /// <param name="properties">Список свойств модели</param>
         /// <returns>Элемент <see cref="ListView"/></returns>
-        private ListViewItem CreateListViewItem(object item, PropertyInfo[] properties, int num)
+        private ListViewItem CreateListViewItem(object item, int num)
         {
             ListViewItem lvItem = new ();
             bool isNum = num != 0;
+            PropertyInfo[] properties = item.GetType().GetProperties();
 
             if (isNum) lvItem.Text = num.ToString(); 
 
@@ -88,6 +88,10 @@ namespace WinFormsComponents.Classes.Services
                     else if (vmAttribute.RemovingFlag && !Convert.ToBoolean(property.GetValue(item)))
                     {
                         lvItem.BackColor = removingRowColor;
+                    }
+                    else if (vmAttribute.BackColor && lvItem.BackColor != removingRowColor)
+                    {
+                        lvItem.BackColor = (Color)property.GetValue(item);
                     }
                     else
                     {

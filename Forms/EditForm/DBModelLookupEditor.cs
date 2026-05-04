@@ -8,7 +8,7 @@ using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
 using RentalAccountingApp.Properties;
 
-namespace RentalAccountingApp.Forms
+namespace RentalAccountingApp.Forms.EditForm
 {
     public partial class DBModelLookupEditor : Form
     {
@@ -19,25 +19,27 @@ namespace RentalAccountingApp.Forms
         /// </summary>
         public event EventHandler<IModel> UpdateChanged;
 
-        public DBModelLookupEditor()
+        public DBModelLookupEditor(Form parentForm)
         {
             InitializeComponent();
             this.KeyDown += dbmlEditor.DBModelLookupEditorOnKeyDown;
+            parentForm.FormClosing += (s,e) => this.Close(); 
         }
 
-        public DBModelLookupEditor(Type modelType, Action<object> action) : this()
+        public DBModelLookupEditor(Type modelType, Action action, Form parentForm) : this(parentForm)
         {
             LoadInfoModel(modelType);
-            this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", dbmlEditor.ParametrTitle);
+
+            this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", dbmlEditor.Parametr.Title);
             model = (IModel)Activator.CreateInstance(((BaseView)Activator.CreateInstance(modelType)).ModelType);
-            this.UpdateChanged += (s, e) => action?.Invoke(model);
+            this.UpdateChanged += (s, e) => action?.Invoke();
             this.Icon = Resources.add;
         }
 
-        public DBModelLookupEditor(object model, Action<object> action) : this()
+        public DBModelLookupEditor(object model, Action action, Form parentForm) : this(parentForm)
         {
             Init(model);
-            this.UpdateChanged += (s, e) => action?.Invoke(model);
+            this.UpdateChanged += (s, e) => action?.Invoke();
         }
 
         /// <summary>
@@ -52,7 +54,7 @@ namespace RentalAccountingApp.Forms
             UpdateTitle();
 
             this.model = await view.GetModel();
-            this.Icon = Resources.editor;
+            this.Icon = Resources.editorIcon;
         }
 
         /// <summary>
@@ -72,14 +74,15 @@ namespace RentalAccountingApp.Forms
                 {
                     if (vmAttribute.Headline)
                     {
+                        string value = null;
+
                         if (view is not null)
                         {
-                            dbmlEditor.ParametrValue = property.GetValue(view)?.ToString() ?? string.Empty;
+                            value = property.GetValue(view)?.ToString() ?? string.Empty;
                             dbmlEditor.EditorMode = EditorMode.UpdateOrDelete;
                         }
 
-                        dbmlEditor.ParametrTitle = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
-                        dbmlEditor.ParametrTag = property.Name;
+                        dbmlEditor.Parametr = new(property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty, value, property.Name, typeof(string));
                     }
                     else if (vmAttribute.RemovingFlag && view is not null && !Convert.ToBoolean(property.GetValue(view)))
                     {
@@ -92,16 +95,16 @@ namespace RentalAccountingApp.Forms
         /// <summary>
         /// Обновление заголовка формы
         /// </summary>
-        private void UpdateTitle() 
+        private void UpdateTitle()
         {
             this.Text = String.Format("{0}:{1} [РЕДАКТИРОВАНИЕ{2}]",
-                                        dbmlEditor.ParametrTitle,
-                                        dbmlEditor.ParametrValue,
+                                        dbmlEditor.Parametr.Title,
+                                        dbmlEditor.Parametr.Value,
                                         dbmlEditor.EditorMode == EditorMode.UpdateOrRepair
                                             ? " - УДАЛЁН"
                                             : String.Empty);
 
-            this.Icon = Resources.editor;
+            this.Icon = Resources.editorIcon;
         }
 
         private async void dbmlEditorOnDeleteOrRepairChanged(object sender, EventArgs e)
@@ -113,32 +116,16 @@ namespace RentalAccountingApp.Forms
 
         private async void dbmlEditorOnInsertChanged(object sender, EventArgs e)
         {
-            await CheckOnSetParametr().ContinueWith(async (task) =>
-            {
-                if (!task.IsFaulted)
-                {
-                    await this.Invoke(async () =>
-                    {
-                        IModel model = await this.model.Insert();
-                        CheckResultUpdateModel(model);
-                    });
-                }
-            }).Unwrap();
+            CheckOnSetParametr();
+            IModel model = await this.model.Insert();
+            CheckResultUpdateModel(model);
         }
 
         private async void dbmlEditorOnUpdateChanged(object sender, EventArgs e)
         {
-            await CheckOnSetParametr().ContinueWith(async (task) =>
-            {
-                if (!task.IsFaulted)
-                {
-                    await this.Invoke(async () =>
-                    {
-                        IModel model = await this.model.Update();
-                        CheckResultUpdateModel(model);
-                    });
-                }
-            }).Unwrap();
+            IModel oldModel = CheckOnSetParametr();
+            IModel model = await this.model.Update(oldModel);
+            CheckResultUpdateModel(model);
         }
 
         protected virtual void OnUpdateChanged()
@@ -150,13 +137,12 @@ namespace RentalAccountingApp.Forms
         /// Проверка заполнености и запись измененного значения параметра
         /// </summary>
         /// <returns>Процес</returns>
-        private async Task CheckOnSetParametr()
+        private IModel CheckOnSetParametr()
         {
-            if (await dbmlEditor.tbValueParametr.TextEmptyTextBox())
-            {
-                model.GetType().GetProperty(dbmlEditor.ParametrTag)?.SetValue(model, dbmlEditor.tbValueParametr.Text);
-            }
-            else await Task.FromException(new Exception());
+            IModel oldModel = this.model.Clone();
+            model.GetType().GetProperty(dbmlEditor.Parametr.Tag)?.SetValue(model, dbmlEditor.Parametr.Value);
+
+            return oldModel;
         }
 
         /// <summary>
@@ -172,7 +158,6 @@ namespace RentalAccountingApp.Forms
             else
             {
                 this.model = model;
-                dbmlEditor.ParametrValue = dbmlEditor.tbValueParametr.Text;
                 UpdateTitle();
                 OnUpdateChanged();
             }

@@ -1,4 +1,6 @@
 using RentalAccountingApp.Forms;
+using RentalAccountingApp.Forms.CatalogsForm;
+using RentalAccountingApp.Forms.EditForm;
 using RentalDBModels.Views;
 using WinFormsComponents.Classes;
 
@@ -11,14 +13,9 @@ namespace RentalAccountingApp
             InitializeComponent();
 
             ConnectionInfo.ConnectDB();
-            dbmlvMaterials.ModelType = typeof(Materials);
-            dmlvCategories.ModelType = typeof(Categories);
+
             dmlvInventory.ModelType = typeof(Inventory);
         }
-
-        private void dbmlvLookupOnUpdateChanged(object sender, Action<object> e) => new DBModelLookupEditor(sender, e).Show();
-
-        private void dbmlvLookupOnInsertChanged(object sender, Action<object> e) => new DBModelLookupEditor(((WinFormsComponents.Controls.DBModelListView)sender).ModelType, e).Show();
 
         private void tsbSetingsOnClick(object sender, EventArgs e) => new SettingsForm().Show();
 
@@ -42,14 +39,14 @@ namespace RentalAccountingApp
                     case 0:
                         dmlvInventory.lvModelOnKeyDown(sender, e);
                         break;
-                    case 1:
-                        dbmlvMaterials.lvModelOnKeyDown(sender, e);
-                        break;
-                    case 2:
-                        dmlvCategories.lvModelOnKeyDown(sender, e);
-                        break;
                 }
             }
         }
+
+        private void tsbCatalogsOnClick(object sender, EventArgs e) => new BaseCatalogsForm().Show();
+
+        private void dbmlvComplexOnUpdateChanged(object sender, Action e) => new DBModelComplexEditor(sender, e, this).Show();
+
+        private void dbmlvComplexOnInsertChanged(object sender, Action e) => new DBModelComplexEditor(((WinFormsComponents.Controls.DBModelListView)sender).ModelType, e, this).Show();
     }
 }

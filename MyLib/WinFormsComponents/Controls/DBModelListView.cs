@@ -1,5 +1,6 @@
 ﻿using DataBaseProvaider;
 using DataBaseProvaider.Attributes;
+using DataBaseProvaider.Classes;
 using DataBaseProvaider.Classes.Abstract;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
@@ -22,6 +23,7 @@ namespace WinFormsComponents.Controls
         private readonly IListViewLoader listViewLoader;
         private string parametrRemovingName = null;
         private Loader loader = new();
+        private bool isModal = false;
 
         /// <summary>
         /// Колекция элементов списка
@@ -130,20 +132,52 @@ namespace WinFormsComponents.Controls
         public bool IsShowNum { get; set; } = false;
 
         /// <summary>
+        /// Отображение возможности востановления строк
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsRepairRow { get; set; } = true;
+
+        /// <summary>
+        /// Отображение возможности востановления редактора
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsRepairEditor { get; set; } = true;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsEditor { get; set; } = false;
+
+        /// <summary>
         /// Включить постраничный вывод
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int PageLimit { get; set; } = 0;
 
+        public IEnumerable<ConditionsParametr> SelectedModalResult { get; private set; }
+
         /// <summary>
         /// Событие при добавлении
         /// </summary>
-        public event EventHandler<Action<object>> InsertChanged;
+        public event EventHandler<Action> InsertChanged;
 
         /// <summary>
         /// Событие при обновлении
         /// </summary>
-        public event EventHandler<object, Action<object>> UpdateChanged;
+        public event EventHandler<object, Action> UpdateChanged;
+
+        /// <summary>
+        /// Событие при удалении
+        /// </summary>
+        public event EventHandler<IEnumerable<ConditionsParametr>, Action> DeleteOrRepairChanged;
+
+        /// <summary>
+        /// Событие перед загрузкой списка после получения элементов
+        /// </summary>
+        public event EventHandler<BindingList<object>> PreVisualizationChanged;
+
+        /// <summary>
+        /// Событие отката редактирования
+        /// </summary>
+        public event EventHandler<Action> RepairEditingChanged;
 
         /// <summary>
         /// Настройка взаимодействия с БД(Удаление/Оновление)
@@ -171,15 +205,20 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private async Task LoadInfo()
         {
+            Form thisForm = this.GetForm();
+            isModal = thisForm.Modal;
+
             lvModel.GroupImageList = lvModel.StateImageList = lvModel.LargeImageList = lvModel.SmallImageList = ImageList;
-            parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false)?.Name;
+            parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => (i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false) && IsRepairRow)?.Name;
             loader.Visible = true;
             tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
             tsmiAllCountShow.Checked = IsShowCountAll;
             tsmiEnterCountShow.Checked = IsShowCountEnter;
             tsmiNumeretorVisible.Checked = IsShowNum;
-            tsmiAdd.Enabled = tsbAdd.Enabled = InsertChanged is not null;
-            tsmiEdit.Enabled = tsbEdit.Enabled = UpdateChanged is not null;
+            tsmiAdd.Visible = tsbAdd.Visible = !isModal && InsertChanged is not null;
+            tsmiEdit.Visible = tsbEdit.Visible = !isModal && UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
+            tssFilter.Visible = tsbAdd.Visible || tsbEdit.Visible || tsbDel.Visible || tsbRepair.Visible;
+            tsbRepairEditing.Visible = RepairEditingChanged is not null;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
@@ -189,6 +228,32 @@ namespace WinFormsComponents.Controls
             if (!await UpdateCountPage(PageLimit == 0 ? Properties.Settings.Default.Limit : PageLimit))
             {
                 await LoadListAsync();
+            }
+
+            LaodInfoDialog(thisForm);
+        }
+
+        /// <summary>
+        /// Загрузка настроек, если элемент открывается в модальном окне
+        /// </summary>
+        /// <param name="modalForm">Модальная форма</param>
+        private void LaodInfoDialog(Form modalForm)
+        {
+            if (isModal)
+            {
+                lvModel.ContextMenuStrip = cmsModalModel;
+                tsbAdd.ToolTipText = "Выбрать(Insert/Enter)";
+                SelectedModalResult = null;
+
+                if (InsertChanged is null)
+                {
+                    InsertChanged += (s, e) =>
+                    {
+                        SelectedModalResult = TermsOfInteractionDB.GetSelectedParamers(lvModel.SelectedItems, ModelType);
+                        modalForm.DialogResult = DialogResult.OK;
+                        modalForm.Close();
+                    };
+                }
             }
         }
 
@@ -338,15 +403,17 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private void CreateParametrShowRemoving()
         {
-            if (parametrRemovingName is null)
+            if (parametrRemovingName is null || isModal)
             {
                 tsmiShowDeleted.Visible = false;
-                tsddbFilter.Visible = IsSearch || IsFilter;
+                tsddbFilter.Visible = IsSearch || IsFilter || IsSorted;
+
+                if (!isModal) return;
             }
 
             if (!Parameters.Conditions.Any(i => i.ColumnName.Equals(parametrRemovingName)) && ShowDeleted != ShowRemooving.Always)
             {
-                Parameters.Conditions += new ConditionsParametr(parametrRemovingName, ConditionalOperators.Equal, LogicOperators.And, ShowDeleted == ShowRemooving.ExecNotRemoving);
+                Parameters.Conditions = Parameters.Conditions.InsertAt(new ConditionsParametr(parametrRemovingName, ConditionalOperators.Equal, LogicOperators.And, ShowDeleted == ShowRemooving.ExecNotRemoving), 0);
             }
         }
 
@@ -400,7 +467,7 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Загрузка списка элементов
         /// </summary>
-        private async Task LoadListAsync()
+        public async Task LoadListAsync()
         {
             loader.StartAnimation();
             lvModel.SelectedItems.Clear();
@@ -419,13 +486,15 @@ namespace WinFormsComponents.Controls
 
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
-            listViewLoader.PopulateListView(lvModel, modelType, Items);
+            OnPreVisualizationChanged();
+            listViewLoader.PopulateListView(lvModel, Items);
 
             if (IsShowCountAll)
             {
                 tslAllCount.Text = String.Format("Всего: {0}", await modelType.GetResultByType<int>([Parameters.Conditions], nameof(DBProvider.Count)));
             }
 
+            tsbRepairEditing.Enabled = IsRepairEditor;
             loader.StopAnimation();
         }
 
@@ -531,14 +600,27 @@ namespace WinFormsComponents.Controls
         /// <returns>Кортеж значений isRemove - доступ к удалению, isRepair - доступ к востановлению</returns>
         private (bool isRemove, bool isRepair) SelectedCheck()
         {
-            PropertyInfo property = modelType.GetProperty(parametrRemovingName);
+            bool isSelect = lvModel.SelectedItems.Count > 0;
+
+            if (isModal) return (false, false);
+            else if (parametrRemovingName is null && !IsEditor) return (isSelect, false);
+
+            PropertyInfo property = 
+                IsEditor 
+                    ? modelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>().BackColor) 
+                    : modelType.GetProperty(parametrRemovingName);
+
+            if (property is null && IsEditor) return (isSelect, false);
+
             bool isRemoving = true;
             bool isNotRemoving = true;
-            bool isSelect = lvModel.SelectedItems.Count > 0;
 
             foreach (ListViewItem item in lvModel.SelectedItems)
             {
-                bool flag = Convert.ToBoolean(property?.GetValue(item.Tag) ?? true);
+                bool flag = 
+                    IsEditor 
+                        ? (Color)property.GetValue(item.Tag) != RemovingRowColor
+                        : Convert.ToBoolean(property?.GetValue(item.Tag) ?? true);
 
                 if (isNotRemoving) isNotRemoving = flag;
                 if (isRemoving) isRemoving = !flag;
@@ -553,7 +635,15 @@ namespace WinFormsComponents.Controls
         /// <returns>Процес</returns>
         private async Task DeleteOrRepair()
         {
-            await modelType.InvokeMethodByType([TermsOfInteractionDB.GetDeleteParamers(lvModel.SelectedItems, ModelType)], nameof(DBProvider.Delete))
+            IEnumerable<ConditionsParametr> parametrs = TermsOfInteractionDB.GetSelectedParamers(lvModel.SelectedItems, ModelType);
+
+            if (DeleteOrRepairChanged is not null)
+            {
+                OnDeleteOrRepairChanged(parametrs);
+                return;
+            }
+
+            await modelType.InvokeMethodByType([parametrs], nameof(DBProvider.Delete))
                 .ContinueWith(async task =>
                 {
                     if (!task.IsFaulted)
@@ -599,7 +689,7 @@ namespace WinFormsComponents.Controls
             if ((Items?.Count ?? 0) > 0)
             {
                 loader.StartAnimation();
-                listViewLoader.PopulateListView(lvModel, modelType, Items);
+                listViewLoader.PopulateListView(lvModel, Items);
                 loader.StopAnimation();
             }
         }
@@ -650,19 +740,24 @@ namespace WinFormsComponents.Controls
         {
             (bool isRemove, bool isRepair) = SelectedCheck();
 
+            tsbAdd.Visible = !isModal || lvModel.SelectedItems.Count > 0;
             tsbDel.Visible = isRemove;
             tsbRepair.Visible = isRepair;
-            tsbEdit.Visible = lvModel.SelectedItems.Count == 1;
+            tsbEdit.Visible = UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
             tslEnterCount.Text = String.Format("Выбрано: {0}", lvModel.SelectedItems.Count);
+            tssFilter.Visible = tsbAdd.Visible || tsbEdit.Visible || tsbDel.Visible || tsbRepair.Visible;
         }
 
         private void cmsModelOnOpening(object sender, CancelEventArgs e)
         {
             (bool isRemove, bool isRepair) = SelectedCheck();
+            bool isEdit = UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
 
             tsmiDel.Visible = isRemove;
             tsmiRepair.Visible = isRepair;
-            tsmiEdit.Visible = lvModel.SelectedItems.Count == 1;
+            tsmiEdit.Visible = isEdit;
+
+            e.Cancel = !(InsertChanged is not null || isRemove || isRepair || isEdit);
         }
 
         private void tsbVisibleModeOnClick(object sender, EventArgs e) => ShowVisibleMode(((ToolStripButton)sender).Tag.ToString().StringToEnum<VisibleMode>());
@@ -685,7 +780,7 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Enter when lvModel.SelectedItems.Count == 1 && UpdateChanged is not null:
+                case Keys.Enter when (lvModel.SelectedItems.Count == 1 && UpdateChanged is not null) || (isModal && lvModel.SelectedItems.Count > 0):
                     isComand = true;
                     OnUpdateChanged(lvModel.SelectedItems[0].Tag);
                     break;
@@ -693,19 +788,19 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Insert when InsertChanged is not null:
+                case Keys.Insert when (isModal && lvModel.SelectedItems.Count > 0) || (!isModal && InsertChanged is not null):
                     isComand = true;
                     OnInsertChanged();
                     break;
-                case Keys.A when e.Control && ShowDeleted != ShowRemooving.Always:
+                case Keys.A when e.Control && ShowDeleted != ShowRemooving.Always && IsRepairRow && !isModal:
                     isComand = true;
                     await ShowRemoving(ShowRemooving.Always);
                     break;
-                case Keys.D when e.Control && ShowDeleted != ShowRemooving.ExecRemoving:
+                case Keys.D when e.Control && ShowDeleted != ShowRemooving.ExecRemoving && IsRepairRow && !isModal:
                     isComand = true;
                     await ShowRemoving(ShowRemooving.ExecRemoving);
                     break;
-                case Keys.V when e.Control && ShowDeleted != ShowRemooving.ExecNotRemoving:
+                case Keys.V when e.Control && ShowDeleted != ShowRemooving.ExecNotRemoving && IsRepairRow && !isModal:
                     isComand = true;
                     await ShowRemoving(ShowRemooving.ExecNotRemoving);
                     break;
@@ -749,6 +844,10 @@ namespace WinFormsComponents.Controls
                 case Keys.I when e.Control:
                     isComand = true;
                     tsmiNumeretorVisible.Checked = !tsmiNumeretorVisible.Checked;
+                    break;
+                case Keys.L when e.Control && IsRepairEditor && RepairEditingChanged is not null:
+                    isComand = true;
+                    OnRepairEditingChanged();
                     break;
             }
 
@@ -840,12 +939,30 @@ namespace WinFormsComponents.Controls
 
         protected virtual void OnInsertChanged()
         {
-            InsertChanged?.Invoke(this, async (m) => { await LoadListAsync(); });
+            if (isModal)
+            {
+                InsertChanged?.Invoke(this, null);
+                return;
+            }
+
+            InsertChanged?.Invoke(this, async () => await LoadListAsync());
         }
+
+        protected virtual void OnPreVisualizationChanged() => PreVisualizationChanged?.Invoke(this, Items);
+
+        protected virtual void OnRepairEditingChanged() => RepairEditingChanged?.Invoke(this, async () => await LoadListAsync());
+
+        protected virtual void OnDeleteOrRepairChanged(IEnumerable<ConditionsParametr> parametrs) => DeleteOrRepairChanged?.Invoke(parametrs, async () => await LoadListAsync());
 
         protected virtual void OnUpdateChanged(object modelUpdate)
         {
-            UpdateChanged?.Invoke(modelUpdate, async (m) => { await LoadListAsync(); });
+            if (isModal)
+            {
+                OnInsertChanged();
+                return;
+            }
+
+            UpdateChanged?.Invoke(modelUpdate, async () => await LoadListAsync());
         }
 
         private void tsbInsertOnClick(object sender, EventArgs e) => OnInsertChanged();
@@ -865,5 +982,14 @@ namespace WinFormsComponents.Controls
 
             FilterFunction.CheckedChangedItemMenu(tsmiNumeretorVisible, parametrs);
         }
+
+        private void tsmiSelectedOnClick(object sender, EventArgs e) => OnInsertChanged();
+
+        private void cmsModalModelOnOpening(object sender, CancelEventArgs e)
+        {
+            e.Cancel = lvModel.SelectedItems.Count == 0;
+        }
+
+        private void tsbRepairEditingOnClick(object sender, EventArgs e) => OnRepairEditingChanged();
     }
 }

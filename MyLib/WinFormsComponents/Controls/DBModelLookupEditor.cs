@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel;
+using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
+using WinFormsComponents.Classes.Model;
 
 namespace WinFormsComponents.Controls
 {
     public partial class DBModelLookupEditor : UserControl
     {
         private Loader loader = new() { Size = new(50, 50) };
-        private string parametrTitle;
-        private string parametrValue;
+        ModelParametrEditor parametr = null;
         private EditorMode editorMode;
 
         /// <summary>
@@ -48,57 +49,36 @@ namespace WinFormsComponents.Controls
         }
 
         /// <summary>
-        /// Подпись параметра
+        /// Редактируемый параметр подписи
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public string ParametrTitle
+        public ModelParametrEditor Parametr
         {
-            get => parametrTitle;
+            get => parametr;
             set
             {
-                if (parametrTitle != value)
+                if (parametr != value)
                 {
-                    parametrTitle = value;
-                    lbNameParametr.Text = value;
+                    parametr = value;
+                    lbNameParametr.Text = parametr.Title;
+                    CreateBindTextBox();
                 }
             }
         }
-
-        /// <summary>
-        /// Значение параметра
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public string ParametrValue
-        {
-            get => parametrValue;
-            set
-            {
-                if (parametrValue != value)
-                {
-                    parametrValue = value;
-                    tbValueParametr.Text = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Тэг обращения к праметру
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public string ParametrTag { get; set; }
 
         public DBModelLookupEditor()
         {
             InitializeComponent();
 
             loader.AutoSetup(this);
-            loader.StartAnimation();
-            lbNameParametr.Text = ParametrTitle;
-            tbValueParametr.Text = ParametrValue;
-            loader.StopAnimation();
+            loader.Visible = false;
+
             CheckMode();
         }
 
+        /// <summary>
+        /// Метод проверки режима редактирования элемнта
+        /// </summary>
         private void CheckMode()
         {
             tsbInsert.Visible = tsbSave.Visible = tsbRemove.Visible = tsbRepair.Visible = false;
@@ -122,8 +102,42 @@ namespace WinFormsComponents.Controls
             }
         }
 
-        protected virtual void OnInsertChanged()
+        /// <summary>
+        /// Создание текстового поля по параметру
+        /// </summary>
+        /// <param name="parametr">Параметр</param>
+        /// <returns>Текствое поле</returns>
+        private void CreateBindTextBox()
         {
+            tbValueParametr.DataBindings.Clear();
+
+            Binding binding = new Binding(
+                    nameof(TextBox.Text),
+                    parametr,
+                    nameof(ModelParametrEditor.Value),
+                    true,
+                    DataSourceUpdateMode.OnPropertyChanged);
+
+            binding.Format += (s, e) =>
+            {
+                if (e.Value != null)
+                {
+                    e.Value = e.Value.ToString();
+                }
+            };
+
+            tbValueParametr.DataBindings.Add(binding);
+
+            if (parametr?.SettingFilter?.Regex is not null)
+            {
+                tbValueParametr.TextChanged += (s, e) => tbValueParametr.RegexTextBoxCheck(Parametr.SettingFilter.Regex);
+            }
+        }
+
+        protected async virtual void OnInsertChanged()
+        {
+            if (!await tbValueParametr.TextEmptyTextBox()) return;
+
             loader.StartAnimation();
             InsertChanged?.Invoke(this, EventArgs.Empty);
             EditorMode = EditorMode.UpdateOrDelete;
@@ -131,8 +145,10 @@ namespace WinFormsComponents.Controls
             loader.StopAnimation();
         }
 
-        protected virtual void OnUpdateChanged()
+        protected async virtual void OnUpdateChanged()
         {
+            if (!await tbValueParametr.TextEmptyTextBox()) return;
+
             loader.StartAnimation();
             UpdateChanged?.Invoke(this, EventArgs.Empty);
             loader.StopAnimation();

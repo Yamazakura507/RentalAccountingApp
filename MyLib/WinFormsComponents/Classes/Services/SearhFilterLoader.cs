@@ -17,6 +17,8 @@ namespace WinFormsComponents.Classes.Services
         /// </summary>
         private readonly ConditionalOperators[] coExacStringTypeFilter = [ConditionalOperators.ILike, ConditionalOperators.Like, ConditionalOperators.ExactILike, ConditionalOperators.ExactLike, ConditionalOperators.Levenshtein];
 
+        private readonly ConditionalOperators[] coInnerFilter = [ConditionalOperators.Between, ConditionalOperators.In, ConditionalOperators.NotIn];
+
         /// <summary>
         /// Цвет отключенного фильтра
         /// </summary>
@@ -288,11 +290,11 @@ namespace WinFormsComponents.Classes.Services
         {
             Dictionary<ConditionalOperators, string> operators = Extensions.GetCommitEnumDictionary<ConditionalOperators>();
 
-            comboBox.Items.Remove(operators.First(i => i.Key == ConditionalOperators.Between).Value);
+            IEnumerable<ConditionalOperators> hideFilter = coExacStringTypeFilter.Union(coInnerFilter);
 
             if (valueFilterType.Equals(typeof(string))) return;
 
-            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => coExacStringTypeFilter.Contains(i.Key)))
+            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => hideFilter.Contains(i.Key)))
             {
                 comboBox.Items.Remove(kvp.Value);
             }

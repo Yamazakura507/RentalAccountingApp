@@ -1,4 +1,4 @@
-﻿namespace RentalAccountingApp.Forms
+﻿namespace RentalAccountingApp.Forms.EditForm
 {
     partial class DBModelLookupEditor
     {
@@ -40,9 +40,7 @@
             dbmlEditor.MaximumSize = new Size(0, 75);
             dbmlEditor.MinimumSize = new Size(475, 75);
             dbmlEditor.Name = "dbmlEditor";
-            dbmlEditor.ParametrTag = null;
-            dbmlEditor.ParametrTitle = null;
-            dbmlEditor.ParametrValue = null;
+            dbmlEditor.Parametr = null;
             dbmlEditor.Size = new Size(514, 75);
             dbmlEditor.TabIndex = 0;
             dbmlEditor.InsertChanged += dbmlEditorOnInsertChanged;

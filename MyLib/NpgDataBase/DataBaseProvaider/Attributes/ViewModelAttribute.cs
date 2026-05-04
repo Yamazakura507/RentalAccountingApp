@@ -26,5 +26,9 @@
         /// Метка свойства включающая его в компонент фильтрации
         /// </summary>
         public bool FilterOn { get; set; } = false;
+        /// <summary>
+        /// Метка свойства указывающего цвет фона строк
+        /// </summary>
+        public bool BackColor { get; set; } = false;
     }
 }
