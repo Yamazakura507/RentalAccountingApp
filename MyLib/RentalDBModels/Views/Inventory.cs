@@ -27,7 +27,7 @@ namespace RentalDBModels.Views
         [Dependency("Категории", typeof(Categories), DependencyType.OneToMany, ImageKey = "category.png", DependencyModelType = typeof(InventoryCategories))]
         Task<IEnumerable<int>> CategoriesId => GetDependenciesId<InventoryCategories>();
 
-        [Dependency("Матерьялы", typeof(Materials), DependencyType.OneToMany, ImageKey = "materials.png", DependencyModelType = typeof(InventoryMaterials))]
+        [Dependency("Материалы", typeof(Materials), DependencyType.OneToMany, ImageKey = "materials.png", DependencyModelType = typeof(InventoryMaterials))]
         Task<IEnumerable<int>> MaterialsId => GetDependenciesId<InventoryMaterials>();
     }
 }

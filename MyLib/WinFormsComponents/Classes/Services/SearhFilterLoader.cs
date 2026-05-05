@@ -290,11 +290,14 @@ namespace WinFormsComponents.Classes.Services
         {
             Dictionary<ConditionalOperators, string> operators = Extensions.GetCommitEnumDictionary<ConditionalOperators>();
 
-            IEnumerable<ConditionalOperators> hideFilter = coExacStringTypeFilter.Union(coInnerFilter);
+            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => coInnerFilter.Contains(i.Key)))
+            {
+                comboBox.Items.Remove(kvp.Value);
+            }
 
             if (valueFilterType.Equals(typeof(string))) return;
 
-            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => hideFilter.Contains(i.Key)))
+            foreach (KeyValuePair<ConditionalOperators, string> kvp in operators.Where(i => coExacStringTypeFilter.Contains(i.Key)))
             {
                 comboBox.Items.Remove(kvp.Value);
             }
