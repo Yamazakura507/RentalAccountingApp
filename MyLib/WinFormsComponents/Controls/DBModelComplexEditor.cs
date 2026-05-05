@@ -349,7 +349,7 @@ namespace WinFormsComponents.Controls
         /// <returns>Текствое поле</returns>
         private TextBox CreateTextBox(ModelParametrEditor parametr)
         {
-            TextBox textBox = new ();
+            TextBox textBox = new() { Tag = parametr };
 
             Binding binding = new Binding(
                     nameof(TextBox.Text),
@@ -369,7 +369,7 @@ namespace WinFormsComponents.Controls
 
             if (parametr.SettingFilter?.Regex is not null)
             {
-                textBox.TextChanged += (s, e) => textBox.RegexTextBoxCheck(parametr.SettingFilter.Regex);
+                textBox.Leave += async (s, e) => await textBox.RegexTextBoxCheck(parametr.SettingFilter.Regex);
             }
             
             return textBox;
@@ -480,24 +480,32 @@ namespace WinFormsComponents.Controls
         /// Проверка на пустые значения перед сохранением
         /// </summary>
         /// <returns>Результат проверки</returns>
-        private async Task<bool> CheckEmptyValue()
+        private async Task<bool> CheckEmptyTBValue()
         {
-            bool isEmptyVal = false;
+            List<Task<bool>> tasks = new List<Task<bool>>();
 
             foreach (Control control in tlp.Controls)
             {
-                if (control is TextBox && !await((TextBox)control).TextEmptyTextBox())
+                if (control is TextBox textBox && textBox.Tag is ModelParametrEditor parametr)
                 {
-                    isEmptyVal = true;
+                    tasks.Add(textBox.TextEmptyTextBox());
+
+                    if (parametr.SettingFilter?.Regex is not null)
+                    {
+                        tasks.Add(textBox.RegexTextBoxCheck(parametr.SettingFilter.Regex, errMess: parametr.SettingFilter.RegexErrorMessage));
+                    }
                 }
             }
+
+            bool[] results = await Task.WhenAll(tasks);
+            bool isEmptyVal = results.Any(r => !r);
 
             return isEmptyVal;
         }
 
         protected async virtual void OnInsertChanged()
         {
-            if (await CheckEmptyValue()) return;
+            if (await CheckEmptyTBValue()) return;
 
             loader.StartAnimation();
             InsertChanged?.Invoke(this, EventArgs.Empty);
@@ -506,8 +514,10 @@ namespace WinFormsComponents.Controls
             loader.StopAnimation();
         }
 
-        protected virtual void OnUpdateChanged()
+        protected async virtual void OnUpdateChanged()
         {
+            if (await CheckEmptyTBValue()) return;
+
             loader.StartAnimation();
             UpdateChanged?.Invoke(this, EventArgs.Empty);
             loader.StopAnimation();

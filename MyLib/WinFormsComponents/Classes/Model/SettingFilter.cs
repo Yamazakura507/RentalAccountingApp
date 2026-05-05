@@ -19,6 +19,10 @@ namespace WinFormsComponents.Classes.Model
         /// Регулярное ограничение
         /// </summary>
         public Regex Regex {  get; set; }
+        /// <summary>
+        /// Сообщение при ошибки проверки регулярного ограничения
+        /// </summary>
+        public string RegexErrorMessage { get; set; } = null;
 
         /// <summary>
         /// Конструктор настройки фильтра
@@ -36,11 +40,13 @@ namespace WinFormsComponents.Classes.Model
         /// Конструктор настройки фильтра
         /// </summary>
         /// <param name="regex">Регулярный ограничитель</param>
-        public SettingFilter(Regex regex)
+        /// <param name="rgexErrorMessage">Сообщение при ошибки проверки регулярного ограничения</param>
+        public SettingFilter(Regex regex, string rgexErrorMessage = null)
         {
             Maximum = null;
             Minimum = null;
             Regex = regex;
+            RegexErrorMessage = rgexErrorMessage;
         }
     }
 }

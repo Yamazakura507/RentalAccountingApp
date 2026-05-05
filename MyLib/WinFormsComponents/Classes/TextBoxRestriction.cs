@@ -103,13 +103,16 @@ namespace WinFormsComponents.Classes
         /// <param name="textBox">Поле ввода</param>
         /// <param name="regex">Регулярное выражение для проверки</param>
         /// <param name="timeout">Время задержки(в милисекундах, по умолчанию 3 секунды)</param>
+        /// <param name="errMess">Сообщение при ошибки проверки регулярного ограничения</param>
         /// <returns>Результат проверки</returns>
-        async public static Task<bool> RegexTextBoxCheck(this TextBox textBox, Regex regex, int timeout = 3000)
+        async public static Task<bool> RegexTextBoxCheck(this TextBox textBox, Regex regex, int timeout = 3000, string errMess = null)
         {
             if (!regex.IsMatch(textBox.Text.Trim()))
             {
                 textBox.BackColor = AlertBursh;
                 textBox.Clear();
+
+                if (!String.IsNullOrEmpty(errMess)) InfoViewer.AlertMessege(errMess);
                 await Sleep(textBox, timeout);
 
                 return false;

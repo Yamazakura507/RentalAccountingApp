@@ -82,6 +82,7 @@ namespace RentalAccountingApp.Forms.EditForm
             foreach (PropertyInfo property in properties)
             {
                 ViewModelAttribute vmAttribute = property.GetCustomAttribute<ViewModelAttribute>();
+                CheckAttribute checkAttribute = property.GetCustomAttribute<CheckAttribute>();
 
                 if (vmAttribute != null)
                 {
@@ -92,8 +93,23 @@ namespace RentalAccountingApp.Forms.EditForm
                         if (view is not null) valueParametr = property.GetValue(view);
 
                         string title = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+                        bool isNull = false;
+                        SettingFilter filter = null;
 
-                        dmlceEditor.Parametrs.Add(new(title, valueParametr, property.Name, property.PropertyType));
+                        if (checkAttribute != null)
+                        {
+                            isNull = checkAttribute.IsNull;
+
+                            if (!String.IsNullOrEmpty(checkAttribute.RegexPattern)) 
+                                filter = new(checkAttribute.RegexCheck, checkAttribute.NotChecibleMessage);
+                        }
+
+                        dmlceEditor.Parametrs.Add(
+                            new(title, valueParametr, property.Name, property.PropertyType) 
+                            { 
+                                IsNull = isNull, 
+                                SettingFilter = filter 
+                            });
 
                         if (vmAttribute.Headline)
                         {

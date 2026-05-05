@@ -41,6 +41,10 @@ namespace WinFormsComponents.Classes.Model
         /// Ограничитель ввода значения
         /// </summary>
         public SettingFilter SettingFilter { get; set; }
+        /// <summary>
+        /// Метка указывающая принимает ли параметр пустое значение
+        /// </summary>
+        public bool IsNull { get; set; } = false;
 
         /// <summary>
         /// Конструктор параметра модели
