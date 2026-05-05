@@ -114,7 +114,7 @@ namespace WinFormsComponents.Controls
                     }
                     break;
                 case NotifyCollectionChangedAction.Reset:
-                    CheckOrCreateTabControl().TabPages.Clear();
+                    CheckOrCreateTabControl(true)?.TabPages.Clear();
                     break;
             }
         }
@@ -452,11 +452,11 @@ namespace WinFormsComponents.Controls
         /// Получение таб панели для вывода привязок многие ко многим
         /// </summary>
         /// <returns>Таб панель</returns>
-        private TabControl CheckOrCreateTabControl()
+        private TabControl CheckOrCreateTabControl(bool isReset = false)
         {
             TabControl dependenciesTabControl = tlp.Controls.OfType<TabControl>().FirstOrDefault();
 
-            if (dependenciesTabControl is null)
+            if (dependenciesTabControl is null && !isReset)
             {
                 dependenciesTabControl = new()
                 {

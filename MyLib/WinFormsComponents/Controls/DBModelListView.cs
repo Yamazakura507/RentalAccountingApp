@@ -740,7 +740,7 @@ namespace WinFormsComponents.Controls
         {
             (bool isRemove, bool isRepair) = SelectedCheck();
 
-            tsbAdd.Visible = !isModal || lvModel.SelectedItems.Count > 0;
+            tsbAdd.Visible = (!isModal || lvModel.SelectedItems.Count > 0) && InsertChanged is not null;
             tsbDel.Visible = isRemove;
             tsbRepair.Visible = isRepair;
             tsbEdit.Visible = UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
@@ -753,6 +753,7 @@ namespace WinFormsComponents.Controls
             (bool isRemove, bool isRepair) = SelectedCheck();
             bool isEdit = UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
 
+            tsmiAdd.Visible = InsertChanged is not null;
             tsmiDel.Visible = isRemove;
             tsmiRepair.Visible = isRepair;
             tsmiEdit.Visible = isEdit;

@@ -30,7 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
+            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
             tsMainMenu = new ToolStrip();
             tsbSetings = new ToolStripButton();
             tsbCatalogs = new ToolStripButton();
@@ -38,6 +38,7 @@
             tcDBViewr = new TabControl();
             tpInventory = new TabPage();
             dmlvInventory = new WinFormsComponents.Controls.DBModelListView();
+            tsbClients = new ToolStripButton();
             tsMainMenu.SuspendLayout();
             tcDBViewr.SuspendLayout();
             tpInventory.SuspendLayout();
@@ -45,7 +46,7 @@
             // 
             // tsMainMenu
             // 
-            tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs });
+            tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs, tsbClients });
             tsMainMenu.Location = new Point(0, 0);
             tsMainMenu.Name = "tsMainMenu";
             tsMainMenu.Size = new Size(800, 25);
@@ -78,9 +79,8 @@
             ilTabMenu.ColorDepth = ColorDepth.Depth32Bit;
             ilTabMenu.ImageStream = (ImageListStreamer)resources.GetObject("ilTabMenu.ImageStream");
             ilTabMenu.TransparentColor = Color.Transparent;
-            ilTabMenu.Images.SetKeyName(0, "category.png");
-            ilTabMenu.Images.SetKeyName(1, "inventory.png");
-            ilTabMenu.Images.SetKeyName(2, "materials.png");
+            ilTabMenu.Images.SetKeyName(0, "inventory.png");
+            ilTabMenu.Images.SetKeyName(1, "clients.png");
             // 
             // tcDBViewr
             // 
@@ -113,8 +113,11 @@
             dmlvInventory.FilterOffColor = Color.MistyRose;
             dmlvInventory.FilterOnColor = Color.LightGreen;
             dmlvInventory.ImageList = ilTabMenu;
+            dmlvInventory.IsEditor = false;
             dmlvInventory.IsFilter = true;
             dmlvInventory.IsGridLines = true;
+            dmlvInventory.IsRepairEditor = true;
+            dmlvInventory.IsRepairRow = true;
             dmlvInventory.IsSearch = true;
             dmlvInventory.IsShowCountAll = true;
             dmlvInventory.IsShowCountEnter = true;
@@ -125,10 +128,10 @@
             dmlvInventory.ModelType = null;
             dmlvInventory.Name = "dmlvInventory";
             dmlvInventory.PageLimit = 0;
-            collectionParametrs1.Limit = 0;
-            collectionParametrs1.Offset = 0;
-            collectionParametrs1.SerhingParametrsCount = 0;
-            dmlvInventory.Parameters = collectionParametrs1;
+            collectionParametrs2.Limit = 0;
+            collectionParametrs2.Offset = 0;
+            collectionParametrs2.SerhingParametrsCount = 0;
+            dmlvInventory.Parameters = collectionParametrs2;
             dmlvInventory.RemovingRowColor = Color.MistyRose;
             dmlvInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dmlvInventory.Size = new Size(786, 391);
@@ -136,6 +139,15 @@
             dmlvInventory.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
             dmlvInventory.InsertChanged += dbmlvComplexOnInsertChanged;
             dmlvInventory.UpdateChanged += dbmlvComplexOnUpdateChanged;
+            // 
+            // tsbClients
+            // 
+            tsbClients.Image = Properties.Resources.clients;
+            tsbClients.ImageTransparentColor = Color.Magenta;
+            tsbClients.Name = "tsbClients";
+            tsbClients.Size = new Size(75, 22);
+            tsbClients.Text = "Клиенты";
+            tsbClients.Click += tsbClientsOnClick;
             // 
             // MainForm
             // 
@@ -165,5 +177,6 @@
         private TabPage tpInventory;
         private WinFormsComponents.Controls.DBModelListView dmlvInventory;
         private ToolStripButton tsbCatalogs;
+        private ToolStripButton tsbClients;
     }
 }

@@ -48,5 +48,7 @@ namespace RentalAccountingApp
         private void dbmlvComplexOnUpdateChanged(object sender, Action e) => new DBModelComplexEditor(sender, e, this).Show();
 
         private void dbmlvComplexOnInsertChanged(object sender, Action e) => new DBModelComplexEditor(((WinFormsComponents.Controls.DBModelListView)sender).ModelType, e, this).Show();
+
+        private void tsbClientsOnClick(object sender, EventArgs e) => new ClientsForm().Show();
     }
 }
