@@ -12,6 +12,7 @@
     <EmbeddedResource Include="Controls\ConnectingSettingsControl.resx" />
     <EmbeddedResource Include="Controls\DBModelComplexEditor.resx" />
     <EmbeddedResource Include="Controls\DBModelListView.resx" />
+    <EmbeddedResource Include="Controls\DBModelSelectedList.resx" />
     <EmbeddedResource Include="Controls\DBModelPicker.resx" />
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
@@ -27,6 +28,9 @@
 
   <ItemGroup>
     <Compile Update="Controls\DBModelComplexEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\DBModelSelectedList.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs">

@@ -1,14 +1,12 @@
 ﻿using DataBaseProvaider.Enums;
-using DataBaseProvaider.Objects;
-using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Reflection.Metadata;
 using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
+using WinFormsComponents.Classes.Interface;
 using WinFormsComponents.Classes.Model;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace WinFormsComponents.Controls
 {
@@ -181,7 +179,8 @@ namespace WinFormsComponents.Controls
                     AddDependencyOneToMany(collection, index - Parametrs.Count);
                     break;
                 case DependencyType.OneToOnePicker:
-                    AddDependencyOneToOnePicker(collection, index - DependencyParametrs.Count);
+                case DependencyType.OneToOneSelectionList:
+                    AddDependencyOneToOne(collection, index - DependencyParametrs.Count, collection.DependencyType);
                     break;
             }
         }
@@ -273,7 +272,7 @@ namespace WinFormsComponents.Controls
         /// </summary>
         /// <param name="collection">Параметр зависимости</param>
         /// <param name="index">Положение контрола</param>
-        private void AddDependencyOneToOnePicker(DependencyCollection collection, int index)
+        private void AddDependencyOneToOne(DependencyCollection collection, int index, DependencyType dependencyType)
         {
             Label controlTitle = new()
             {
@@ -284,29 +283,41 @@ namespace WinFormsComponents.Controls
                 Dock = DockStyle.Right
             };
 
-            var image = ImageList.Images[collection.ImageKey];
-
-            DBModelPicker comboBoxDependency = new()
+            Control controlDependency = dependencyType switch
             {
-                ModelType = collection.DependencyViewType,
-                SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
-                Image = image
-            };
-
-            comboBoxDependency.SelectedChange += (s, e) =>
-            {
-                collection.Dependencies.Clear();
-
-                if (comboBoxDependency.SelectedVal is not null)
+                DependencyType.OneToOnePicker => new DBModelPicker()
                 {
-                    collection.Add(comboBoxDependency.SelectedVal.Value);
+                    ModelType = collection.DependencyViewType,
+                    SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
+                    Image = ImageList.Images[collection.ImageKey],
+                    IsNullVal = collection.IsNullableDependency
+                },
+                DependencyType.OneToOneSelectionList => new DBModelSelectedList()
+                { 
+                    ModelType = collection.DependencyViewType,
+                    IsNullVal = collection.IsNullableDependency,
+                    ImageList = this.ImageList,
+                    ImageKey = collection.ImageKey,
+                    IconSelectedForm = BaseCatologIcon,
+                    SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
+                    TitleCatalogSelectedForm = collection.Title
                 }
             };
 
-            LoactionControl(index, comboBoxDependency);
+            ((ISelected)controlDependency).SelectedChange += (s, e) =>
+            {
+                collection.Dependencies.Clear();
+
+                if (((ISelected)controlDependency).SelectedVal is not null)
+                {
+                    collection.Add(((ISelected)controlDependency).SelectedVal.Value);
+                }
+            };
+
+            LoactionControl(index, controlDependency);
 
             tlp.Controls.Add(controlTitle, 0, index);
-            tlp.Controls.Add(comboBoxDependency, 1, index);
+            tlp.Controls.Add(controlDependency, 1, index);
 
             collection.SetDependesiesToBase();
         }
@@ -335,10 +346,7 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Создание формы каталога, выбора элементов для добавления в привязку
         /// </summary>
-        /// <param name="modelType">Тип модели каатлога</param>
-        /// <param name="title">Подпись каатлога</param>
-        /// <param name="imageIndex">Иконка католога</param>
-        /// <param name="dependenciesId">Идентификаторы исключения</param>
+        /// <param name="collection">Объект зависимости</param>
         /// <returns>Форма выбора элемента привязки</returns>
         private (Form, DBModelListView) CreateBaseCatalogModalForm(DependencyCollection collection)
         {

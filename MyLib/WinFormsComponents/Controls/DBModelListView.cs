@@ -150,6 +150,12 @@ namespace WinFormsComponents.Controls
         public bool IsEditor { get; set; } = false;
 
         /// <summary>
+        /// Метка разрешающая множественный выбор
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool MultiSelect { get; set; } = true;
+
+        /// <summary>
         /// Включить постраничный вывод
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -216,6 +222,7 @@ namespace WinFormsComponents.Controls
             isModal = thisForm.Modal;
 
             lvModel.GroupImageList = lvModel.StateImageList = lvModel.LargeImageList = lvModel.SmallImageList = ImageList;
+            lvModel.MultiSelect = MultiSelect;
             parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => (i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false) && IsRepairRow)?.Name;
             loader.Visible = true;
             tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;

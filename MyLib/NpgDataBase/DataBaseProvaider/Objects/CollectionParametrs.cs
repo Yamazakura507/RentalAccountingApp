@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace DataBaseProvaider.Objects
 {
-    public class CollectionParametrs : IDisposable, INotifyPropertyChanged
+    public class CollectionParametrs : IDisposable, INotifyPropertyChanged, ICloneable
     {
         private IEnumerable<ConditionsParametr> conditions = new List<ConditionsParametr>();
         private IEnumerable<OrderParametr> orders = new List<OrderParametr>();
@@ -95,6 +95,11 @@ namespace DataBaseProvaider.Objects
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        object ICloneable.Clone() => Clone();
+
+        /// <summary>
         /// Деструктор/Очистка памяти от объекта
         /// </summary>
         public void Dispose() => GC.SuppressFinalize(this);
@@ -106,6 +111,26 @@ namespace DataBaseProvaider.Objects
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        public CollectionParametrs Clone()
+        {
+            var clone = new CollectionParametrs
+            {
+                limit = this.limit,
+                offset = this.offset,
+                serhingParametrsCount = this.serhingParametrsCount,
+
+                conditions = this.conditions?.Select(c => c?.Clone()).ToList()
+                             ?? new List<ConditionsParametr>(),
+                orders = this.orders?.Select(o => o?.Clone()).ToList()
+                         ?? new List<OrderParametr>()
+            };
+
+            return clone;
         }
     }
 }

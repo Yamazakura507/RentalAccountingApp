@@ -6,7 +6,7 @@ namespace DataBaseProvaider.Objects
     /// <summary>
     /// Параметр фильтрации
     /// </summary>
-    public class ConditionsParametr : BaseParametrCollection, IDisposable
+    public class ConditionsParametr : BaseParametrCollection, IDisposable, ICloneable
     {
         /// <summary>
         /// Наименование колонки
@@ -134,5 +134,15 @@ namespace DataBaseProvaider.Objects
 
             return Id == other.Id;
         }
+
+        /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        object ICloneable.Clone() => Clone();
+
+        /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        public virtual ConditionsParametr Clone() =>  new(ColumnName, Operator, LogicOperator, Value) { IsSerhing = IsSerhing, Type = Type };
     }
 }

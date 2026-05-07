@@ -30,5 +30,9 @@
         /// Метка свойства указывающего цвет фона строк
         /// </summary>
         public bool BackColor { get; set; } = false;
+        /// <summary>
+        /// Метка указывающая, что поле изменяемое
+        /// </summary>
+        public bool IsEdit { get; set; } = true;
     }
 }

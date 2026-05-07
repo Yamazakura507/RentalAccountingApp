@@ -53,6 +53,11 @@ namespace WinFormsComponents.Classes.Model
         public Type DependencyModelType { get; set; }
 
         /// <summary>
+        /// Указывает, может ли привязка отсутствовать
+        /// </summary>
+        public bool IsNullableDependency { get; set; } = false;
+
+        /// <summary>
         /// Цвет добавляемых строк
         /// </summary>
         public Color InsertRowColor { get; set; } = Color.YellowGreen;

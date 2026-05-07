@@ -6,10 +6,11 @@ using DataBaseProvaider.Objects;
 using System.ComponentModel;
 using System.Data;
 using System.Reflection;
+using WinFormsComponents.Classes.Interface;
 
 namespace WinFormsComponents.Controls
 {
-    public partial class DBModelPicker : UserControl
+    public partial class DBModelPicker : UserControl, ISelected
     {
         private Type modelType;
         private string parametrRemovingName = null;

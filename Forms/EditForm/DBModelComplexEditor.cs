@@ -86,7 +86,7 @@ namespace RentalAccountingApp.Forms.EditForm
 
                 if (vmAttribute != null)
                 {
-                    if (!vmAttribute.ViewHide)
+                    if (!vmAttribute.ViewHide && vmAttribute.IsEdit)
                     {
                         object valueParametr = null;
 
@@ -168,6 +168,7 @@ namespace RentalAccountingApp.Forms.EditForm
                             case DataBaseProvaider.Enums.DependencyType.OneToOnePicker:
                             case DataBaseProvaider.Enums.DependencyType.OneToOneSelectionList:
                                 dependencyCollection.Add(new DependencyInfo((int)property.GetValue(view)));
+                                dependencyCollection.IsNullableDependency = Nullable.GetUnderlyingType(property.PropertyType) != null;
                                 break;
                         }
                     }

@@ -29,7 +29,7 @@ namespace RentalDBModels.Views
         [Description("Количество ивентаря в аренде")]
         public Task<int> CountInventory => DBProvider.Count<InventoryRental>([new ConditionsParametr(nameof(InventoryRental.IdRental), ConditionalOperators.Equal, this.Id)]);
 
-        [ViewModel]
+        [ViewModel(IsEdit = false)]
         [Description("Статус оплаты")]
         public string PayStatus => true ? "Оплачено" : ReturnDate is not null && DateOnly.FromDateTime(DateTime.Now) > ReturnDate ? "Не оплачено | Долг" : "Не оплачено";
 
@@ -42,7 +42,7 @@ namespace RentalDBModels.Views
         //[Dependency("Платеж", typeof(Categories), DependencyType.OneToOne, ImageKey = "pay.png", DependencyModelType = typeof(InventoryCategories))]
         //public int? IdPayment { get; set; }
 
-        [Dependency("Клиент", typeof(Clients), DependencyType.OneToOnePicker, ImageKey = "clients.png", DependencyModelType = typeof(Models.Clients))]
+        [Dependency("Клиент", typeof(Clients), DependencyType.OneToOneSelectionList, ImageKey = "clients.png", DependencyModelType = typeof(Models.Clients))]
         public int IdClient { get; set; }
 
         [Dependency("Инвентарь в аренде", typeof(Inventory), DependencyType.OneToMany, ImageKey = "inventory.png", DependencyModelType = typeof(InventoryRental))]

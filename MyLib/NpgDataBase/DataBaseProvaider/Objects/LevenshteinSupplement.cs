@@ -47,5 +47,22 @@ namespace DataBaseProvaider.Objects
         /// Точное указание приоритета сортировки, работает только при <see cref="OrderLevenshteineSupplement.Position"/>
         /// </summary>
         public int OrderPriorityPosition { get; set; } = 0;
+
+        public override LevenshteinSupplement Clone()
+        {
+            return new() 
+            { 
+                ColumnName = ColumnName, 
+                Operator = Operator,
+                LogicOperator = LogicOperator, 
+                Value = Value, 
+                IsSerhing = IsSerhing, 
+                Type = Type,
+                OrderType = OrderType,
+                MaxDistance = MaxDistance,
+                OrderPriority = OrderPriority,
+                OrderPriorityPosition = OrderPriorityPosition,
+            };
+        }
     }
 }

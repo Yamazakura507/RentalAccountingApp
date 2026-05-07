@@ -6,7 +6,7 @@ namespace DataBaseProvaider.Objects
     /// <summary>
     /// Объект сортировки колонки
     /// </summary>
-    public class OrderParametr : BaseParametrCollection, IDisposable
+    public class OrderParametr : BaseParametrCollection, IDisposable, ICloneable
     {
         /// <summary>
         /// Наименование сортируемой колонки
@@ -84,5 +84,15 @@ namespace DataBaseProvaider.Objects
 
             return Id == other.Id;
         }
+
+        /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        object ICloneable.Clone() => Clone();
+
+        /// <summary>
+        /// Создает глубокую копию объекта
+        /// </summary>
+        public OrderParametr Clone() => new(ColumnName, OrderType, IsTemp);
     }
 }

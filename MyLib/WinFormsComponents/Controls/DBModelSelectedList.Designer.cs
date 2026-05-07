@@ -1,6 +1,6 @@
 ﻿namespace WinFormsComponents.Controls
 {
-    partial class DBModelPicker
+    partial class DBModelSelectedList
     {
         /// <summary> 
         /// Обязательная переменная конструктора.
@@ -28,35 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
-            cbDBModel = new ComboBox();
             tlpDBModelView = new TableLayoutPanel();
+            btAdd = new Button();
             btNullVal = new Button();
             pbIcon = new PictureBox();
+            lbSelectedName = new Label();
             tlpDBModelView.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pbIcon).BeginInit();
             SuspendLayout();
             // 
-            // cbDBModel
-            // 
-            cbDBModel.Dock = DockStyle.Fill;
-            cbDBModel.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbDBModel.FormattingEnabled = true;
-            cbDBModel.Location = new Point(27, 3);
-            cbDBModel.Name = "cbDBModel";
-            cbDBModel.Size = new Size(359, 23);
-            cbDBModel.TabIndex = 0;
-            cbDBModel.SelectedIndexChanged += cbDBModelOnSelectedIndexChanged;
-            // 
             // tlpDBModelView
             // 
             tlpDBModelView.BackColor = Color.Transparent;
-            tlpDBModelView.ColumnCount = 3;
+            tlpDBModelView.ColumnCount = 4;
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle());
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle());
+            tlpDBModelView.ColumnStyles.Add(new ColumnStyle());
+            tlpDBModelView.Controls.Add(btAdd, 3, 0);
             tlpDBModelView.Controls.Add(btNullVal, 2, 0);
-            tlpDBModelView.Controls.Add(cbDBModel, 1, 0);
             tlpDBModelView.Controls.Add(pbIcon, 0, 0);
+            tlpDBModelView.Controls.Add(lbSelectedName, 1, 0);
             tlpDBModelView.Dock = DockStyle.Fill;
             tlpDBModelView.Location = new Point(0, 0);
             tlpDBModelView.Name = "tlpDBModelView";
@@ -66,6 +58,22 @@
             tlpDBModelView.TabIndex = 1;
             tlpDBModelView.Tag = "";
             // 
+            // btAdd
+            // 
+            btAdd.BackColor = Color.Transparent;
+            btAdd.BackgroundImage = Properties.Resources.add;
+            btAdd.BackgroundImageLayout = ImageLayout.Zoom;
+            btAdd.Dock = DockStyle.Fill;
+            btAdd.FlatAppearance.BorderSize = 0;
+            btAdd.FlatStyle = FlatStyle.Flat;
+            btAdd.Location = new Point(392, 3);
+            btAdd.Name = "btAdd";
+            btAdd.Size = new Size(24, 24);
+            btAdd.TabIndex = 4;
+            btAdd.Tag = "0";
+            btAdd.UseVisualStyleBackColor = false;
+            btAdd.Click += btSelectedOnClick;
+            // 
             // btNullVal
             // 
             btNullVal.BackColor = Color.Transparent;
@@ -74,7 +82,7 @@
             btNullVal.Dock = DockStyle.Fill;
             btNullVal.FlatAppearance.BorderSize = 0;
             btNullVal.FlatStyle = FlatStyle.Flat;
-            btNullVal.Location = new Point(392, 3);
+            btNullVal.Location = new Point(362, 3);
             btNullVal.Name = "btNullVal";
             btNullVal.Size = new Size(24, 24);
             btNullVal.TabIndex = 1;
@@ -97,25 +105,39 @@
             pbIcon.TabIndex = 2;
             pbIcon.TabStop = false;
             // 
-            // DBModelPicker
+            // lbSelectedName
+            // 
+            lbSelectedName.AutoSize = true;
+            lbSelectedName.Dock = DockStyle.Fill;
+            lbSelectedName.Font = new Font("Segoe UI", 14F, FontStyle.Bold | FontStyle.Underline);
+            lbSelectedName.Location = new Point(27, 0);
+            lbSelectedName.Name = "lbSelectedName";
+            lbSelectedName.Size = new Size(329, 30);
+            lbSelectedName.TabIndex = 3;
+            lbSelectedName.Text = "SelectedName";
+            lbSelectedName.TextAlign = ContentAlignment.MiddleLeft;
+            lbSelectedName.Click += btSelectedOnClick;
+            // 
+            // DBModelSelectedList
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Transparent;
             Controls.Add(tlpDBModelView);
-            Name = "DBModelPicker";
+            Name = "DBModelSelectedList";
             Size = new Size(419, 30);
             Load += DBModelPickerOnLoad;
             tlpDBModelView.ResumeLayout(false);
+            tlpDBModelView.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pbIcon).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private ComboBox cbDBModel;
         private TableLayoutPanel tlpDBModelView;
         private Button btNullVal;
         private PictureBox pbIcon;
+        private Label lbSelectedName;
+        private Button btAdd;
     }
 }
