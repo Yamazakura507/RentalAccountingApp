@@ -2,8 +2,6 @@
 using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
-using RentalDBModels.Attribute;
-using RentalDBModels.Models.DependenceModel;
 using RentalDBModels.Models.Interface;
 using System.Data;
 using System.Reflection;
@@ -135,7 +133,9 @@ namespace RentalDBModels.Models.Abstract
                                             [
                                                 parametrUpdate,
                                                 new [] { new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id) },
-                                                this.GetType().GetProperties().Select(i => i.Name).ToArray()
+                                                this.GetType().GetProperties()
+                                                    .Where(p => !p.IsDefined(typeof(SkipPropertyAttribute), inherit: true))
+                                                    .Select(i => i.Name).ToArray()
                                             ], nameof(DBProvider.Update));
 
             if (row != null)
@@ -156,7 +156,9 @@ namespace RentalDBModels.Models.Abstract
             DataRow dataRow = await DBProvider.Update<TModel>(
                                         parametrUpdate,
                                         [new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id)],
-                                        this.GetType().GetProperties().Select(i => i.Name).ToArray());
+                                        this.GetType().GetProperties()
+                                            .Where(p => !p.IsDefined(typeof(SkipPropertyAttribute), inherit: true))
+                                            .Select(i => i.Name).ToArray());
 
             if (dataRow != null)
             {
@@ -175,7 +177,7 @@ namespace RentalDBModels.Models.Abstract
             foreach (PropertyInfo property in this.GetType().GetProperties().Where(p => !p.IsDefined(typeof(SkipPropertyAttribute), inherit: true)))
             {
                 if (!propertiesBase.Any(i => i.Name == property.Name) && 
-                    (oldModel is null || !property.GetValue(this).Equals(property.GetValue(oldModel))))
+                    (oldModel is null || !Equals(property.GetValue(this), property.GetValue(oldModel))))
                 {
                     parametrs.Add(property.Name, property.GetValue(this));
                 }

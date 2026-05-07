@@ -3,12 +3,17 @@ using RentalDBModels.Models.Abstract;
 using RentalDBModels.Models.DependenceModel;
 using RentalDBModels.Models.Interface;
 
-
 namespace RentalDBModels.Models
 {
-    public class Inventory : BaseLookupModel, IForigenParent
+    public class Rental : BaseModel, IForigenParent
     {
-        public double Price { get; set; }
+        public DateOnly IssueDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+        public DateOnly? ReturnDate { get; set; }
+
+        public int? IdPayment { get; set; }
+
+        public int IdClient { get; set; }
 
         [SkipProperty]
         public Dictionary<Type, IEnumerable<int>> InsertDependencies { get; set; }
@@ -23,6 +28,8 @@ namespace RentalDBModels.Models
 
         public override async Task<IModel> Insert()
         {
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).First();
+
             IModel model = await base.Insert();
             bool isInsertDependency = await InsertDependency(model);
 
@@ -39,6 +46,8 @@ namespace RentalDBModels.Models
 
         public override async Task<IModel> Update(IModel oldModel = null)
         {
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).FirstOrDefault(IdClient);
+
             IModel model = await base.Update(oldModel);
             bool isUpdate = await UpdateDependency(model);
 
@@ -47,6 +56,8 @@ namespace RentalDBModels.Models
 
         public override async Task<TModel> Update<TModel>(TModel oldModel = null)
         {
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).FirstOrDefault(IdClient);
+
             TModel model = await base.Update<TModel>(oldModel);
             bool isUpdate = await UpdateDependency(model);
 
@@ -55,24 +66,22 @@ namespace RentalDBModels.Models
 
         private async Task<bool> InsertDependency(IModel model)
         {
-            bool isDependencyCategory = await InsertDependency<InventoryCategories>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryCategories)));
-            bool isDependencyMaterial = await InsertDependency<InventoryMaterials>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryMaterials)));
+            bool isDependencyInventory = await InsertDependency<InventoryRental>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryRental)));
             InsertDependencies.Clear();
 
-            return isDependencyCategory && isDependencyMaterial;
+            return isDependencyInventory;
         }
 
         private async Task<bool> RemoveDependency(IModel model)
         {
-            bool isDependencyCategory = await RemoveDependency<InventoryCategories>(model, RemoveDependencies.GetValueOrDefault(typeof(InventoryCategories)));
-            bool isDependencyMaterial = await RemoveDependency<InventoryMaterials>(model, RemoveDependencies.GetValueOrDefault(typeof(InventoryMaterials)));
+            bool isDependencyInventory = await RemoveDependency<InventoryRental>(model, RemoveDependencies.GetValueOrDefault(typeof(InventoryRental)));
             RemoveDependencies.Clear();
 
-            return isDependencyCategory && isDependencyMaterial;
+            return isDependencyInventory;
         }
 
         private async Task<bool> UpdateDependency(IModel model)
-        { 
+        {
             bool isInsertDependency = await InsertDependency(model);
             bool isRemoveDependency = await RemoveDependency(model);
 

@@ -4,9 +4,11 @@ using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Reflection.Metadata;
 using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Model;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WinFormsComponents.Controls
 {
@@ -141,33 +143,26 @@ namespace WinFormsComponents.Controls
         /// <param name="index">Индекс добавления</param>
         private void AddView(ModelParametrEditor parametr, int index)
         {
+            Control controlEdit = parametr.Type switch
+            {
+                Type t when t.Equals(typeof(string)) => CreateTextBox(parametr),
+                Type t when t.Equals(typeof(double)) || t.Equals(typeof(int)) => CreateNumericUpDown(parametr),
+                Type t when t.Equals(typeof(DateOnly)) || t.Equals(typeof(DateOnly?)) => CreateDateTimePicker(parametr),
+                _ => null
+            };
+
+            if (controlEdit is null) return;
+
             Label controlTitle = new()
             {
                 Text = parametr.Title,
                 Font = new("Segoe UI", 12, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleRight,
-                AutoSize = true
+                AutoSize = true,
+                Dock = DockStyle.Right
             };
 
-            Control controlEdit = parametr.Type switch
-            {
-                Type t when t.Equals(typeof(string)) => CreateTextBox(parametr),
-                Type t when t.Equals(typeof(double)) || t.Equals(typeof(int)) => CreateNumericUpDown(parametr),
-                Type t when t.Equals(typeof(DateTime)) => CreateDateTimePicker(parametr)
-            };
-
-            controlEdit.Dock = DockStyle.Fill;
-            controlEdit.Margin = new Padding(0,5,5,5);
-            controlEdit.KeyDown += DBModelLookupEditorOnKeyDown;
-
-            if (tlp.RowCount <= index)
-            {
-                tlp.RowCount++;
-                tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-
-                this.ParentForm.Height += controlEdit.Height + controlEdit.Margin.Top + controlEdit.Margin.Bottom;
-                this.ParentForm.MinimumSize = new Size(this.ParentForm.MinimumSize.Width, this.ParentForm.Height);
-            }
+            LoactionControl(index, controlEdit);
 
             tlp.Controls.Add(controlTitle,0,index);
             tlp.Controls.Add(controlEdit,1,index);
@@ -185,7 +180,8 @@ namespace WinFormsComponents.Controls
                 case DependencyType.OneToMany:
                     AddDependencyOneToMany(collection, index - Parametrs.Count);
                     break;
-                case DependencyType.OneToOne:
+                case DependencyType.OneToOnePicker:
+                    AddDependencyOneToOnePicker(collection, index - DependencyParametrs.Count);
                     break;
             }
         }
@@ -270,6 +266,70 @@ namespace WinFormsComponents.Controls
             collection.SetDependesiesToBase();
 
             dependenciesTabControl.TabPages.Add(dependencyTabPage);
+        }
+
+        /// <summary>
+        /// Добавление зависимости один к одному выбор из выпадающего списка
+        /// </summary>
+        /// <param name="collection">Параметр зависимости</param>
+        /// <param name="index">Положение контрола</param>
+        private void AddDependencyOneToOnePicker(DependencyCollection collection, int index)
+        {
+            Label controlTitle = new()
+            {
+                Text = collection.Title,
+                Font = new("Segoe UI", 12, FontStyle.Bold),
+                TextAlign = ContentAlignment.MiddleRight,
+                AutoSize = true,
+                Dock = DockStyle.Right
+            };
+
+            var image = ImageList.Images[collection.ImageKey];
+
+            DBModelPicker comboBoxDependency = new()
+            {
+                ModelType = collection.DependencyViewType,
+                SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
+                Image = image
+            };
+
+            comboBoxDependency.SelectedChange += (s, e) =>
+            {
+                collection.Dependencies.Clear();
+
+                if (comboBoxDependency.SelectedVal is not null)
+                {
+                    collection.Add(comboBoxDependency.SelectedVal.Value);
+                }
+            };
+
+            LoactionControl(index, comboBoxDependency);
+
+            tlp.Controls.Add(controlTitle, 0, index);
+            tlp.Controls.Add(comboBoxDependency, 1, index);
+
+            collection.SetDependesiesToBase();
+        }
+
+        /// <summary>
+        /// Назначение позиции элемента
+        /// </summary>
+        /// <param name="index">Индекс позиции</param>
+        /// <param name="control">Контрол</param>
+        public void LoactionControl(int index, Control control)
+        {
+            control.Dock = DockStyle.Fill;
+            control.Margin = new Padding(0, 5, 5, 5);
+            control.KeyDown += DBModelLookupEditorOnKeyDown;
+
+            if (tlp.RowCount <= index)
+            {
+                tlp.RowCount++;
+                tlp.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+                this.ParentForm.Height += control.Height + control.Margin.Top + control.Margin.Bottom;
+                this.ParentForm.MinimumSize = new Size(this.ParentForm.MinimumSize.Width, this.ParentForm.Height);
+            }
         }
 
         /// <summary>
@@ -423,7 +483,9 @@ namespace WinFormsComponents.Controls
                 Format = DateTimePickerFormat.Custom,
                 CustomFormat = "dd MMMM yyyy",
                 MaxDate = Convert.ToDateTime(parametr.SettingFilter?.Maximum ?? DateTime.Now),
-                MinDate = Convert.ToDateTime(parametr.SettingFilter?.Minimum ?? new DateTime(1991, 12, 25))
+                MinDate = Convert.ToDateTime(parametr.SettingFilter?.Minimum ?? new DateTime(1991, 12, 25)),
+                ShowCheckBox = parametr.Type.Equals(typeof(DateOnly?)),
+                Checked = parametr.Value is not null
             };
 
             Binding binding = new Binding(
@@ -437,11 +499,30 @@ namespace WinFormsComponents.Controls
             {
                 if (e.Value != null)
                 {
-                    e.Value = Convert.ToDateTime(e.Value ?? DateTime.Now);
+                    if (e.Value is null)
+                    {
+                        dateTimePicker.Checked = false;
+                        e.Value = DateTime.Now;
+                    }
+                    else
+                    {
+                        dateTimePicker.Checked = true;
+                        e.Value = ((DateOnly)e.Value).ToDateTime(TimeOnly.MinValue);
+                    }
                 }
             };
 
-            binding.Parse += (s, e) => e.Value = Convert.ToDateTime(e.Value);
+            binding.Parse += (s, e) =>
+            {
+                if (!dateTimePicker.Checked)
+                {
+                    e.Value = null;
+                }
+                else
+                {
+                    e.Value = DateOnly.FromDateTime(dateTimePicker.Value);
+                }
+            };
 
             dateTimePicker.DataBindings.Add(binding);
 

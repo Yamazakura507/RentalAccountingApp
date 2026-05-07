@@ -13,13 +13,11 @@ namespace RentalAccountingApp
             InitializeComponent();
 
             ConnectionInfo.ConnectDB();
-
-            dmlvInventory.ModelType = typeof(Inventory);
         }
 
         private void tsbSetingsOnClick(object sender, EventArgs e) => new SettingsForm().Show();
 
-        private void tcDBViewrOnKeyDown(object sender, KeyEventArgs e)
+        private void MainFormOnKeyDown(object sender, KeyEventArgs e)
         {
             bool isComand = false;
 
@@ -31,24 +29,12 @@ namespace RentalAccountingApp
                     e.SuppressKeyPress = true;
                     break;
             }
-
-            if (!isComand)
-            {
-                switch (tcDBViewr.SelectedIndex)
-                {
-                    case 0:
-                        dmlvInventory.lvModelOnKeyDown(sender, e);
-                        break;
-                }
-            }
         }
 
         private void tsbCatalogsOnClick(object sender, EventArgs e) => new BaseCatalogsForm().Show();
 
-        private void dbmlvComplexOnUpdateChanged(object sender, Action e) => new DBModelComplexEditor(sender, e, this).Show();
-
-        private void dbmlvComplexOnInsertChanged(object sender, Action e) => new DBModelComplexEditor(((WinFormsComponents.Controls.DBModelListView)sender).ModelType, e, this).Show();
-
         private void tsbClientsOnClick(object sender, EventArgs e) => new ClientsForm().Show();
+
+        private void tsbJournal_Click(object sender, EventArgs e) => new Journal().Show();
     }
 }

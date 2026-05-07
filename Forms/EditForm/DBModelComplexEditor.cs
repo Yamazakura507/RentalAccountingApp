@@ -33,7 +33,7 @@ namespace RentalAccountingApp.Forms.EditForm
 
         public DBModelComplexEditor(Type modelType, Action action, Form parentForm) : this(parentForm)
         {
-            LoadInfoModel(modelType);
+            LoadInfoModel(modelType).Wait();
 
             this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", titleHeader);
             this.Icon = Resources.add;
@@ -60,7 +60,7 @@ namespace RentalAccountingApp.Forms.EditForm
         {
             view = (IView)model;
 
-            LoadInfoModel(view.GetType(), view);
+            await LoadInfoModel(view.GetType(), view);
             UpdateTitle();
 
             this.model = await view.GetModel();
@@ -73,7 +73,7 @@ namespace RentalAccountingApp.Forms.EditForm
         /// </summary>
         /// <param name="modelType">Тип представления модели</param>
         /// <param name="view">Представление модели</param>
-        private void LoadInfoModel(Type modelType, IView view = null)
+        private async Task LoadInfoModel(Type modelType, IView view = null)
         {
             if (view is not null) dmlceEditor.EditorMode = EditorMode.UpdateOrDelete;
 
@@ -90,7 +90,18 @@ namespace RentalAccountingApp.Forms.EditForm
                     {
                         object valueParametr = null;
 
-                        if (view is not null) valueParametr = property.GetValue(view);
+                        if (view is not null)
+                        {
+                            valueParametr = property.GetValue(view);
+
+                            if (valueParametr is Task task)
+                            {
+                                await task;
+
+                                PropertyInfo resultProperty = task.GetType().GetProperty("Result");
+                                valueParametr = resultProperty?.GetValue(task);
+                            }
+                        }
 
                         string title = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
                         bool isNull = false;
@@ -133,7 +144,7 @@ namespace RentalAccountingApp.Forms.EditForm
         {
             dmlceEditor.DependencyParametrs.Clear();
 
-            PropertyInfo[] properties = view.GetType().GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
+            PropertyInfo[] properties = view.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             foreach (PropertyInfo property in properties)
             {
@@ -149,7 +160,16 @@ namespace RentalAccountingApp.Forms.EditForm
 
                     if (model is not null)
                     {
-                        dependencyCollection.AddRange((await (Task<IEnumerable<int>>)property.GetValue(view)).Select(i => new DependencyInfo(i)));
+                        switch (dependency.DependencyType)
+                        {
+                            case DataBaseProvaider.Enums.DependencyType.OneToMany:
+                                dependencyCollection.AddRange((await (Task<IEnumerable<int>>)property.GetValue(view)).Select(i => new DependencyInfo(i)));
+                                break;
+                            case DataBaseProvaider.Enums.DependencyType.OneToOnePicker:
+                            case DataBaseProvaider.Enums.DependencyType.OneToOneSelectionList:
+                                dependencyCollection.Add(new DependencyInfo((int)property.GetValue(view)));
+                                break;
+                        }
                     }
 
                     dmlceEditor.DependencyParametrs.Add(dependencyCollection);

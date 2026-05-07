@@ -58,6 +58,8 @@
             ilDependencies.TransparentColor = Color.Transparent;
             ilDependencies.Images.SetKeyName(0, "category.png");
             ilDependencies.Images.SetKeyName(1, "materials.png");
+            ilDependencies.Images.SetKeyName(2, "inventory.png");
+            ilDependencies.Images.SetKeyName(3, "clients.png");
             // 
             // DBModelComplexEditor
             // 

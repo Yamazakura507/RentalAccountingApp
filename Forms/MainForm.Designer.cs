@@ -30,23 +30,18 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
             tsMainMenu = new ToolStrip();
             tsbSetings = new ToolStripButton();
             tsbCatalogs = new ToolStripButton();
-            ilTabMenu = new ImageList(components);
-            tcDBViewr = new TabControl();
-            tpInventory = new TabPage();
-            dmlvInventory = new WinFormsComponents.Controls.DBModelListView();
             tsbClients = new ToolStripButton();
+            tsbJournal = new ToolStripButton();
+            ilTabMenu = new ImageList(components);
             tsMainMenu.SuspendLayout();
-            tcDBViewr.SuspendLayout();
-            tpInventory.SuspendLayout();
             SuspendLayout();
             // 
             // tsMainMenu
             // 
-            tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs, tsbClients });
+            tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs, tsbClients, tsbJournal });
             tsMainMenu.Location = new Point(0, 0);
             tsMainMenu.Name = "tsMainMenu";
             tsMainMenu.Size = new Size(800, 25);
@@ -71,74 +66,8 @@
             tsbCatalogs.Name = "tsbCatalogs";
             tsbCatalogs.Size = new Size(102, 22);
             tsbCatalogs.Text = "Справочники";
-            tsbCatalogs.ToolTipText = "Справочники()";
+            tsbCatalogs.ToolTipText = "Справочники";
             tsbCatalogs.Click += tsbCatalogsOnClick;
-            // 
-            // ilTabMenu
-            // 
-            ilTabMenu.ColorDepth = ColorDepth.Depth32Bit;
-            ilTabMenu.ImageStream = (ImageListStreamer)resources.GetObject("ilTabMenu.ImageStream");
-            ilTabMenu.TransparentColor = Color.Transparent;
-            ilTabMenu.Images.SetKeyName(0, "inventory.png");
-            ilTabMenu.Images.SetKeyName(1, "clients.png");
-            // 
-            // tcDBViewr
-            // 
-            tcDBViewr.Controls.Add(tpInventory);
-            tcDBViewr.Dock = DockStyle.Fill;
-            tcDBViewr.ImageList = ilTabMenu;
-            tcDBViewr.Location = new Point(0, 25);
-            tcDBViewr.Name = "tcDBViewr";
-            tcDBViewr.SelectedIndex = 0;
-            tcDBViewr.Size = new Size(800, 425);
-            tcDBViewr.TabIndex = 1;
-            tcDBViewr.KeyDown += tcDBViewrOnKeyDown;
-            // 
-            // tpInventory
-            // 
-            tpInventory.Controls.Add(dmlvInventory);
-            tpInventory.ImageKey = "inventory.png";
-            tpInventory.Location = new Point(4, 24);
-            tpInventory.Name = "tpInventory";
-            tpInventory.Padding = new Padding(3);
-            tpInventory.Size = new Size(792, 397);
-            tpInventory.TabIndex = 2;
-            tpInventory.Text = "Инвентарь";
-            tpInventory.UseVisualStyleBackColor = true;
-            // 
-            // dmlvInventory
-            // 
-            dmlvInventory.Dock = DockStyle.Fill;
-            dmlvInventory.Enabled = false;
-            dmlvInventory.FilterOffColor = Color.MistyRose;
-            dmlvInventory.FilterOnColor = Color.LightGreen;
-            dmlvInventory.ImageList = ilTabMenu;
-            dmlvInventory.IsEditor = false;
-            dmlvInventory.IsFilter = true;
-            dmlvInventory.IsGridLines = true;
-            dmlvInventory.IsRepairEditor = true;
-            dmlvInventory.IsRepairRow = true;
-            dmlvInventory.IsSearch = true;
-            dmlvInventory.IsShowCountAll = true;
-            dmlvInventory.IsShowCountEnter = true;
-            dmlvInventory.IsShowNum = false;
-            dmlvInventory.IsSorted = true;
-            dmlvInventory.Location = new Point(3, 3);
-            dmlvInventory.MinimumSize = new Size(530, 130);
-            dmlvInventory.ModelType = null;
-            dmlvInventory.Name = "dmlvInventory";
-            dmlvInventory.PageLimit = 0;
-            collectionParametrs2.Limit = 0;
-            collectionParametrs2.Offset = 0;
-            collectionParametrs2.SerhingParametrsCount = 0;
-            dmlvInventory.Parameters = collectionParametrs2;
-            dmlvInventory.RemovingRowColor = Color.MistyRose;
-            dmlvInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
-            dmlvInventory.Size = new Size(786, 391);
-            dmlvInventory.TabIndex = 0;
-            dmlvInventory.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
-            dmlvInventory.InsertChanged += dbmlvComplexOnInsertChanged;
-            dmlvInventory.UpdateChanged += dbmlvComplexOnUpdateChanged;
             // 
             // tsbClients
             // 
@@ -149,21 +78,36 @@
             tsbClients.Text = "Клиенты";
             tsbClients.Click += tsbClientsOnClick;
             // 
+            // tsbJournal
+            // 
+            tsbJournal.Image = Properties.Resources.rent;
+            tsbJournal.ImageTransparentColor = Color.Magenta;
+            tsbJournal.Name = "tsbJournal";
+            tsbJournal.Size = new Size(124, 22);
+            tsbJournal.Text = "Журналы аренды";
+            tsbJournal.Click += tsbJournal_Click;
+            // 
+            // ilTabMenu
+            // 
+            ilTabMenu.ColorDepth = ColorDepth.Depth32Bit;
+            ilTabMenu.ImageStream = (ImageListStreamer)resources.GetObject("ilTabMenu.ImageStream");
+            ilTabMenu.TransparentColor = Color.Transparent;
+            ilTabMenu.Images.SetKeyName(0, "inventory.png");
+            ilTabMenu.Images.SetKeyName(1, "rent.png");
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(tcDBViewr);
             Controls.Add(tsMainMenu);
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "ПРОКАТ";
+            KeyDown += MainFormOnKeyDown;
             tsMainMenu.ResumeLayout(false);
             tsMainMenu.PerformLayout();
-            tcDBViewr.ResumeLayout(false);
-            tpInventory.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -172,11 +116,9 @@
 
         private ToolStrip tsMainMenu;
         private ToolStripButton tsbSetings;
-        private TabControl tcDBViewr;
         private ImageList ilTabMenu;
-        private TabPage tpInventory;
-        private WinFormsComponents.Controls.DBModelListView dmlvInventory;
         private ToolStripButton tsbCatalogs;
         private ToolStripButton tsbClients;
+        private ToolStripButton tsbJournal;
     }
 }

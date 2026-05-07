@@ -34,12 +34,14 @@
             tpConectionSettings = new TabPage();
             connectingSettingsControl1 = new WinFormsComponents.ConnectingSettingsControl();
             ilSettings = new ImageList(components);
+            tpBaseSetting = new TabPage();
             tcSettings.SuspendLayout();
             tpConectionSettings.SuspendLayout();
             SuspendLayout();
             // 
             // tcSettings
             // 
+            tcSettings.Controls.Add(tpBaseSetting);
             tcSettings.Controls.Add(tpConectionSettings);
             tcSettings.Dock = DockStyle.Fill;
             tcSettings.ImageList = ilSettings;
@@ -58,7 +60,7 @@
             tpConectionSettings.Padding = new Padding(3);
             tpConectionSettings.Size = new Size(976, 188);
             tpConectionSettings.TabIndex = 1;
-            tpConectionSettings.Text = "Соеденение";
+            tpConectionSettings.Text = "Соеденения";
             tpConectionSettings.UseVisualStyleBackColor = true;
             // 
             // connectingSettingsControl1
@@ -76,6 +78,18 @@
             ilSettings.ImageStream = (ImageListStreamer)resources.GetObject("ilSettings.ImageStream");
             ilSettings.TransparentColor = Color.Transparent;
             ilSettings.Images.SetKeyName(0, "connect.png");
+            ilSettings.Images.SetKeyName(1, "setings.png");
+            // 
+            // tpBaseSetting
+            // 
+            tpBaseSetting.ImageKey = "setings.png";
+            tpBaseSetting.Location = new Point(4, 24);
+            tpBaseSetting.Name = "tpBaseSetting";
+            tpBaseSetting.Padding = new Padding(3);
+            tpBaseSetting.Size = new Size(976, 188);
+            tpBaseSetting.TabIndex = 2;
+            tpBaseSetting.Text = "Общие";
+            tpBaseSetting.UseVisualStyleBackColor = true;
             // 
             // SettingsForm
             // 
@@ -99,5 +113,6 @@
         private ImageList ilSettings;
         private TabPage tpConectionSettings;
         private WinFormsComponents.ConnectingSettingsControl connectingSettingsControl1;
+        private TabPage tpBaseSetting;
     }
 }

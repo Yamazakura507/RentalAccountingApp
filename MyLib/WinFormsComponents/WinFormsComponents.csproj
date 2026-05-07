@@ -5,7 +5,16 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	<EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Controls\ConnectingSettingsControl.resx" />
+    <EmbeddedResource Include="Controls\DBModelComplexEditor.resx" />
+    <EmbeddedResource Include="Controls\DBModelListView.resx" />
+    <EmbeddedResource Include="Controls\DBModelPicker.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -36,6 +45,7 @@
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
 

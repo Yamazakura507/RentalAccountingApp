@@ -111,6 +111,16 @@ namespace RentalAccountingApp.Properties {
         }
         
         /// <summary>
+        ///   Поиск локализованного ресурса типа System.Byte[].
+        /// </summary>
+        internal static byte[] clientsIcon {
+            get {
+                object obj = ResourceManager.GetObject("clientsIcon", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap connect {
@@ -167,6 +177,26 @@ namespace RentalAccountingApp.Properties {
             get {
                 object obj = ResourceManager.GetObject("materials", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap rent {
+            get {
+                object obj = ResourceManager.GetObject("rent", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        internal static System.Drawing.Icon rentIcon {
+            get {
+                object obj = ResourceManager.GetObject("rentIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
         

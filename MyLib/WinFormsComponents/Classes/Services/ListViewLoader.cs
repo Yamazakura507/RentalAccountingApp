@@ -34,7 +34,7 @@ namespace WinFormsComponents.Classes.Services
         /// <summary>
         /// Заполнение ListView данными
         /// </summary>
-        public void PopulateListView(ListView listView, BindingList<object> items)
+        public async Task PopulateListView(ListView listView, BindingList<object> items)
         {
             listView.BeginUpdate();
             listView.Items.Clear();
@@ -44,13 +44,13 @@ namespace WinFormsComponents.Classes.Services
 
             foreach (object item in items)
             {
-                ListViewItem lvItem = CreateListViewItem(item, num);
+                ListViewItem lvItem = await CreateListViewItem(item, num);
                 listView.Items.Add(lvItem);
                 if(isNum) num++;
             }
 
             listView.EndUpdate();
-            listView.AutoResizeColumns(items.Count == 0 ? ColumnHeaderAutoResizeStyle.HeaderSize : ColumnHeaderAutoResizeStyle.ColumnContent);
+            AutoSizeColumns(listView);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace WinFormsComponents.Classes.Services
         /// <param name="item">Компонент примезки</param>
         /// <param name="properties">Список свойств модели</param>
         /// <returns>Элемент <see cref="ListView"/></returns>
-        private ListViewItem CreateListViewItem(object item, int num)
+        private async Task<ListViewItem> CreateListViewItem(object item, int num)
         {
             ListViewItem lvItem = new ();
             bool isNum = num != 0;
@@ -72,18 +72,28 @@ namespace WinFormsComponents.Classes.Services
                 ViewModelAttribute vmAttribute = property.GetCustomAttribute<ViewModelAttribute>();
                 DisplayFormatAttribute dfAttribute = property.GetCustomAttribute<DisplayFormatAttribute>();
 
+                object rawValue = property.GetValue(item);
+
+                if (rawValue is Task task)
+                {
+                    await task;
+
+                    PropertyInfo resultProperty = task.GetType().GetProperty("Result");
+                    rawValue = resultProperty?.GetValue(task);
+                }
+
                 if (vmAttribute != null)
                 {
                     if (vmAttribute.Headline)
                     {
-                        string value = property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString);
+                        string value = rawValue.StringOutDBFormated(dfAttribute?.DataFormatString);
 
                         if (isNum) lvItem.SubItems.Add(value);
                         else lvItem.Text = value;
                     }
                     else if (vmAttribute.Image)
                     {
-                        lvItem.ImageKey = property.GetValue(item)?.ToString();
+                        lvItem.ImageKey = rawValue?.ToString();
                     }
                     else if (vmAttribute.RemovingFlag && !Convert.ToBoolean(property.GetValue(item)))
                     {
@@ -91,22 +101,46 @@ namespace WinFormsComponents.Classes.Services
                     }
                     else if (vmAttribute.BackColor && lvItem.BackColor != removingRowColor)
                     {
-                        lvItem.BackColor = (Color)property.GetValue(item);
+                        lvItem.BackColor = (Color)rawValue;
                     }
                     else
                     {
-                        lvItem.SubItems.Add(property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString));
+                        lvItem.SubItems.Add(rawValue.StringOutDBFormated(dfAttribute?.DataFormatString));
                     }
                 }
                 else
                 {
-                    lvItem.SubItems.Add(property.GetValue(item).StringOutDBFormated(dfAttribute?.DataFormatString));
+                    lvItem.SubItems.Add(rawValue.StringOutDBFormated(dfAttribute?.DataFormatString));
                 }
 
                 lvItem.Tag = item;
             }
 
             return lvItem;
+        }
+
+        /// <summary>
+        /// Определение ширины коклонки для списка относительно заголовка и контента
+        /// </summary>
+        /// <param name="listView">Список, объект <see cref="ListView"/></param>
+        public static void AutoSizeColumns(ListView listView)
+        {
+            if (listView.Items.Count == 0) 
+            {
+                listView.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+                return;
+            };
+
+            foreach (ColumnHeader column in listView.Columns)
+            {
+                column.Width = -2; // AutoSize по заголовку
+                int headerWidth = column.Width;
+
+                column.Width = -1; // AutoSize по контенту
+                int contentWidth = column.Width;
+
+                column.Width = Math.Max(headerWidth, contentWidth);
+            }
         }
     }
 }

@@ -114,7 +114,7 @@ namespace WinFormsComponents.Controls
         /// </summary>
         /// <param name="control">Родительский элемент</param>
         public void AutoSetup(Control control)
-        {
+        { 
             this.ArcElements = ArcLoaderElement.GetArcElementsRandomCollection().ToArray();
             this.Location = new((control.Width - this.Width) / 2, (control.Height - this.Height) / 2);
             control.Controls.Add(this);

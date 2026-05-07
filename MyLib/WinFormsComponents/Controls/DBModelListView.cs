@@ -143,6 +143,9 @@ namespace WinFormsComponents.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool IsRepairEditor { get; set; } = true;
 
+        /// <summary>
+        /// Метка режима редактирования
+        /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool IsEditor { get; set; } = false;
 
@@ -152,7 +155,17 @@ namespace WinFormsComponents.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public int PageLimit { get; set; } = 0;
 
+        /// <summary>
+        /// Колекция возвращаемая при выборе в модальном режиме
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public IEnumerable<ConditionsParametr> SelectedModalResult { get; private set; }
+
+        /// <summary>
+        /// Настройка взаимодействия с БД(Удаление/Оновление)
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        private TermsOfInteractionDB TermsOfInteractionDB { get; set; }
 
         /// <summary>
         /// Событие при добавлении
@@ -178,12 +191,6 @@ namespace WinFormsComponents.Controls
         /// Событие отката редактирования
         /// </summary>
         public event EventHandler<Action> RepairEditingChanged;
-
-        /// <summary>
-        /// Настройка взаимодействия с БД(Удаление/Оновление)
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        private TermsOfInteractionDB TermsOfInteractionDB { get; set; }
 
         public DBModelListView()
         {
@@ -487,7 +494,7 @@ namespace WinFormsComponents.Controls
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
             OnPreVisualizationChanged();
-            listViewLoader.PopulateListView(lvModel, Items);
+            await listViewLoader.PopulateListView(lvModel, Items);
 
             if (IsShowCountAll)
             {
@@ -681,7 +688,7 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Отображени/Скрытие колонки нумерации
         /// </summary>
-        private void ShowNumerate()
+        private async Task ShowNumerate()
         {
             if (IsShowNum) lvModel.Columns.Insert(0, new ColumnHeader() { Text = "№", Name = "numColumn", Tag = Parameters.Offset == 0 ? 1 : Parameters.Offset + 1 });
             else lvModel.Columns.RemoveAt(0);
@@ -689,7 +696,7 @@ namespace WinFormsComponents.Controls
             if ((Items?.Count ?? 0) > 0)
             {
                 loader.StartAnimation();
-                listViewLoader.PopulateListView(lvModel, Items);
+                await listViewLoader.PopulateListView(lvModel, Items);
                 loader.StopAnimation();
             }
         }
@@ -970,10 +977,10 @@ namespace WinFormsComponents.Controls
 
         private void tsbEditOnClick(object sender, EventArgs e) => OnUpdateChanged(lvModel.SelectedItems[0].Tag);
 
-        private void tsmiNumeretorVisibleOnCheckedChanged(object sender, EventArgs e)
+        private async void tsmiNumeretorVisibleOnCheckedChanged(object sender, EventArgs e)
         {
             IsShowNum = tsmiNumeretorVisible.Checked;
-            ShowNumerate();
+            await ShowNumerate();
 
             Dictionary<bool, (string, string, Color)> parametrs = new()
             {

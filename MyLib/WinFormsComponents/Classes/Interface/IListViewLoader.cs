@@ -10,6 +10,6 @@ namespace WinFormsComponents.Classes.Interface
         /// <summary>
         /// Заполнение ListView данными
         /// </summary>
-        void PopulateListView(ListView listView, BindingList<dynamic> items);
+        Task PopulateListView(ListView listView, BindingList<dynamic> items);
     }
 }
