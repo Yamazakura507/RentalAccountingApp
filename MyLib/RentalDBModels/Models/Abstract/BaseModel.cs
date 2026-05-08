@@ -11,7 +11,6 @@ namespace RentalDBModels.Models.Abstract
     public abstract class BaseModel : IModel
     {
         public int Id { get; init; }
-        public bool Flag { get; set; }
 
         public IModel Clone()
         {
@@ -26,27 +25,12 @@ namespace RentalDBModels.Models.Abstract
 
         public virtual async Task Delete()
         {
-            await this.GetType().InvokeMethodByType([new[] { new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id) }], nameof(DBProvider.Delete))
-                .ContinueWith((task) =>
-                {
-                    if (!task.IsFaulted)
-                    {
-                        this.Flag = !this.Flag;
-                    }
-                });
-            
+            await this.GetType().InvokeMethodByType([new[] { new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id) }], nameof(DBProvider.Delete));
         }
 
         public virtual async Task Delete<TModel>() where TModel : IModel
         {
-            await DBProvider.Delete<TModel>([new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id)])
-            .ContinueWith((task) =>
-            {
-                if (!task.IsFaulted)
-                {
-                    this.Flag = !this.Flag;
-                }
-            });
+            await DBProvider.Delete<TModel>([new ConditionsParametr(nameof(this.Id), ConditionalOperators.Equal, this.Id)]);
         }
 
         public virtual async Task<IModel> Insert()

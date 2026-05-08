@@ -60,6 +60,7 @@
             ilDependencies.Images.SetKeyName(1, "materials.png");
             ilDependencies.Images.SetKeyName(2, "inventory.png");
             ilDependencies.Images.SetKeyName(3, "clients.png");
+            ilDependencies.Images.SetKeyName(4, "pay.png");
             // 
             // DBModelComplexEditor
             // 

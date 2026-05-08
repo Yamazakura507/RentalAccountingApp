@@ -180,7 +180,7 @@ namespace WinFormsComponents.Controls
                     break;
                 case DependencyType.OneToOnePicker:
                 case DependencyType.OneToOneSelectionList:
-                    AddDependencyOneToOne(collection, index - DependencyParametrs.Count, collection.DependencyType);
+                    AddDependencyOneToOne(collection, index - DependencyParametrs.Count(i => i.DependencyType == DependencyType.OneToMany), collection.DependencyType);
                     break;
             }
         }

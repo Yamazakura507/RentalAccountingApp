@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace RentalDBModels.Views
 {
-    public class Categories : BaseView
+    public class Categories : BaseRemovingView
     {
         [ViewModel(Headline = true)]
         [Description("Категория")]

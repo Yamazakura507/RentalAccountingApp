@@ -8,6 +8,7 @@ namespace DataBaseProvaider.Enums
     /// <para>OneToMany - один ко многим</para>
     /// <para>OneToOnePicker - один к одному через выпадающий список</para>
     /// <para>OneToOneSelectionList - один к одному через выборный список</para>
+    /// <para>OneToOneSelectionNewObject - один к одному через привязку нового объекта</para>
     /// </remarks>
     public enum DependencyType
     {
@@ -25,7 +26,12 @@ namespace DataBaseProvaider.Enums
         /// Один к одному через выборный список
         /// </summary>
         /// <value>2</value>
-        OneToOneSelectionList = 2
+        OneToOneSelectionList = 2,
+        /// <summary>
+        /// Один к одному через привязку нового объекта
+        /// </summary>
+        /// <value>3</value>
+        OneToOneSelectionNewObject = 3
 
     }
 }

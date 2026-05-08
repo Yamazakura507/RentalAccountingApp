@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace RentalDBModels.Views
 {
-    public class Clients : BaseView
+    public class Clients : BaseRemovingView
     {
         [ViewModel(Headline = true)]
         [Check(RegexPattern = @"^[А-ЯЁA-Z][а-яёa-z']+(-[А-ЯЁA-Z][а-яёa-z']+)?\s+[А-ЯЁA-Z][а-яёa-z']+(\s+[А-ЯЁA-Z][а-яёa-z']+)?$", 

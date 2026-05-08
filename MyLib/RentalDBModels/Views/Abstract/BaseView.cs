@@ -14,9 +14,6 @@ namespace RentalDBModels.Views.Abstract
         [ViewModel(ViewHide = true)]
         public int Id { get; set; }
 
-        [ViewModel(ViewHide = true, RemovingFlag = true)]
-        public bool Flag { get; set; }
-
         [ViewModel(ViewHide = true)]
         public virtual Type ModelType { get; set; }
 

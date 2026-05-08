@@ -7,8 +7,6 @@ namespace RentalDBModels.Models.Interface
     {
         public int Id { get; init; }
 
-        public bool Flag { get; set; }
-
         Task<IModel> Insert();
         Task<IModel> Update(IModel oldModel = null);
         Task Delete();

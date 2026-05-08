@@ -5,6 +5,7 @@ using DataBaseProvaider.Classes.Abstract;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
 using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
@@ -310,8 +311,9 @@ namespace WinFormsComponents.Controls
             foreach (PropertyInfo property in properties)
             {
                 string titleMenu = property.GetCustomAttribute<DescriptionAttribute>()?.Description;
+                ViewModelAttribute vma = property.GetCustomAttribute<ViewModelAttribute>();
 
-                if (titleMenu is not null)
+                if (titleMenu is not null && (vma?.IsEdit ?? false))
                 {
                     if (IsSearch)
                     {
@@ -333,7 +335,7 @@ namespace WinFormsComponents.Controls
                         this.tsmiSorted.DropDownItems.Add(tsmiSorted);
                     }
 
-                    if (IsFilter && (property.GetCustomAttribute<ViewModelAttribute>()?.FilterOn ?? false))
+                    if (IsFilter && vma.FilterOn)
                     {
                         IEnumerable<ConditionsParametr> filterParameters = Parameters.Conditions.Where(i => !i.IsSerhing);
                         object max = await modelType.GetResultByType<object>([property.Name, null], nameof(DBProvider.Max));
@@ -488,14 +490,7 @@ namespace WinFormsComponents.Controls
 
             foreach (ConditionsParametr condition in Parameters.Conditions.Where(i => i?.IsSerhing ?? false))
             {
-                try
-                {
-                    condition.Value = Convert.ChangeType(tstbSearh.Text, condition.Type);
-                }
-                catch (Exception)
-                {
-                    condition.Value = null;
-                }
+                condition.Value = ConvertToType(tstbSearh.Text, condition.Type);
             }
 
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
@@ -510,6 +505,41 @@ namespace WinFormsComponents.Controls
 
             tsbRepairEditing.Enabled = IsRepairEditor;
             loader.StopAnimation();
+        }
+
+        /// <summary>
+        /// Преобразование строки поиска к типу параметра поиска
+        /// </summary>
+        /// <param name="text">Текст</param>
+        /// <param name="targetType">Тип параметра поиска</param>
+        /// <returns>Объект типа targetType или null, если приведение не удачно</returns>
+        private object ConvertToType(string text, Type targetType)
+        {
+            if (targetType == typeof(DateOnly))
+            {
+                string[] formats = { "yyyy-MM-dd", "dd.MM.yyyy", "dd/MM/yyyy", "yyyy/MM/dd" };
+
+                if (DateOnly.TryParseExact(text, formats, null, DateTimeStyles.None, out DateOnly date))
+                {
+                    return date;
+                }
+
+                if (DateOnly.TryParse(text, out date))
+                {
+                    return date;
+                }
+
+                return null;
+            }
+
+            try
+            {
+                return Convert.ChangeType(text, targetType);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         /// <summary>

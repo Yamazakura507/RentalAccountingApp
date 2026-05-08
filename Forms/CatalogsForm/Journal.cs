@@ -11,6 +11,7 @@ namespace RentalAccountingApp.Forms.CatalogsForm
 
             dmlvInventory.ModelType = typeof(Inventory);
             dmlvRental.ModelType = typeof(Rental);
+            dmlvOplat.ModelType = typeof(Payments);
         }
 
         private void tcDBViewrOnKeyDown(object sender, KeyEventArgs e)
@@ -22,6 +23,9 @@ namespace RentalAccountingApp.Forms.CatalogsForm
                     break;
                 case 1:
                     dmlvInventory.lvModelOnKeyDown(sender, e);
+                    break;
+                case 2:
+                    dmlvOplat.lvModelOnKeyDown(sender, e);
                     break;
             }
         }

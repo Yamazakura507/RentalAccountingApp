@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace RentalDBModels.Views
 {
-    public class Materials : BaseView
+    public class Materials : BaseRemovingView
     {
         [ViewModel(Headline = true)]
         [Description("Материал")]

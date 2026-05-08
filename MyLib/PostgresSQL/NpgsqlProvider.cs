@@ -263,7 +263,8 @@ namespace PostgresSQL
 
             try
             {
-                value = (T)Convert.ChangeType(await cmd.ExecuteScalarAsync(), typeof(T));
+                if (typeof(object).Equals(typeof(T))) value = (T)await cmd.ExecuteScalarAsync();
+                else value = (T)Convert.ChangeType(await cmd.ExecuteScalarAsync(), typeof(T));
             }
             catch (NpgsqlException ex)
             {

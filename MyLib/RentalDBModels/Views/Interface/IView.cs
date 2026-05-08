@@ -6,8 +6,6 @@ namespace RentalDBModels.Views.Interface
     {
         public int Id { get; set; }
 
-        public bool Flag { get; set; }
-
         public Type ModelType { get; set; }
 
         Task<IModel> GetModel();

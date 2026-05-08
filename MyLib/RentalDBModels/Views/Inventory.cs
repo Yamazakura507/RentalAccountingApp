@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RentalDBModels.Views
 {
-    public class Inventory : BaseView
+    public class Inventory : BaseRemovingView
     {
         [ViewModel(Headline = true)]
         [Description("Инвентарь")]

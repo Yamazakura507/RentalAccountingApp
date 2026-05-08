@@ -1,7 +1,5 @@
 using RentalAccountingApp.Forms;
 using RentalAccountingApp.Forms.CatalogsForm;
-using RentalAccountingApp.Forms.EditForm;
-using RentalDBModels.Views;
 using WinFormsComponents.Classes;
 
 namespace RentalAccountingApp

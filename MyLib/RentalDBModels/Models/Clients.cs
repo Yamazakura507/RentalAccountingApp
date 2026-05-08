@@ -2,7 +2,7 @@
 
 namespace RentalDBModels.Models
 {
-    public class Clients : BaseModel
+    public class Clients : BaseRemovingModel
     {
         public string OwnerName { get; set; }
         public string Phone { get; set; }

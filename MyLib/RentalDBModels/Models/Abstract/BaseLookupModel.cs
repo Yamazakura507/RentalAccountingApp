@@ -2,7 +2,7 @@
 
 namespace RentalDBModels.Models.Abstract
 {
-    public abstract class BaseLookupModel : BaseModel, ILookupModel
+    public abstract class BaseLookupModel : BaseRemovingModel, ILookupModel
     {
         public string Name { get; set; }
     }

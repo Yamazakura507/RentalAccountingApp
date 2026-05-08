@@ -9,29 +9,33 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RentalDBModels.Views
 {
-    public class Rental : BaseView
+    public class Rental : BaseRemovingView
     {
-        [ViewModel(Headline = true)]
-        [Description("Клиент")]
+        [ViewModel(Headline = true, IsEdit = false)]
+        [Description("Заявка от клиента")]
         public Task<string> ClientName => ClientStr();
 
-        [ViewModel]
+        [ViewModel(FilterOn = true)]
         [Description("Дата аренды")]
         [DisplayFormat(DataFormatString = "{0:dd MMMM yyyy}")]
         public DateOnly IssueDate { get; set; }
 
-        [ViewModel]
+        [ViewModel(FilterOn = true)]
         [Description("Дата возврата")]
         [DisplayFormat(DataFormatString = "{0:dd MMMM yyyy}")]
         public DateOnly? ReturnDate { get; set; }
 
-        [ViewModel]
+        [ViewModel(IsEdit = false)]
         [Description("Количество ивентаря в аренде")]
         public Task<int> CountInventory => DBProvider.Count<InventoryRental>([new ConditionsParametr(nameof(InventoryRental.IdRental), ConditionalOperators.Equal, this.Id)]);
 
         [ViewModel(IsEdit = false)]
         [Description("Статус оплаты")]
-        public string PayStatus => true ? "Оплачено" : ReturnDate is not null && DateOnly.FromDateTime(DateTime.Now) > ReturnDate ? "Не оплачено | Долг" : "Не оплачено";
+        public string PayStatus => IdPayment is not null
+                                    ? "Оплачено" 
+                                    : ReturnDate is not null && DateOnly.FromDateTime(DateTime.Now) > ReturnDate 
+                                        ? "Не оплачено | Долг" 
+                                        : "Не оплачено";
 
         [ViewModel(ViewHide = true, Image = true)]
         public string ImageKey { get; set; } = "rent.png";
@@ -39,8 +43,8 @@ namespace RentalDBModels.Views
         [ViewModel(ViewHide = true)]
         public override Type ModelType { get => typeof(Models.Rental); }
 
-        //[Dependency("Платеж", typeof(Categories), DependencyType.OneToOne, ImageKey = "pay.png", DependencyModelType = typeof(InventoryCategories))]
-        //public int? IdPayment { get; set; }
+        [Dependency("Платеж", typeof(Payments), DependencyType.OneToOnePicker, ImageKey = "pay.png", DependencyModelType = typeof(Models.Payments))]
+        public int? IdPayment { get; set; }
 
         [Dependency("Клиент", typeof(Clients), DependencyType.OneToOneSelectionList, ImageKey = "clients.png", DependencyModelType = typeof(Models.Clients))]
         public int IdClient { get; set; }

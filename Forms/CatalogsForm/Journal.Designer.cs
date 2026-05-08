@@ -32,15 +32,19 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Journal));
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
+            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs3 = new DataBaseProvaider.Objects.CollectionParametrs();
             ilTabMenu = new ImageList(components);
             tcDBViewr = new TabControl();
             tpRental = new TabPage();
             dmlvRental = new WinFormsComponents.Controls.DBModelListView();
             tpInventory = new TabPage();
             dmlvInventory = new WinFormsComponents.Controls.DBModelListView();
+            tpOplat = new TabPage();
+            dmlvOplat = new WinFormsComponents.Controls.DBModelListView();
             tcDBViewr.SuspendLayout();
             tpRental.SuspendLayout();
             tpInventory.SuspendLayout();
+            tpOplat.SuspendLayout();
             SuspendLayout();
             // 
             // ilTabMenu
@@ -50,11 +54,13 @@
             ilTabMenu.TransparentColor = Color.Transparent;
             ilTabMenu.Images.SetKeyName(0, "inventory.png");
             ilTabMenu.Images.SetKeyName(1, "rent.png");
+            ilTabMenu.Images.SetKeyName(2, "pay.png");
             // 
             // tcDBViewr
             // 
             tcDBViewr.Controls.Add(tpRental);
             tcDBViewr.Controls.Add(tpInventory);
+            tcDBViewr.Controls.Add(tpOplat);
             tcDBViewr.Dock = DockStyle.Fill;
             tcDBViewr.ImageList = ilTabMenu;
             tcDBViewr.Location = new Point(0, 0);
@@ -96,6 +102,7 @@
             dmlvRental.Location = new Point(3, 3);
             dmlvRental.MinimumSize = new Size(600, 130);
             dmlvRental.ModelType = null;
+            dmlvRental.MultiSelect = true;
             dmlvRental.Name = "dmlvRental";
             dmlvRental.PageLimit = 0;
             collectionParametrs1.Limit = 0;
@@ -142,6 +149,7 @@
             dmlvInventory.Location = new Point(3, 3);
             dmlvInventory.MinimumSize = new Size(530, 130);
             dmlvInventory.ModelType = null;
+            dmlvInventory.MultiSelect = true;
             dmlvInventory.Name = "dmlvInventory";
             dmlvInventory.PageLimit = 0;
             collectionParametrs2.Limit = 0;
@@ -156,6 +164,51 @@
             dmlvInventory.InsertChanged += dbmlvComplexOnInsertChanged;
             dmlvInventory.UpdateChanged += dbmlvComplexOnUpdateChanged;
             // 
+            // tpOplat
+            // 
+            tpOplat.Controls.Add(dmlvOplat);
+            tpOplat.ImageKey = "pay.png";
+            tpOplat.Location = new Point(4, 24);
+            tpOplat.Name = "tpOplat";
+            tpOplat.Padding = new Padding(3);
+            tpOplat.Size = new Size(792, 422);
+            tpOplat.TabIndex = 4;
+            tpOplat.Text = "Оплаты";
+            tpOplat.UseVisualStyleBackColor = true;
+            // 
+            // dmlvOplat
+            // 
+            dmlvOplat.Dock = DockStyle.Fill;
+            dmlvOplat.Enabled = false;
+            dmlvOplat.FilterOffColor = Color.MistyRose;
+            dmlvOplat.FilterOnColor = Color.LightGreen;
+            dmlvOplat.ImageList = ilTabMenu;
+            dmlvOplat.IsEditor = false;
+            dmlvOplat.IsFilter = true;
+            dmlvOplat.IsGridLines = true;
+            dmlvOplat.IsRepairEditor = false;
+            dmlvOplat.IsRepairRow = false;
+            dmlvOplat.IsSearch = true;
+            dmlvOplat.IsShowCountAll = true;
+            dmlvOplat.IsShowCountEnter = true;
+            dmlvOplat.IsShowNum = false;
+            dmlvOplat.IsSorted = true;
+            dmlvOplat.Location = new Point(3, 3);
+            dmlvOplat.MinimumSize = new Size(600, 130);
+            dmlvOplat.ModelType = null;
+            dmlvOplat.MultiSelect = true;
+            dmlvOplat.Name = "dmlvOplat";
+            dmlvOplat.PageLimit = 0;
+            collectionParametrs3.Limit = 0;
+            collectionParametrs3.Offset = 0;
+            collectionParametrs3.SerhingParametrsCount = 0;
+            dmlvOplat.Parameters = collectionParametrs3;
+            dmlvOplat.RemovingRowColor = Color.MistyRose;
+            dmlvOplat.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
+            dmlvOplat.Size = new Size(786, 416);
+            dmlvOplat.TabIndex = 0;
+            dmlvOplat.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
+            // 
             // Journal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -168,6 +221,7 @@
             tcDBViewr.ResumeLayout(false);
             tpRental.ResumeLayout(false);
             tpInventory.ResumeLayout(false);
+            tpOplat.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -179,5 +233,7 @@
         private WinFormsComponents.Controls.DBModelListView dmlvInventory;
         private TabPage tpRental;
         private WinFormsComponents.Controls.DBModelListView dmlvRental;
+        private TabPage tpOplat;
+        private WinFormsComponents.Controls.DBModelListView dmlvOplat;
     }
 }

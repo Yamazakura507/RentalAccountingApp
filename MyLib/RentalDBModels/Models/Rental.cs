@@ -5,7 +5,7 @@ using RentalDBModels.Models.Interface;
 
 namespace RentalDBModels.Models
 {
-    public class Rental : BaseModel, IForigenParent
+    public class Rental : BaseRemovingModel, IForigenParent
     {
         public DateOnly IssueDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 

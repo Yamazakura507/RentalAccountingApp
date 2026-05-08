@@ -108,6 +108,35 @@ namespace WinFormsComponents.Classes.Services
                         Maximum = Convert.ToDecimal(settingFilter?.Maximum ?? 1000),
                         Minimum = Convert.ToDecimal(settingFilter?.Minimum ?? 0)
                     })
+                ],
+                Type t when t.Equals(typeof(DateOnly)) || t.Equals(typeof(DateOnly?)) =>
+                [
+                    new (new Label() { Text = "Минимальное значение", Enabled = isEnable }),
+                    new (new DateTimePicker()
+                    {
+                        Format = DateTimePickerFormat.Custom,
+                        CustomFormat = "dd MMMM yyyy",
+                        Enabled = isEnable,
+                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
+                        MinDate = settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
+                        Value = GetClampedValue(
+                                    min is null ? new DateTime(1991,12,25) : ((DateOnly)min).ToDateTime(TimeOnly.MinValue),
+                                    settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
+                                    settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
+                    }),
+                    new (new Label() { Text = "Максимальное значение", Enabled = isEnable }),
+                    new (new DateTimePicker()
+                    {
+                        Format = DateTimePickerFormat.Custom,
+                        CustomFormat = "dd MMMM yyyy",
+                        Enabled = isEnable,
+                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
+                        MinDate = settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
+                        Value = GetClampedValue(
+                                    max is null ? DateTime.Now : ((DateOnly)max).ToDateTime(TimeOnly.MinValue),
+                                    settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
+                                    settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
+                    })
                 ]
             };
         }
@@ -133,6 +162,10 @@ namespace WinFormsComponents.Classes.Services
                     max = ((NumericUpDown)tschMax.Control).Value;
                     min = ((NumericUpDown)tschMin.Control).Value;
                     break;
+                case Type t when t.Equals(typeof(DateOnly)) || t.Equals(typeof(DateOnly?)):
+                    max = ((DateTimePicker)tschMax.Control).Value;
+                    min = ((DateTimePicker)tschMin.Control).Value;
+                    break;
             }
 
             object[] filter = [min, max];
@@ -141,6 +174,20 @@ namespace WinFormsComponents.Classes.Services
             { 
                 Type = typeParametr
             };
+        }
+
+        /// <summary>
+        /// Проверка что значение даты попадает в диапазон MaxDate - MinDate
+        /// </summary>
+        /// <param name="value">Значение даты</param>
+        /// <param name="min">Значение MinDate</param>
+        /// <param name="max">Значение MaxDate</param>
+        /// <returns>Нормализованая диапазоном дата</returns>
+        private DateTime GetClampedValue(DateTime value, DateTime min, DateTime max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
         }
     }
 }

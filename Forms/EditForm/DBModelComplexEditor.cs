@@ -14,6 +14,7 @@ namespace RentalAccountingApp.Forms.EditForm
     public partial class DBModelComplexEditor : Form
     {
         private string titleHeader;
+        private string tagHeader;
         private string valHeader;
         private IModel model;
         private IView view;
@@ -86,7 +87,7 @@ namespace RentalAccountingApp.Forms.EditForm
 
                 if (vmAttribute != null)
                 {
-                    if (!vmAttribute.ViewHide && vmAttribute.IsEdit)
+                    if (!vmAttribute.ViewHide)
                     {
                         object valueParametr = null;
 
@@ -115,16 +116,20 @@ namespace RentalAccountingApp.Forms.EditForm
                                 filter = new(checkAttribute.RegexCheck, checkAttribute.NotChecibleMessage);
                         }
 
-                        dmlceEditor.Parametrs.Add(
-                            new(title, valueParametr, property.Name, property.PropertyType) 
-                            { 
-                                IsNull = isNull, 
-                                SettingFilter = filter 
+                        if (vmAttribute.IsEdit)
+                        {
+                            dmlceEditor.Parametrs.Add(
+                            new(title, valueParametr, property.Name, property.PropertyType)
+                            {
+                                IsNull = isNull,
+                                SettingFilter = filter
                             });
+                        }
 
                         if (vmAttribute.Headline)
                         {
                             titleHeader = title;
+                            tagHeader = property.Name;
                             valHeader = valueParametr?.ToString();
                         }
                     }
@@ -167,7 +172,9 @@ namespace RentalAccountingApp.Forms.EditForm
                                 break;
                             case DataBaseProvaider.Enums.DependencyType.OneToOnePicker:
                             case DataBaseProvaider.Enums.DependencyType.OneToOneSelectionList:
-                                dependencyCollection.Add(new DependencyInfo((int)property.GetValue(view)));
+                                int? id = (int?)property.GetValue(view);
+
+                                if(id is not null) dependencyCollection.Add(new DependencyInfo(id.Value));
                                 dependencyCollection.IsNullableDependency = Nullable.GetUnderlyingType(property.PropertyType) != null;
                                 break;
                         }
@@ -276,7 +283,7 @@ namespace RentalAccountingApp.Forms.EditForm
                 }
 
                 updateTypeList.Clear();
-                valHeader = dmlceEditor.Parametrs.First(i => i.Title.Equals(titleHeader)).Value.ToString();
+                valHeader = model.GetType().GetProperty(tagHeader).GetValue(model).ToString();
                 UpdateTitle();
                 OnUpdateChanged();
             }

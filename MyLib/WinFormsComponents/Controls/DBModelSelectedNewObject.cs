@@ -8,7 +8,7 @@ using WinFormsComponents.Classes.Interface;
 
 namespace WinFormsComponents.Controls
 {
-    public partial class DBModelSelectedList : UserControl, ISelected
+    public partial class DBModelSelectedNewObject : UserControl, ISelected
     {
         private Type modelType;
         private string parametrHeaderName = null;
@@ -95,11 +95,10 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelSelectedList()
+        public DBModelSelectedNewObject()
         {
             InitializeComponent();
 
-            Parameters ??= new();
             btNullVal.Visible = IsNullVal;
         }
 
