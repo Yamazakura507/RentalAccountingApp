@@ -7,6 +7,9 @@ namespace RentalDBModels.Models
 {
     public class Rental : BaseRemovingModel, IForigenParent
     {
+        [SkipProperty]
+        public override Type ViewType => typeof(Views.Rental);
+
         public DateOnly IssueDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         public DateOnly? ReturnDate { get; set; }
@@ -16,7 +19,7 @@ namespace RentalDBModels.Models
         public int IdClient { get; set; }
 
         [SkipProperty]
-        public Dictionary<Type, IEnumerable<int>> InsertDependencies { get; set; }
+        public Dictionary<Type, IEnumerable<int?>> InsertDependencies { get; set; }
         [SkipProperty]
         public Dictionary<Type, IEnumerable<int>> RemoveDependencies { get; set; }
 
@@ -28,7 +31,8 @@ namespace RentalDBModels.Models
 
         public override async Task<IModel> Insert()
         {
-            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).First();
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).OfType<int>().First();
+            IdPayment = InsertDependencies.GetValueOrDefault(typeof(Payments)).DefaultIfEmpty(null).FirstOrDefault();
 
             IModel model = await base.Insert();
             bool isInsertDependency = await InsertDependency(model);
@@ -38,6 +42,9 @@ namespace RentalDBModels.Models
 
         public override async Task<TModel> Insert<TModel>()
         {
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).OfType<int>().First();
+            IdPayment = InsertDependencies.GetValueOrDefault(typeof(Payments)).DefaultIfEmpty(null).FirstOrDefault();
+
             TModel model = await base.Insert<TModel>();
             bool isInsertDependency = await InsertDependency(model);
 
@@ -46,7 +53,8 @@ namespace RentalDBModels.Models
 
         public override async Task<IModel> Update(IModel oldModel = null)
         {
-            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).FirstOrDefault(IdClient);
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).OfType<int>().FirstOrDefault(IdClient);
+            IdPayment = InsertDependencies.GetValueOrDefault(typeof(Payments)).DefaultIfEmpty(IdPayment).FirstOrDefault();
 
             IModel model = await base.Update(oldModel);
             bool isUpdate = await UpdateDependency(model);
@@ -56,7 +64,8 @@ namespace RentalDBModels.Models
 
         public override async Task<TModel> Update<TModel>(TModel oldModel = null)
         {
-            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).FirstOrDefault(IdClient);
+            IdClient = InsertDependencies.GetValueOrDefault(typeof(Clients)).OfType<int>().FirstOrDefault(IdClient);
+            IdPayment = InsertDependencies.GetValueOrDefault(typeof(Payments)).DefaultIfEmpty(IdPayment).FirstOrDefault();
 
             TModel model = await base.Update<TModel>(oldModel);
             bool isUpdate = await UpdateDependency(model);
@@ -66,7 +75,7 @@ namespace RentalDBModels.Models
 
         private async Task<bool> InsertDependency(IModel model)
         {
-            bool isDependencyInventory = await InsertDependency<InventoryRental>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryRental)));
+            bool isDependencyInventory = await InsertDependency<InventoryRental>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryRental)).OfType<int>());
             InsertDependencies.Clear();
 
             return isDependencyInventory;
@@ -87,5 +96,7 @@ namespace RentalDBModels.Models
 
             return isInsertDependency && isRemoveDependency;
         }
+
+        public bool DateIssueCheck() => ReturnDate is null || IssueDate <= ReturnDate;
     }
 }

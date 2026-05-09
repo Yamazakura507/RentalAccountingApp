@@ -12,6 +12,7 @@ using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Interface;
 using WinFormsComponents.Classes.Model;
 using WinFormsComponents.Classes.Services;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsComponents.Controls
 {
@@ -649,9 +650,9 @@ namespace WinFormsComponents.Controls
             if (isModal) return (false, false);
             else if (parametrRemovingName is null && !IsEditor) return (isSelect, false);
 
-            PropertyInfo property = 
-                IsEditor 
-                    ? modelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>().BackColor) 
+            PropertyInfo property =
+                IsEditor
+                    ? modelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>().BackColor)
                     : modelType.GetProperty(parametrRemovingName);
 
             if (property is null && IsEditor) return (isSelect, false);
@@ -661,8 +662,8 @@ namespace WinFormsComponents.Controls
 
             foreach (ListViewItem item in lvModel.SelectedItems)
             {
-                bool flag = 
-                    IsEditor 
+                bool flag =
+                    IsEditor
                         ? (Color)property.GetValue(item.Tag) != RemovingRowColor
                         : Convert.ToBoolean(property?.GetValue(item.Tag) ?? true);
 
@@ -1036,5 +1037,19 @@ namespace WinFormsComponents.Controls
         }
 
         private void tsbRepairEditingOnClick(object sender, EventArgs e) => OnRepairEditingChanged();
+
+        private void tsbExcelExportOnClick(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveDialog = ExcelReporter.ExportDialog)
+            {
+                string sheetName = modelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.Headline ?? false)?.GetCustomAttribute<DescriptionAttribute>().Description;
+                saveDialog.FileName = String.Format("{0}_{1:dd_MM_yyyy}.xlsx", sheetName.ToUpper(), DateTime.Now);
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    ExcelReporter.ExportListViewToExcel(lvModel, saveDialog.FileName, sheetName);
+                }
+            }
+        }
     }
 }

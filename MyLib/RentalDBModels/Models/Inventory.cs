@@ -11,7 +11,10 @@ namespace RentalDBModels.Models
         public double Price { get; set; }
 
         [SkipProperty]
-        public Dictionary<Type, IEnumerable<int>> InsertDependencies { get; set; }
+        public override Type ViewType => typeof(Views.Inventory);
+
+        [SkipProperty]
+        public Dictionary<Type, IEnumerable<int?>> InsertDependencies { get; set; }
         [SkipProperty]
         public Dictionary<Type, IEnumerable<int>> RemoveDependencies { get; set; }
 
@@ -55,8 +58,8 @@ namespace RentalDBModels.Models
 
         private async Task<bool> InsertDependency(IModel model)
         {
-            bool isDependencyCategory = await InsertDependency<InventoryCategories>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryCategories)));
-            bool isDependencyMaterial = await InsertDependency<InventoryMaterials>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryMaterials)));
+            bool isDependencyCategory = await InsertDependency<InventoryCategories>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryCategories)).OfType<int>());
+            bool isDependencyMaterial = await InsertDependency<InventoryMaterials>(model, InsertDependencies.GetValueOrDefault(typeof(InventoryMaterials)).OfType<int>());
             InsertDependencies.Clear();
 
             return isDependencyCategory && isDependencyMaterial;

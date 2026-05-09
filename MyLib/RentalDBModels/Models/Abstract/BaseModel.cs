@@ -3,6 +3,7 @@ using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using RentalDBModels.Models.Interface;
+using RentalDBModels.Views.Interface;
 using System.Data;
 using System.Reflection;
 
@@ -11,6 +12,7 @@ namespace RentalDBModels.Models.Abstract
     public abstract class BaseModel : IModel
     {
         public int Id { get; init; }
+        public abstract Type ViewType { get; }
 
         public IModel Clone()
         {
@@ -169,5 +171,7 @@ namespace RentalDBModels.Models.Abstract
 
             return parametrs;
         }
+
+        public async Task<IView> GetView() => (IView)Convert.ChangeType(await this.ViewType.GetResultByType<object>([this.Id], nameof(DBProvider.GetModel)), this.ViewType);
     }
 }

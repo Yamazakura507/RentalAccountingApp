@@ -1,4 +1,5 @@
-﻿using RentalDBModels.Models.Abstract;
+﻿using DataBaseProvaider.Attributes;
+using RentalDBModels.Models.Abstract;
 
 namespace RentalDBModels.Models
 {
@@ -6,5 +7,8 @@ namespace RentalDBModels.Models
     {
         public string OwnerName { get; set; }
         public string Phone { get; set; }
+
+        [SkipProperty]
+        public override Type ViewType => typeof(Views.Clients);
     }
 }

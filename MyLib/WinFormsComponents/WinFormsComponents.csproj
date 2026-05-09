@@ -12,12 +12,14 @@
     <EmbeddedResource Include="Controls\ConnectingSettingsControl.resx" />
     <EmbeddedResource Include="Controls\DBModelComplexEditor.resx" />
     <EmbeddedResource Include="Controls\DBModelListView.resx" />
+    <EmbeddedResource Include="Controls\DBModelSelectedNewObject.resx" />
     <EmbeddedResource Include="Controls\DBModelSelectedList.resx" />
     <EmbeddedResource Include="Controls\DBModelPicker.resx" />
     <EmbeddedResource Include="Properties\Resources.resx" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="8.5.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Npgsql" Version="10.0.2" />
   </ItemGroup>
@@ -28,6 +30,9 @@
 
   <ItemGroup>
     <Compile Update="Controls\DBModelComplexEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Update="Controls\DBModelSelectedNewObject.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Update="Controls\DBModelSelectedList.cs">

@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             tlpDBModelView = new TableLayoutPanel();
+            btDelete = new Button();
             btAdd = new Button();
-            btNullVal = new Button();
             pbIcon = new PictureBox();
             lbSelectedName = new Label();
             tlpDBModelView.SuspendLayout();
@@ -45,8 +45,9 @@
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle());
             tlpDBModelView.ColumnStyles.Add(new ColumnStyle());
-            tlpDBModelView.Controls.Add(btAdd, 3, 0);
-            tlpDBModelView.Controls.Add(btNullVal, 2, 0);
+            tlpDBModelView.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 20F));
+            tlpDBModelView.Controls.Add(btDelete, 3, 0);
+            tlpDBModelView.Controls.Add(btAdd, 2, 0);
             tlpDBModelView.Controls.Add(pbIcon, 0, 0);
             tlpDBModelView.Controls.Add(lbSelectedName, 1, 0);
             tlpDBModelView.Dock = DockStyle.Fill;
@@ -58,6 +59,22 @@
             tlpDBModelView.TabIndex = 1;
             tlpDBModelView.Tag = "";
             // 
+            // btDelete
+            // 
+            btDelete.BackColor = Color.Transparent;
+            btDelete.BackgroundImage = Properties.Resources.delete;
+            btDelete.BackgroundImageLayout = ImageLayout.Zoom;
+            btDelete.Dock = DockStyle.Fill;
+            btDelete.FlatAppearance.BorderSize = 0;
+            btDelete.FlatStyle = FlatStyle.Flat;
+            btDelete.Location = new Point(392, 3);
+            btDelete.Name = "btDelete";
+            btDelete.Size = new Size(24, 24);
+            btDelete.TabIndex = 5;
+            btDelete.Tag = "0";
+            btDelete.UseVisualStyleBackColor = false;
+            btDelete.Click += btDeleteOnClick;
+            // 
             // btAdd
             // 
             btAdd.BackColor = Color.Transparent;
@@ -66,29 +83,13 @@
             btAdd.Dock = DockStyle.Fill;
             btAdd.FlatAppearance.BorderSize = 0;
             btAdd.FlatStyle = FlatStyle.Flat;
-            btAdd.Location = new Point(392, 3);
+            btAdd.Location = new Point(362, 3);
             btAdd.Name = "btAdd";
             btAdd.Size = new Size(24, 24);
             btAdd.TabIndex = 4;
             btAdd.Tag = "0";
             btAdd.UseVisualStyleBackColor = false;
-            btAdd.Click += btSelectedOnClick;
-            // 
-            // btNullVal
-            // 
-            btNullVal.BackColor = Color.Transparent;
-            btNullVal.BackgroundImage = Properties.Resources.checkible;
-            btNullVal.BackgroundImageLayout = ImageLayout.Zoom;
-            btNullVal.Dock = DockStyle.Fill;
-            btNullVal.FlatAppearance.BorderSize = 0;
-            btNullVal.FlatStyle = FlatStyle.Flat;
-            btNullVal.Location = new Point(362, 3);
-            btNullVal.Name = "btNullVal";
-            btNullVal.Size = new Size(24, 24);
-            btNullVal.TabIndex = 1;
-            btNullVal.Tag = "0";
-            btNullVal.UseVisualStyleBackColor = false;
-            btNullVal.Click += btNullValOnClick;
+            btAdd.Click += btInsertOnClick;
             // 
             // pbIcon
             // 
@@ -116,15 +117,15 @@
             lbSelectedName.TabIndex = 3;
             lbSelectedName.Text = "SelectedName";
             lbSelectedName.TextAlign = ContentAlignment.MiddleLeft;
-            lbSelectedName.Click += btSelectedOnClick;
+            lbSelectedName.Click += btInsertOnClick;
             // 
-            // DBModelSelectedList
+            // DBModelSelectedNewObject
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.Transparent;
             Controls.Add(tlpDBModelView);
-            Name = "DBModelSelectedList";
+            Name = "DBModelSelectedNewObject";
             Size = new Size(419, 30);
             Load += DBModelPickerOnLoad;
             tlpDBModelView.ResumeLayout(false);
@@ -135,9 +136,9 @@
 
         #endregion
         private TableLayoutPanel tlpDBModelView;
-        private Button btNullVal;
         private PictureBox pbIcon;
         private Label lbSelectedName;
         private Button btAdd;
+        private Button btDelete;
     }
 }

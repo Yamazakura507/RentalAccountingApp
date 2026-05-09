@@ -1,4 +1,6 @@
-﻿using DataBaseProvaider.Attributes;
+﻿using DataBaseProvaider;
+using DataBaseProvaider.Attributes;
+using DataBaseProvaider.Enums;
 using RentalAccountingApp.Properties;
 using RentalDBModels.Models.Interface;
 using RentalDBModels.Views.Abstract;
@@ -13,6 +15,7 @@ namespace RentalAccountingApp.Forms.EditForm
 {
     public partial class DBModelComplexEditor : Form
     {
+        private bool isRepair = true;
         private string titleHeader;
         private string tagHeader;
         private string valHeader;
@@ -34,27 +37,39 @@ namespace RentalAccountingApp.Forms.EditForm
 
         public DBModelComplexEditor(Type modelType, Action action, Form parentForm) : this(parentForm)
         {
-            LoadInfoModel(modelType).Wait();
-
-            this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", titleHeader);
-            this.Icon = Resources.add;
-
-            view = (BaseView)Activator.CreateInstance(modelType);
-            LoadInfoDependency().Wait();
-
-            model = (IModel)Activator.CreateInstance(view.ModelType);
-
+            InitInsert(modelType);
             this.UpdateChanged += (s, e) => action?.Invoke();
+            isRepair = view.GetType().GetProperties().Any(i => i?.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false);
         }
 
         public DBModelComplexEditor(object model, Action action, Form parentForm) : this(parentForm)
         {
             Init(model);
             this.UpdateChanged += (s, e) => action?.Invoke();
+            isRepair = view.GetType().GetProperties().Any(i => i?.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false);
         }
 
         /// <summary>
-        /// Действие при нициализации в режиме изменений
+        /// Действие при инициализации в режиме добавления
+        /// </summary>
+        /// <param name="modelType">Тип представления</param>
+        /// <param name="action">Действие при обновлении</param>
+        /// <param name="parentForm">Родительская форма</param>
+        public async void InitInsert(Type modelType)
+        {
+            await LoadInfoModel(modelType);
+
+            this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", titleHeader);
+            this.Icon = Resources.add;
+
+            view = (IView)Activator.CreateInstance(modelType);
+            await LoadInfoDependency();
+
+            model = (IModel)Activator.CreateInstance(view.ModelType);
+        }
+
+        /// <summary>
+        /// Действие при инициализации в режиме изменений
         /// </summary>
         /// <param name="model">объект представления модели</param>
         public async void Init(object model)
@@ -76,6 +91,8 @@ namespace RentalAccountingApp.Forms.EditForm
         /// <param name="view">Представление модели</param>
         private async Task LoadInfoModel(Type modelType, IView view = null)
         {
+            dmlceEditor.Parametrs.Clear();
+
             if (view is not null) dmlceEditor.EditorMode = EditorMode.UpdateOrDelete;
 
             PropertyInfo[] properties = modelType.GetProperties();
@@ -83,7 +100,6 @@ namespace RentalAccountingApp.Forms.EditForm
             foreach (PropertyInfo property in properties)
             {
                 ViewModelAttribute vmAttribute = property.GetCustomAttribute<ViewModelAttribute>();
-                CheckAttribute checkAttribute = property.GetCustomAttribute<CheckAttribute>();
 
                 if (vmAttribute != null)
                 {
@@ -105,7 +121,8 @@ namespace RentalAccountingApp.Forms.EditForm
                         }
 
                         string title = property.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
-                        bool isNull = false;
+                        CheckAttribute checkAttribute = property.GetCustomAttribute<CheckAttribute>();
+                        bool isNull = Nullable.GetUnderlyingType(property.PropertyType) != null;
                         SettingFilter filter = null;
 
                         if (checkAttribute != null)
@@ -167,18 +184,32 @@ namespace RentalAccountingApp.Forms.EditForm
                     {
                         switch (dependency.DependencyType)
                         {
-                            case DataBaseProvaider.Enums.DependencyType.OneToMany:
+                            case DependencyType.OneToMany:
                                 dependencyCollection.AddRange((await (Task<IEnumerable<int>>)property.GetValue(view)).Select(i => new DependencyInfo(i)));
                                 break;
-                            case DataBaseProvaider.Enums.DependencyType.OneToOnePicker:
-                            case DataBaseProvaider.Enums.DependencyType.OneToOneSelectionList:
+                            case DependencyType.OneToOnePicker:
+                            case DependencyType.OneToOneSelectionList:
+                            case DependencyType.OneToOneSelectionNewObject:
                                 int? id = (int?)property.GetValue(view);
 
-                                if(id is not null) dependencyCollection.Add(new DependencyInfo(id.Value));
-                                dependencyCollection.IsNullableDependency = Nullable.GetUnderlyingType(property.PropertyType) != null;
+                                if (id is not null)
+                                {
+                                    dependencyCollection.Add(new DependencyInfo(id.Value));
+
+                                    if (dependency.DependencyType == DependencyType.OneToOneSelectionNewObject)
+                                    {
+                                        IView viewDependecy = (IView)Convert.ChangeType(await dependency.DependencyViewType.GetResultByType<object>([id.Value], nameof(DBProvider.GetModel)), dependency.DependencyViewType);
+                                        dmlceEditor.FormNewObjectDependency = new DBModelComplexEditor(viewDependecy, null, this);
+                                    }
+                                }
                                 break;
                         }
                     }
+
+                    dependencyCollection.IsNullableDependency = Nullable.GetUnderlyingType(property.PropertyType) != null;
+
+                    if (dependency.DependencyType == DependencyType.OneToOneSelectionNewObject)
+                        dmlceEditor.FormNewObjectDependency ??= new DBModelComplexEditor(dependency.DependencyViewType, null, this);
 
                     dmlceEditor.DependencyParametrs.Add(dependencyCollection);
                 }
@@ -190,26 +221,35 @@ namespace RentalAccountingApp.Forms.EditForm
         /// </summary>
         private void UpdateTitle()
         {
-            this.Text = String.Format("{0}:{1} [РЕДАКТИРОВАНИЕ{2}]",
-                                        titleHeader,
-                                        valHeader,
-                                        dmlceEditor.EditorMode == EditorMode.UpdateOrRepair
-                                            ? " - УДАЛЁН"
-                                            : String.Empty);
-
-            this.Icon = Resources.editorIcon;
+            if (dmlceEditor.EditorMode != EditorMode.Insert)
+            {
+                this.Text = String.Format("{0}:{1} [РЕДАКТИРОВАНИЕ{2}]",
+                                            titleHeader,
+                                            valHeader,
+                                            dmlceEditor.EditorMode == EditorMode.UpdateOrRepair
+                                                ? " - УДАЛЁН"
+                                                : String.Empty);
+                this.Icon = Resources.editorIcon;
+            }
+            else
+            {
+                this.Text = String.Format("{0} [ДОБАВЛЕНИЕ]", titleHeader);
+                this.Icon = Resources.add;
+            }
         }
 
-        private async void dbmlEditorOnDeleteOrRepairChanged(object sender, EventArgs e)
+        private async void dbmlEditorOnDeleteOrRepairChanged(object sender, Action<EditorMode> e)
         {
             await model.Delete();
-            OnUpdateChanged();
+            OnUpdateChanged(true);
+            e?.Invoke(isRepair ? EditorMode.UpdateOrRepair : EditorMode.Insert);
             UpdateTitle();
         }
 
         private async void dbmlEditorOnInsertChanged(object sender, EventArgs e)
         {
             CheckOnSetParametr();
+            if (!await IsCustomCheck()) return;
             IModel model = await this.model.Insert();
             await CheckResultUpdateModel(model);
         }
@@ -217,13 +257,47 @@ namespace RentalAccountingApp.Forms.EditForm
         private async void dbmlEditorOnUpdateChanged(object sender, EventArgs e)
         {
             IModel oldModel = CheckOnSetParametr();
+            if (!await IsCustomCheck()) return;
             IModel model = await this.model.Update(oldModel);
             await CheckResultUpdateModel(model);
         }
 
-        protected virtual void OnUpdateChanged()
+        protected virtual void OnUpdateChanged(bool isDel = false)
         {
-            UpdateChanged?.Invoke(this, model);
+            UpdateChanged?.Invoke(this, isDel ? isRepair ? model : null : model);
+        }
+
+        /// <summary>
+        /// Проверка кастомных разрешений
+        /// </summary>
+        /// <returns>Результат проверки</returns>
+        private async Task<bool> IsCustomCheck()
+        {
+            List<string> errors = new List<string>();
+            PropertyInfo[] properties = view.GetType().GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                CheckAttribute checkAttribute = property.GetCustomAttribute<CheckAttribute>();
+
+                if (checkAttribute is not null && checkAttribute.NameCustomCheckFunc is not null)
+                {
+                    bool isValid = await checkAttribute.GetNameCustomCheckFunc(this.model);
+
+                    if (!isValid)
+                    {
+                        string errorMessage = !string.IsNullOrEmpty(checkAttribute.NotChecibleMessage)
+                            ? checkAttribute.NotChecibleMessage
+                            : $"Поле '{property.Name}' не прошло проверку";
+
+                        errors.Add(errorMessage);
+                    }
+                }
+            }
+
+            if (errors.Count != 0) InfoViewer.AlertMessege(String.Join("\n\n", errors));
+
+            return errors.Count == 0;
         }
 
         /// <summary>
@@ -239,7 +313,7 @@ namespace RentalAccountingApp.Forms.EditForm
                 model.GetType().GetProperty(parametr.Tag)?.SetValue(model, parametr.Value);
             }
 
-            Dictionary<Type, IEnumerable<int>>  insertDict =
+            Dictionary<Type, IEnumerable<int?>>  insertDict =
                 dmlceEditor.DependencyParametrs
                   .ToDictionary(
                         d => d.DependencyModelType,
@@ -250,14 +324,14 @@ namespace RentalAccountingApp.Forms.EditForm
 
             if (dmlceEditor.EditorMode != EditorMode.Insert)
             {
-                Dictionary<Type, IEnumerable<int>> removeDict =
+                Dictionary<Type, IEnumerable<int?>> removeDict =
                     dmlceEditor.DependencyParametrs
                             .ToDictionary(
                                 d => d.DependencyModelType,
                                 d => d.Dependencies.Where(i => i.Status == DependencyStatus.Remove)?.Select(i => i.IdDependency));
 
                 CheckDictUpdate(removeDict);
-                model.GetType().GetProperty(nameof(IForigenParent.RemoveDependencies))?.SetValue(model, removeDict);
+                model.GetType().GetProperty(nameof(IForigenParent.RemoveDependencies))?.SetValue(model, removeDict.ToDictionary(i => i.Key, i => i.Value.OfType<int>()));
             }
 
             return oldModel;
@@ -282,8 +356,10 @@ namespace RentalAccountingApp.Forms.EditForm
                     dmlceEditor.DependencyParametrs.First(i => i.DependencyModelType.Equals(updateType)).OnUpdateChange();
                 }
 
+                IView view = await model.GetView();
+
                 updateTypeList.Clear();
-                valHeader = model.GetType().GetProperty(tagHeader).GetValue(model).ToString();
+                valHeader = view.GetType().GetProperty(tagHeader).GetValue(view).ToString();
                 UpdateTitle();
                 OnUpdateChanged();
             }
@@ -293,11 +369,11 @@ namespace RentalAccountingApp.Forms.EditForm
         /// Проверка с занесением в список очереди на обновление
         /// </summary>
         /// <param name="updateDict">Список с обновлениями</param>
-        private void CheckDictUpdate(Dictionary<Type, IEnumerable<int>> updateDict)
+        private void CheckDictUpdate(Dictionary<Type, IEnumerable<int?>> updateDict)
         {
             if (updateDict is null) return;
 
-            foreach (KeyValuePair<Type, IEnumerable<int>> up in updateDict)
+            foreach (KeyValuePair<Type, IEnumerable<int?>> up in updateDict)
             {
                 if (up.Value.Count() > 0 && !updateTypeList.Contains(up.Key))
                 {

@@ -153,7 +153,7 @@ namespace WinFormsComponents.Classes.Model
         /// <returns>Объект условного оператора</returns>
         public ConditionsParametr GetCondition(ConditionalOperators operators)
         {
-            List<int> dependencies;
+            List<int?> dependencies;
 
             if (operators == ConditionalOperators.NotIn)
             {
@@ -256,7 +256,7 @@ namespace WinFormsComponents.Classes.Model
         /// Добавление объекта зависимости
         /// </summary>
         /// <param name="idDependency">Идентификатор объекта зависимоти</param>
-        public void Add(int idDependency)
+        public void Add(int? idDependency)
         {
             DependencyInfo nowDependency = Dependencies.FirstOrDefault(i => i.IdDependency == idDependency);
 
@@ -274,9 +274,9 @@ namespace WinFormsComponents.Classes.Model
         /// Добавление объектов зависимости
         /// </summary>
         /// <param name="idDependencies">Идентификаторы объектов зависимоти</param>
-        public void AddRange(IEnumerable<int> idDependencies)
+        public void AddRange(IEnumerable<int?> idDependencies)
         {
-            foreach (int idDependency in idDependencies)
+            foreach (int? idDependency in idDependencies)
             {
                 Add(idDependency);
             }

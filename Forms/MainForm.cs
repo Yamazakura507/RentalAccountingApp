@@ -33,6 +33,6 @@ namespace RentalAccountingApp
 
         private void tsbClientsOnClick(object sender, EventArgs e) => new ClientsForm().Show();
 
-        private void tsbJournal_Click(object sender, EventArgs e) => new Journal().Show();
+        private void tsbJournalOnClick(object sender, EventArgs e) => new Journal().Show();
     }
 }

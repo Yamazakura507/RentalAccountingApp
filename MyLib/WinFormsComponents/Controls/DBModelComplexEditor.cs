@@ -1,4 +1,6 @@
-﻿using DataBaseProvaider.Enums;
+﻿using DataBaseProvaider;
+using DataBaseProvaider.Enums;
+using DataBaseProvaider.Objects;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -29,12 +31,12 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Событие при удалении
         /// </summary>
-        public event EventHandler DeleteChanged;
+        public event EventHandler<Action<EditorMode>> DeleteChanged;
 
         /// <summary>
         /// Событие при востановлении
         /// </summary>
-        public event EventHandler RepairChanged;
+        public event EventHandler<Action<EditorMode>> RepairChanged;
 
         /// <summary>
         /// Режим редактирования модели
@@ -82,6 +84,12 @@ namespace WinFormsComponents.Controls
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string PKStr { get; set; } = "Id";
+
+        /// <summary>
+        /// Форма при выборе добавления нового объекта
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public Form FormNewObjectDependency { get; set; } = null;
 
         public DBModelComplexEditor()
         {
@@ -180,6 +188,7 @@ namespace WinFormsComponents.Controls
                     break;
                 case DependencyType.OneToOnePicker:
                 case DependencyType.OneToOneSelectionList:
+                case DependencyType.OneToOneSelectionNewObject:
                     AddDependencyOneToOne(collection, index - DependencyParametrs.Count(i => i.DependencyType == DependencyType.OneToMany), collection.DependencyType);
                     break;
             }
@@ -221,7 +230,7 @@ namespace WinFormsComponents.Controls
 
                 if (modalForm.DialogResult.Equals(DialogResult.OK) && modalLV.SelectedModalResult?.Count() > 0)
                 {
-                    collection.AddRange(modalLV.SelectedModalResult.Select(i => (int)i.Value)); 
+                    collection.AddRange(modalLV.SelectedModalResult.Select(i => (int?)i.Value)); 
                     collection.FlagingEditCondition(dependecyLV.Parameters, modalLV.Parameters);
                     dependecyLV.IsRepairEditor = collection.IsEditingDependensies;
                     e?.Invoke();
@@ -283,36 +292,77 @@ namespace WinFormsComponents.Controls
                 Dock = DockStyle.Right
             };
 
+            if (dependencyType == DependencyType.OneToOneSelectionNewObject && FormNewObjectDependency is null)
+            {
+                dependencyType = DependencyType.OneToOnePicker;
+            }
+
             Control controlDependency = dependencyType switch
             {
-                DependencyType.OneToOnePicker => new DBModelPicker()
+                DependencyType.OneToOnePicker => new DBModelPicker(collection.IsNullableDependency)
                 {
                     ModelType = collection.DependencyViewType,
                     SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
                     Image = ImageList.Images[collection.ImageKey],
-                    IsNullVal = collection.IsNullableDependency
+                    PKColName = collection.PKDependency
                 },
-                DependencyType.OneToOneSelectionList => new DBModelSelectedList()
+                DependencyType.OneToOneSelectionList => new DBModelSelectedList(collection.IsNullableDependency)
                 { 
                     ModelType = collection.DependencyViewType,
-                    IsNullVal = collection.IsNullableDependency,
                     ImageList = this.ImageList,
                     ImageKey = collection.ImageKey,
                     IconSelectedForm = BaseCatologIcon,
                     SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
-                    TitleCatalogSelectedForm = collection.Title
-                }
-            };
-
-            ((ISelected)controlDependency).SelectedChange += (s, e) =>
-            {
-                collection.Dependencies.Clear();
-
-                if (((ISelected)controlDependency).SelectedVal is not null)
+                    TitleCatalogSelectedForm = collection.Title,
+                    PKColName = collection.PKDependency
+                },
+                DependencyType.OneToOneSelectionNewObject => new DBModelSelectedNewObject(collection.IsNullableDependency)
                 {
-                    collection.Add(((ISelected)controlDependency).SelectedVal.Value);
+                    ModelType = collection.DependencyViewType,
+                    ImageList = this.ImageList,
+                    ImageKey = collection.ImageKey,
+                    SelectedVal = collection.Dependencies.Count > 0 ? collection.Dependencies[0].IdDependency : null,
+                    FormNewObjectDependency = this.FormNewObjectDependency,
+                    PKColName = collection.PKDependency
                 }
             };
+
+            if (dependencyType == DependencyType.OneToOneSelectionNewObject)
+            {
+                this.GetForm().FormClosing += async (s, e) =>
+                {
+                    if (collection.Dependencies.Count != collection.BaseDependencies.Count
+                    || (collection.BaseDependencies.Count != 0 && collection.Dependencies[0].IdDependency != collection.BaseDependencies[0].IdDependency))
+                    {
+                        ConditionsParametr[] parametrs = [new (collection.PKDependency, ConditionalOperators.Equal, collection.Dependencies[0].IdDependency)];
+
+                        await collection.DependencyModelType.InvokeMethodByType([parametrs], nameof(DBProvider.Delete))
+                            .ContinueWith(async task =>
+                            {
+                                if (task.IsFaulted)
+                                {
+                                    InfoViewer.AlertMessege("Не удалось удалить временную привязку!");
+                                }
+                            });
+                    }
+                };
+            }
+
+            collection.UpdateChange += (s,e) => collection.UpdateDependesiesToBase();
+
+            if (controlDependency is ISelected slectedControl)
+            {
+                slectedControl.SelectedChange += (s, e) =>
+                {
+                    collection.Dependencies.Clear();
+
+                    if (slectedControl.SelectedVal is not null || slectedControl.IsNullVal)
+                    {
+                        collection.Add(((ISelected)controlDependency).SelectedVal);
+                    }
+                };
+            }
+            
 
             LoactionControl(index, controlDependency);
 
@@ -397,6 +447,7 @@ namespace WinFormsComponents.Controls
             {
                 case EditorMode.Insert:
                     tsbInsert.Visible = true;
+                    Cleaner();
                     break;
                 case EditorMode.Update:
                     tsbSave.Visible = true;
@@ -407,6 +458,19 @@ namespace WinFormsComponents.Controls
                 case EditorMode.UpdateOrRepair:
                     tsbSave.Visible = tsbRepair.Visible = true;
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Очистка стола при пеерключении в Insert режим
+        /// </summary>
+        private void Cleaner()
+        {
+            if (Parametrs is null || Parametrs.Count == 0) return;
+
+            foreach (ModelParametrEditor parametr in Parametrs)
+            {
+                parametr.Value = parametr.Type.IsValueType ? Activator.CreateInstance(parametr.Type) : null;
             }
         }
 
@@ -454,7 +518,8 @@ namespace WinFormsComponents.Controls
             {
                 DecimalPlaces = parametr.Type.Equals(typeof(double)) ? 2 : 0,
                 Maximum = Convert.ToDecimal(parametr.SettingFilter?.Maximum ?? 10e7),
-                Minimum = Convert.ToDecimal(parametr.SettingFilter?.Minimum ?? 0)
+                Minimum = Convert.ToDecimal(parametr.SettingFilter?.Minimum ?? 0),
+                Tag = parametr
             };
 
             Binding binding = new Binding(
@@ -490,10 +555,11 @@ namespace WinFormsComponents.Controls
             {
                 Format = DateTimePickerFormat.Custom,
                 CustomFormat = "dd MMMM yyyy",
-                MaxDate = Convert.ToDateTime(parametr.SettingFilter?.Maximum ?? DateTime.Now),
+                MaxDate = Convert.ToDateTime(parametr.SettingFilter?.Maximum ?? DateTime.Now.Date),
                 MinDate = Convert.ToDateTime(parametr.SettingFilter?.Minimum ?? new DateTime(1991, 12, 25)),
-                ShowCheckBox = parametr.Type.Equals(typeof(DateOnly?)),
-                Checked = parametr.Value is not null
+                ShowCheckBox = parametr.IsNull,
+                Checked = parametr.IsNull ? parametr.Value is not null : true,
+                Tag = parametr
             };
 
             Binding binding = new Binding(
@@ -505,24 +571,21 @@ namespace WinFormsComponents.Controls
 
             binding.Format += (s, e) =>
             {
-                if (e.Value != null)
+                if (e.Value is null)
                 {
-                    if (e.Value is null)
-                    {
-                        dateTimePicker.Checked = false;
-                        e.Value = DateTime.Now;
-                    }
-                    else
-                    {
-                        dateTimePicker.Checked = true;
-                        e.Value = ((DateOnly)e.Value).ToDateTime(TimeOnly.MinValue);
-                    }
+                    dateTimePicker.Checked = !parametr.IsNull;
+                    e.Value = DateTime.Now.Date;
+                }
+                else
+                {
+                    dateTimePicker.Checked = true;
+                    e.Value = ((DateOnly)e.Value).ToDateTime(TimeOnly.MinValue);
                 }
             };
 
             binding.Parse += (s, e) =>
             {
-                if (!dateTimePicker.Checked)
+                if (!dateTimePicker.Checked && dateTimePicker.ShowCheckBox)
                 {
                     e.Value = null;
                 }
@@ -533,6 +596,7 @@ namespace WinFormsComponents.Controls
             };
 
             dateTimePicker.DataBindings.Add(binding);
+            if(!dateTimePicker.ShowCheckBox || dateTimePicker.Checked) parametr.Value ??= DateOnly.FromDateTime(DateTime.Now.Date);
 
             return dateTimePicker;
         }
@@ -575,14 +639,34 @@ namespace WinFormsComponents.Controls
 
             foreach (Control control in tlp.Controls)
             {
-                if (control is TextBox textBox && textBox.Tag is ModelParametrEditor parametr)
+                if (control.Tag is ModelParametrEditor parametr)
                 {
-                    tasks.Add(textBox.TextEmptyTextBox());
-
-                    if (parametr.SettingFilter?.Regex is not null)
+                    if (control is TextBox textBox)
                     {
-                        tasks.Add(textBox.RegexTextBoxCheck(parametr.SettingFilter.Regex, errMess: parametr.SettingFilter.RegexErrorMessage));
+                        if (!parametr.IsNull) tasks.Add(textBox.TextEmptyTextBox());
+
+                        if (parametr.SettingFilter?.Regex is not null)
+                        {
+                            tasks.Add(textBox.RegexTextBoxCheck(parametr.SettingFilter.Regex, errMess: parametr.SettingFilter.RegexErrorMessage));
+                        }
                     }
+                }
+                else if (control is ISelected selectedControl && !selectedControl.IsNullVal)
+                {
+                    tasks.Add(Task.Run(async () =>
+                    {
+                        if (selectedControl.SelectedVal is null)
+                        {
+                            control.BackColor = TextBoxRestriction.AlertBursh;
+                            await Task.Delay(3000);
+                            control.BackColor = Color.Transparent;
+
+                            return false;
+                        }
+
+                        control.BackColor = Color.Transparent;
+                        return true;
+                    }));
                 }
             }
 
@@ -615,8 +699,7 @@ namespace WinFormsComponents.Controls
         protected virtual void OnDeleteChanged()
         {
             loader.StartAnimation();
-            DeleteChanged?.Invoke(this, EventArgs.Empty);
-            EditorMode = EditorMode.UpdateOrRepair;
+            DeleteChanged?.Invoke(this, (e) => EditorMode = e);
             CheckMode();
             loader.StopAnimation();
         }
@@ -624,7 +707,7 @@ namespace WinFormsComponents.Controls
         protected virtual void OnRepairChanged()
         {
             loader.StartAnimation();
-            RepairChanged?.Invoke(this, EventArgs.Empty);
+            RepairChanged?.Invoke(this, null);
             EditorMode = EditorMode.UpdateOrDelete;
             CheckMode();
             loader.StopAnimation();

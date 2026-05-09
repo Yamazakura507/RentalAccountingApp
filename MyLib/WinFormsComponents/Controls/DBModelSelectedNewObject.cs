@@ -4,6 +4,7 @@ using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.ComponentModel;
 using System.Reflection;
+using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Interface;
 
 namespace WinFormsComponents.Controls
@@ -19,12 +20,6 @@ namespace WinFormsComponents.Controls
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string PKColName { get; set; } = "Id";
-
-        /// <summary>
-        /// Набор параметров: фильтрации, сортировки, ограничений вывода
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        public CollectionParametrs Parameters { get; set; }
 
         /// <summary>
         /// Модель БД представление по которому будет получен список
@@ -78,28 +73,22 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public string ImageKey { get; set; } = null;
 
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         /// <summary>
-        /// Иконка формы списка выбора элемента
+        /// Форма при выборе добавления нового объекта
         /// </summary>
-        public Icon IconSelectedForm { get; set; } = null;
-
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
-        /// <summary>
-        /// Заголовок формы выбороа элемента
-        /// </summary>
-        public string TitleCatalogSelectedForm { get; set; } = null;
+        public Form FormNewObjectDependency { get; set; }
 
         /// <summary>
         /// Событие изменения выбора
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelSelectedNewObject()
+        public DBModelSelectedNewObject(bool isNulValue = false)
         {
             InitializeComponent();
 
-            btNullVal.Visible = IsNullVal;
+            IsNullVal = isNulValue;
         }
 
         /// <summary>
@@ -111,6 +100,7 @@ namespace WinFormsComponents.Controls
             else pbIcon.Visible = false;
 
             LoadBaseParametr();
+            InserrReturningEvent();
         }
 
         /// <summary>
@@ -140,8 +130,7 @@ namespace WinFormsComponents.Controls
             }
             else
             {
-                lbSelectedName.Text = "<НЕ УКАЗАНО>";
-                btAdd.BackgroundImage = Properties.Resources.add;
+                EmptySetting();
             }
         }
 
@@ -156,89 +145,87 @@ namespace WinFormsComponents.Controls
             PropertyInfo property = modelType.GetProperty(parametrHeaderName);
 
             lbSelectedName.Text = property.GetValue(selectedModel).ToString();
-        }
-
-        private void btNullValOnClick(object sender, EventArgs e)
-        {
-            if (!lbSelectedName.Enabled)
-            {
-                btNullVal.Image = Properties.Resources.checkible;
-                lbSelectedName.Enabled = btAdd.Enabled = true;
-            }
-            else
-            {
-                btNullVal.Image = Properties.Resources.uncheckible;
-                SelectedVal = null;
-                lbSelectedName.Text = "<НЕ УКАЗАНО>";
-                lbSelectedName.Enabled = btAdd.Enabled = false;
-                btAdd.BackgroundImage = Properties.Resources.add;
-            }
+            btDelete.Visible = true;
         }
 
         public void OnSelectedChange() => SelectedChange?.Invoke(this, EventArgs.Empty);
 
-        private async void btSelectedOnClick(object sender, EventArgs e)
+        private async void btInsertOnClick(object sender, EventArgs e) => FormNewObjectDependency.ShowDialog();
+
+        private async void btDeleteOnClick(object sender, EventArgs e)
         {
-            (Form modalForm, DBModelListView modalLV) = CreateBaseCatalogModalForm();
+            ConditionsParametr[] parametrs = [new(PKColName, ConditionalOperators.Equal, SelectedVal)];
 
-            modalForm.ShowDialog();
+            await modelType.InvokeMethodByType([parametrs], nameof(DBProvider.Delete))
+                .ContinueWith(async task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        InfoViewer.AlertMessege("Не удалось удалить временную привязку!");
+                    }
+                });
 
-            if (modalForm.DialogResult.Equals(DialogResult.OK) && modalLV.SelectedModalResult?.Count() > 0)
-            {
-                SelectedVal = (int)modalLV.SelectedModalResult.First().Value;
+            SelectedVal = null;
+            EmptySetting();
 
-                await UploadTitleSelected();
-                btAdd.BackgroundImage = Properties.Resources.editor;
-            }
+            Type formType = FormNewObjectDependency.GetType();
+            Type viewType = formType.GetField("view", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(FormNewObjectDependency).GetType();
 
-            modalForm.Dispose();
+            FormNewObjectDependency = (Form)Activator.CreateInstance(formType, viewType, null, this.GetForm());
+            InserrReturningEvent();
         }
 
         /// <summary>
-        /// Создание формы каталога, выбора элементов для добавления в привязку
+        /// Назначение настроек при пустом значении
         /// </summary>
-        /// <returns>Форма выбора элемента привязки</returns>
-        private (Form, DBModelListView) CreateBaseCatalogModalForm()
+        private void EmptySetting()
         {
-            Form modalForm = new()
+            lbSelectedName.Text = "<НЕ УКАЗАНО>";
+            btDelete.Visible = false;
+            btAdd.BackgroundImage = Properties.Resources.add;
+        }
+
+        /// <summary>
+        /// Добавление события обновления формы выбора
+        /// </summary>
+        private void InserrReturningEvent()
+        {
+            EventInfo eventInfo = FormNewObjectDependency.GetType().GetEvent("UpdateChanged");
+
+            if (eventInfo != null)
             {
-                Text = String.Format("Выбор [КАТАЛОГ - {0}]", TitleCatalogSelectedForm.ToUpper()),
-                Icon = IconSelectedForm,
-                MinimumSize = new Size(620, 350),
-                StartPosition = FormStartPosition.CenterParent
-            };
+                Action<object, object> action = GetActionReturnningEvent();
 
-            TabControl catalogControl = new()
+                Delegate handler = Delegate.CreateDelegate(
+                    eventInfo.EventHandlerType,
+                    action.Target,
+                    action.Method
+                );
+
+                eventInfo.AddEventHandler(FormNewObjectDependency, handler);
+            }
+        }
+
+        /// <summary>
+        /// Получение действий при обратном событии
+        /// </summary>
+        /// <returns>Действие</returns>
+        private Action<object, object> GetActionReturnningEvent()
+        {
+            return async (s, e) =>
             {
-                Dock = DockStyle.Fill,
-                ImageList = this.ImageList
+                if (e is null)
+                {
+                    SelectedVal = null;
+                    EmptySetting();
+                }
+                else
+                {
+                    SelectedVal = (int)e.GetType().GetProperty(PKColName).GetValue(e);
+                    await UploadTitleSelected();
+                    btAdd.BackgroundImage = Properties.Resources.editor;
+                }
             };
-
-            TabPage catalogTabPage = new(TitleCatalogSelectedForm)
-            {
-                ImageKey = ImageKey
-            };
-
-            DBModelListView dependecyLV = new()
-            {
-                ImageList = this.ImageList,
-                ModelType = modelType,
-                Dock = DockStyle.Fill,
-                MultiSelect = false
-            };
-
-            dependecyLV.Parameters = Parameters.Clone();
-
-            if (SelectedVal is not null) 
-                dependecyLV.Parameters.Conditions += new ConditionsParametr(PKColName, ConditionalOperators.NotEqual, SelectedVal);
-
-            catalogControl.KeyDown += dependecyLV.lvModelOnKeyDown;
-
-            catalogTabPage.Controls.Add(dependecyLV);
-            catalogControl.Controls.Add(catalogTabPage);
-            modalForm.Controls.Add(catalogControl);
-
-            return (modalForm, dependecyLV);
         }
     }
 }

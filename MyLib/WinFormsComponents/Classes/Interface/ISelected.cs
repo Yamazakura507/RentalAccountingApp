@@ -1,11 +1,8 @@
-﻿using DataBaseProvaider.Objects;
-
-namespace WinFormsComponents.Classes.Interface
+﻿namespace WinFormsComponents.Classes.Interface
 {
     internal interface ISelected
     {
         string PKColName { get; set; }
-        CollectionParametrs Parameters { get; set; }
         Type ModelType { get; set; }
         bool IsNullVal { get; set; }
         int? SelectedVal { get; set; }

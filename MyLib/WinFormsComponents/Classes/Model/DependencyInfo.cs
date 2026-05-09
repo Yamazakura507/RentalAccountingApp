@@ -10,7 +10,7 @@ namespace WinFormsComponents.Classes.Model
         /// <summary>
         /// Идентификатор зависимости
         /// </summary>
-        public int IdDependency { get; set; }
+        public int? IdDependency { get; set; }
 
         /// <summary>
         /// Статус объекта зависимости
@@ -21,7 +21,7 @@ namespace WinFormsComponents.Classes.Model
         /// Конструктор объекта зависимости
         /// </summary>
         /// <param name="idDependency">Идентификатор объекта зависимости</param>
-        public DependencyInfo(int idDependency)
+        public DependencyInfo(int? idDependency)
         {
             IdDependency = idDependency;
         }
@@ -31,7 +31,7 @@ namespace WinFormsComponents.Classes.Model
         /// </summary>
         /// <param name="idDependency">Идентификатор объекта зависимости</param>
         /// <param name="status">Статус объекта зависимости</param>
-        public DependencyInfo(int idDependency, DependencyStatus status)
+        public DependencyInfo(int? idDependency, DependencyStatus status)
         {
             IdDependency = idDependency;
             Status = status;

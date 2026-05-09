@@ -85,7 +85,7 @@
             tsbJournal.Name = "tsbJournal";
             tsbJournal.Size = new Size(124, 22);
             tsbJournal.Text = "Журналы аренды";
-            tsbJournal.Click += tsbJournal_Click;
+            tsbJournal.Click += tsbJournalOnClick;
             // 
             // ilTabMenu
             // 

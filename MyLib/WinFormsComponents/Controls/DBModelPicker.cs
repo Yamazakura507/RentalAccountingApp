@@ -85,13 +85,13 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelPicker()
+        public DBModelPicker(bool isNulValue = false)
         {
             InitializeComponent();
 
             Parameters ??= new();
-            btNullVal.Visible = IsNullVal;
-            cbDBModel.ValueMember = PKColName;
+            IsNullVal = isNulValue;
+            btNullVal.Visible = isNulValue;
         }
 
         /// <summary>
@@ -99,6 +99,8 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private void LoadInfo()
         {
+            cbDBModel.ValueMember = PKColName;
+
             if (Image is not null) pbIcon.Image = Image;
             else pbIcon.Visible = false;
 
@@ -182,12 +184,12 @@ namespace WinFormsComponents.Controls
         {
             if (SelectedVal is null)
             {
-                btNullVal.Image = Properties.Resources.checkible;
+                btNullVal.BackgroundImage = Properties.Resources.checkible;
                 cbDBModel.Enabled = true;
             }
             else
             {
-                btNullVal.Image = Properties.Resources.uncheckible;
+                btNullVal.BackgroundImage = Properties.Resources.uncheckible;
                 SelectedVal = null;
                 cbDBModel.Enabled = false;
             }

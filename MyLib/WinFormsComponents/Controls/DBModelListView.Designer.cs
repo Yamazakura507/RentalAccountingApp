@@ -30,6 +30,8 @@
         {
             components = new System.ComponentModel.Container();
             tsListMenu = new ToolStrip();
+            tsbExcelExport = new ToolStripButton();
+            tssExport = new ToolStripSeparator();
             tsbAdd = new ToolStripButton();
             tsbDel = new ToolStripButton();
             tsbRepair = new ToolStripButton();
@@ -55,7 +57,7 @@
             tsmiAllCountShow = new ToolStripMenuItem();
             tsmiEnterCountShow = new ToolStripMenuItem();
             tsmiNumeretorVisible = new ToolStripMenuItem();
-            toolStripSeparator1 = new ToolStripSeparator();
+            tssSetting = new ToolStripSeparator();
             tsbTileMode = new ToolStripButton();
             tsbRowMode = new ToolStripButton();
             tsbGrid = new ToolStripButton();
@@ -88,12 +90,26 @@
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, toolStripSeparator1, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbExcelExport, tssExport, tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tssSetting, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
             tsListMenu.Size = new Size(600, 31);
             tsListMenu.TabIndex = 2;
-            tsListMenu.Text = "toolStrip1";
+            // 
+            // tsbExcelExport
+            // 
+            tsbExcelExport.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbExcelExport.Image = Properties.Resources.download;
+            tsbExcelExport.ImageTransparentColor = Color.Magenta;
+            tsbExcelExport.Name = "tsbExcelExport";
+            tsbExcelExport.Size = new Size(23, 28);
+            tsbExcelExport.ToolTipText = "Выгрузить в Excel(Ctrl+Shift+S)";
+            tsbExcelExport.Click += tsbExcelExportOnClick;
+            // 
+            // tssExport
+            // 
+            tssExport.Name = "tssExport";
+            tssExport.Size = new Size(6, 31);
             // 
             // tsbAdd
             // 
@@ -281,7 +297,7 @@
             tsmiPagerCheckit.CheckOnClick = true;
             tsmiPagerCheckit.Image = Properties.Resources.uncheckible;
             tsmiPagerCheckit.Name = "tsmiPagerCheckit";
-            tsmiPagerCheckit.Size = new Size(180, 22);
+            tsmiPagerCheckit.Size = new Size(171, 22);
             tsmiPagerCheckit.Text = "Включить(Ctrl+P)";
             tsmiPagerCheckit.ToolTipText = "Включить постраничный вывод(Ctrl+P)";
             tsmiPagerCheckit.CheckedChanged += tsmiPagerCheckitOnCheckedChanged;
@@ -306,7 +322,7 @@
             // 
             tsmiRepairLimitPage.Image = Properties.Resources.repair_setting;
             tsmiRepairLimitPage.Name = "tsmiRepairLimitPage";
-            tsmiRepairLimitPage.Size = new Size(180, 22);
+            tsmiRepairLimitPage.Size = new Size(171, 22);
             tsmiRepairLimitPage.Text = "Востановить";
             tsmiRepairLimitPage.ToolTipText = "Востановить значение из настроек";
             tsmiRepairLimitPage.Visible = false;
@@ -345,11 +361,11 @@
             tsmiNumeretorVisible.ToolTipText = "Отобразить колонку с номерами строк(Ctrl+I)";
             tsmiNumeretorVisible.CheckedChanged += tsmiNumeretorVisibleOnCheckedChanged;
             // 
-            // toolStripSeparator1
+            // tssSetting
             // 
-            toolStripSeparator1.Alignment = ToolStripItemAlignment.Right;
-            toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(6, 31);
+            tssSetting.Alignment = ToolStripItemAlignment.Right;
+            tssSetting.Name = "tssSetting";
+            tssSetting.Size = new Size(6, 31);
             // 
             // tsbTileMode
             // 
@@ -457,7 +473,7 @@
             tsbNextPage.Image = Properties.Resources.right_arrow;
             tsbNextPage.ImageTransparentColor = Color.Magenta;
             tsbNextPage.Name = "tsbNextPage";
-            tsbNextPage.Size = new Size(23, 28);
+            tsbNextPage.Size = new Size(23, 20);
             tsbNextPage.Tag = "0";
             tsbNextPage.Text = "Следующая страница(Ctrl+N)";
             tsbNextPage.ToolTipText = "Следующая страница(Ctrl+N)";
@@ -583,7 +599,7 @@
             // 
             cmsModalModel.Items.AddRange(new ToolStripItem[] { tsmiSelected });
             cmsModalModel.Name = "cmsModalModel";
-            cmsModalModel.Size = new Size(191, 48);
+            cmsModalModel.Size = new Size(191, 26);
             cmsModalModel.Opening += cmsModalModelOnOpening;
             // 
             // tsmiSelected
@@ -656,7 +672,7 @@
         private ToolStrip tsIformationBar;
         private ToolStripLabel tslAllCount;
         private ToolStripLabel tslEnterCount;
-        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator tssSetting;
         public ToolStripMenuItem tsmiAllCountShow;
         public ToolStripMenuItem tsmiEnterCountShow;
         public ToolStripMenuItem tsmiPager;
@@ -668,5 +684,7 @@
         private ContextMenuStrip cmsModalModel;
         private ToolStripMenuItem tsmiSelected;
         private ToolStripButton tsbRepairEditing;
+        private ToolStripButton tsbExcelExport;
+        private ToolStripSeparator tssExport;
     }
 }

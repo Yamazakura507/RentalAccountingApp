@@ -1,11 +1,13 @@
 ﻿using DataBaseProvaider.Attributes;
 using RentalDBModels.Models.Abstract;
+using RentalDBModels.Views.Interface;
 
 namespace RentalDBModels.Models.Interface
 {
     public interface IModel
     {
         public int Id { get; init; }
+        public abstract Type ViewType { get; }
 
         Task<IModel> Insert();
         Task<IModel> Update(IModel oldModel = null);
@@ -20,5 +22,7 @@ namespace RentalDBModels.Models.Interface
         IModel Clone();
 
         IEnumerable<DependencyAttribute> GetDependencies<TModel>() where TModel : IModel;
+
+        Task<IView> GetView();
     }
 }

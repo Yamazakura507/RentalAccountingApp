@@ -95,12 +95,13 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelSelectedList()
+        public DBModelSelectedList(bool isNulValue = false)
         {
             InitializeComponent();
 
             Parameters ??= new();
-            btNullVal.Visible = IsNullVal;
+            IsNullVal = isNulValue;
+            btNullVal.Visible = isNulValue;
         }
 
         /// <summary>
@@ -163,12 +164,12 @@ namespace WinFormsComponents.Controls
         {
             if (!lbSelectedName.Enabled)
             {
-                btNullVal.Image = Properties.Resources.checkible;
+                btNullVal.BackgroundImage = Properties.Resources.checkible;
                 lbSelectedName.Enabled = btAdd.Enabled = true;
             }
             else
             {
-                btNullVal.Image = Properties.Resources.uncheckible;
+                btNullVal.BackgroundImage = Properties.Resources.uncheckible;
                 SelectedVal = null;
                 lbSelectedName.Text = "<НЕ УКАЗАНО>";
                 lbSelectedName.Enabled = btAdd.Enabled = false;

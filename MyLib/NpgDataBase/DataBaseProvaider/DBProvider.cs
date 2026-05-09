@@ -285,6 +285,15 @@ namespace DataBaseProvaider
         async public static Task<object> Min<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "min", conditions);
 
         /// <summary>
+        /// Получение суммы значений по колонке в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <param name="columnName">Наименование колонки поиска</param>
+        /// <returns>Минимальное значение колонки</returns>
+        async public static Task<object> Sum<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "sum", conditions);
+
+        /// <summary>
         /// Получение значения агрегатной функции по колонке в таблице модели
         /// </summary>
         /// <typeparam name="TModel">Тип модели таблицы</typeparam>

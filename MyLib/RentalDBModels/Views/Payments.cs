@@ -14,6 +14,8 @@ namespace RentalDBModels.Views
         [ViewModel(FilterOn = true)]
         [Description("Сумма оплаты")]
         [DisplayFormat(DataFormatString = "{0:N2} ₽")]
+        [Check(NameCustomCheckFunc = nameof(Models.Payments.SumCheck),
+            NotChecibleMessage = "Некоректная сумма оплаты!\nСумма оплаты должна быть больше 0.")]
         public double Sum { get; set; }
 
         [ViewModel(FilterOn = true)]

@@ -7,7 +7,7 @@ namespace RentalDBModels.Models.Abstract
 {
     public abstract class BaseRemovingModel : BaseModel, IRemovingModel
     {
-        public bool Flag { get; set; }
+        public bool Flag { get; set; } = true;
 
         public override async Task Delete()
         {
