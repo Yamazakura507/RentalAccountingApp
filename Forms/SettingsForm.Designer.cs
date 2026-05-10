@@ -30,26 +30,21 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
-            tcSettings = new TabControl();
+            ilSettings = new ImageList(components);
             tpConectionSettings = new TabPage();
             connectingSettingsControl1 = new WinFormsComponents.ConnectingSettingsControl();
-            ilSettings = new ImageList(components);
-            tpBaseSetting = new TabPage();
-            tcSettings.SuspendLayout();
+            tcSettings = new TabControl();
             tpConectionSettings.SuspendLayout();
+            tcSettings.SuspendLayout();
             SuspendLayout();
             // 
-            // tcSettings
+            // ilSettings
             // 
-            tcSettings.Controls.Add(tpBaseSetting);
-            tcSettings.Controls.Add(tpConectionSettings);
-            tcSettings.Dock = DockStyle.Fill;
-            tcSettings.ImageList = ilSettings;
-            tcSettings.Location = new Point(0, 0);
-            tcSettings.Name = "tcSettings";
-            tcSettings.SelectedIndex = 0;
-            tcSettings.Size = new Size(984, 216);
-            tcSettings.TabIndex = 0;
+            ilSettings.ColorDepth = ColorDepth.Depth32Bit;
+            ilSettings.ImageStream = (ImageListStreamer)resources.GetObject("ilSettings.ImageStream");
+            ilSettings.TransparentColor = Color.Transparent;
+            ilSettings.Images.SetKeyName(0, "connect.png");
+            ilSettings.Images.SetKeyName(1, "setings.png");
             // 
             // tpConectionSettings
             // 
@@ -72,24 +67,16 @@
             connectingSettingsControl1.Size = new Size(966, 183);
             connectingSettingsControl1.TabIndex = 0;
             // 
-            // ilSettings
+            // tcSettings
             // 
-            ilSettings.ColorDepth = ColorDepth.Depth32Bit;
-            ilSettings.ImageStream = (ImageListStreamer)resources.GetObject("ilSettings.ImageStream");
-            ilSettings.TransparentColor = Color.Transparent;
-            ilSettings.Images.SetKeyName(0, "connect.png");
-            ilSettings.Images.SetKeyName(1, "setings.png");
-            // 
-            // tpBaseSetting
-            // 
-            tpBaseSetting.ImageKey = "setings.png";
-            tpBaseSetting.Location = new Point(4, 24);
-            tpBaseSetting.Name = "tpBaseSetting";
-            tpBaseSetting.Padding = new Padding(3);
-            tpBaseSetting.Size = new Size(976, 188);
-            tpBaseSetting.TabIndex = 2;
-            tpBaseSetting.Text = "Общие";
-            tpBaseSetting.UseVisualStyleBackColor = true;
+            tcSettings.Controls.Add(tpConectionSettings);
+            tcSettings.Dock = DockStyle.Fill;
+            tcSettings.ImageList = ilSettings;
+            tcSettings.Location = new Point(0, 0);
+            tcSettings.Name = "tcSettings";
+            tcSettings.SelectedIndex = 0;
+            tcSettings.Size = new Size(984, 216);
+            tcSettings.TabIndex = 0;
             // 
             // SettingsForm
             // 
@@ -102,17 +89,16 @@
             Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "НАСТРОЙКИ";
-            tcSettings.ResumeLayout(false);
+            Load += SettingsFormOnLoad;
             tpConectionSettings.ResumeLayout(false);
+            tcSettings.ResumeLayout(false);
             ResumeLayout(false);
         }
 
         #endregion
-
-        private TabControl tcSettings;
         private ImageList ilSettings;
         private TabPage tpConectionSettings;
         private WinFormsComponents.ConnectingSettingsControl connectingSettingsControl1;
-        private TabPage tpBaseSetting;
+        private TabControl tcSettings;
     }
 }

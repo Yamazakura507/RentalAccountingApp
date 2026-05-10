@@ -895,6 +895,10 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     OnRepairEditingChanged();
                     break;
+                case Keys.S when e.Control && e.Shift:
+                    tsbExcelExportOnClick(null, null);
+                    isComand = true;
+                    break;
             }
 
             e.SuppressKeyPress = isComand;

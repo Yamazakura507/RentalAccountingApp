@@ -65,7 +65,7 @@ namespace RentalDBModels.Views
             ConditionsParametr[] parametrsInventoryRental = [new ConditionsParametr(nameof(InventoryRental.IdRental), ConditionalOperators.Equal, this.Id)];
             List<int> idsInventory = (await DBProvider.GetColumnModel<int, InventoryRental>(nameof(InventoryRental.IdInventory), parametrsInventoryRental)).ToList();
 
-            if(idsInventory.Count == 0) return 0;
+            if (idsInventory.Count == 0) return 0;
 
             ConditionsParametr[] parametrInventory = [new ConditionsParametr(nameof(Inventory.Id), ConditionalOperators.In, idsInventory)];
 
@@ -74,8 +74,10 @@ namespace RentalDBModels.Views
 
         private async Task<string> GetBaseInfo()
         {
-            sumInventory = await GetSumInventory();
-            return String.Format("{0} позиции на сумму: {1:N2} ₽", await CountInventory, sumInventory);
+            int rentalCountDays = ((ReturnDate?.DayNumber ?? DateOnly.FromDateTime(DateTime.Now).DayNumber) - IssueDate.DayNumber) + 1;
+            sumInventory = await GetSumInventory() * rentalCountDays;
+
+            return String.Format("Арендовано {0}, в течении {1}, на сумму: {2:N2} ₽", FormatPositions(await CountInventory), FormatDays(rentalCountDays), sumInventory);
         }
 
         private async Task<string> GetPayInfo()
@@ -116,6 +118,48 @@ namespace RentalDBModels.Views
             }
 
             return status;
+        }
+
+        /// <summary>
+        /// Склонение слова "позиция" в зависимости от числа
+        /// </summary>
+        public static string GetPositionDeclension(int number)
+        {
+            int lastDigit = number % 10;
+            int lastTwoDigits = number % 100;
+
+            if (lastTwoDigits >= 11 && lastTwoDigits <= 19)
+                return "позиций";
+
+            if (lastDigit == 1)
+                return "позиция";
+
+            if (lastDigit >= 2 && lastDigit <= 4)
+                return "позиции";
+
+            return "позиций";
+        }
+
+        /// <summary>
+        /// Возвращает склонированую фразу количество позиций
+        /// </summary>
+        /// <param name="countPosition">Количество позиций</param>
+        /// <returns></returns>
+        public static string FormatPositions(int countPosition)
+        {
+            string word = WordDeclension.GetDeclension(countPosition, "позиция", "позиции", "позиций");
+            return $"{countPosition} {word}";
+        }
+
+        /// <summary>
+        /// Возвращает склонированую фразу количество дней
+        /// </summary>
+        /// <param name="countDays">Количество дней</param>
+        /// <returns></returns>
+        public static string FormatDays(int countDays)
+        {
+            string word = WordDeclension.GetDeclension(countDays, "-го дня", "-х дней", "-ти дней");
+            return $"{countDays}{word}";
         }
     }
 }

@@ -297,7 +297,7 @@
             tsmiPagerCheckit.CheckOnClick = true;
             tsmiPagerCheckit.Image = Properties.Resources.uncheckible;
             tsmiPagerCheckit.Name = "tsmiPagerCheckit";
-            tsmiPagerCheckit.Size = new Size(171, 22);
+            tsmiPagerCheckit.Size = new Size(180, 22);
             tsmiPagerCheckit.Text = "Включить(Ctrl+P)";
             tsmiPagerCheckit.ToolTipText = "Включить постраничный вывод(Ctrl+P)";
             tsmiPagerCheckit.CheckedChanged += tsmiPagerCheckitOnCheckedChanged;
@@ -322,7 +322,7 @@
             // 
             tsmiRepairLimitPage.Image = Properties.Resources.repair_setting;
             tsmiRepairLimitPage.Name = "tsmiRepairLimitPage";
-            tsmiRepairLimitPage.Size = new Size(171, 22);
+            tsmiRepairLimitPage.Size = new Size(180, 22);
             tsmiRepairLimitPage.Text = "Востановить";
             tsmiRepairLimitPage.ToolTipText = "Востановить значение из настроек";
             tsmiRepairLimitPage.Visible = false;
