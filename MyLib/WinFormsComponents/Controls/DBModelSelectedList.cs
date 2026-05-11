@@ -13,12 +13,24 @@ namespace WinFormsComponents.Controls
         private Type modelType;
         private string parametrHeaderName = null;
         private int? selectVal = null;
+        private string imageKey = null;
 
         /// <summary>
         /// Наименование колонки первичного ключа
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public string PKColName { get; set; } = "Id";
+
+        /// <summary>
+        /// Наименование колонок дополнительной фильтрации
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public string[] ForColName { get; set; } = null;
+
+        /// <summary>
+        /// Значения выделения по колонкам дополнительной фильтрации
+        /// </summary>
+        public Dictionary<string, object> ForSelectedWhere = null;
 
         /// <summary>
         /// Набор параметров: фильтрации, сортировки, ограничений вывода
@@ -58,11 +70,8 @@ namespace WinFormsComponents.Controls
             get => selectVal;
             set
             {
-                if (selectVal != value)
-                {
-                    selectVal = value;
-                    OnSelectedChange();
-                }
+                selectVal = value;
+                OnSelectedChange();
             }
         }
 
@@ -76,7 +85,18 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Ключ изображения из списка
         /// </summary>
-        public string ImageKey { get; set; } = null;
+        public string ImageKey 
+        { 
+            get => imageKey;
+            set
+            {
+                if (imageKey != value)
+                {
+                    imageKey = value;
+                    pbIcon.Image = ImageList?.Images[value];
+                }
+            }
+        }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         /// <summary>
@@ -95,13 +115,20 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelSelectedList(bool isNulValue = false)
+        public DBModelSelectedList()
         {
             InitializeComponent();
 
             Parameters ??= new();
-            IsNullVal = isNulValue;
-            btNullVal.Visible = isNulValue;
+            IsNullVal = btNullVal.Visible = false;
+        }
+
+        public DBModelSelectedList(bool isNulValue)
+        {
+            InitializeComponent();
+
+            Parameters ??= new();
+            IsNullVal = btNullVal.Visible = isNulValue;
         }
 
         /// <summary>
@@ -109,6 +136,8 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private void LoadInfo()
         {
+            if (modelType is null)  return;
+
             if (ImageList is not null && ImageKey is not null) pbIcon.Image = ImageList.Images[ImageKey];
             else pbIcon.Visible = false;
 
@@ -153,7 +182,16 @@ namespace WinFormsComponents.Controls
         /// <returns>Процес</returns>
         private async Task UploadTitleSelected()
         {
-            CollectionParametrs parametrs = new() { Conditions = [new ConditionsParametr(PKColName, ConditionalOperators.Equal, SelectedVal)] };
+            CollectionParametrs parametrs = new() { Conditions = [new ConditionsParametr(PKColName, ConditionalOperators.Equal, LogicOperators.And, SelectedVal)] };
+
+            if (ForColName is not null)
+            {
+                foreach (KeyValuePair<string,object> kvp in ForSelectedWhere)
+                {
+                    parametrs.Conditions += new ConditionsParametr(kvp.Key, ConditionalOperators.Equal, LogicOperators.And, kvp.Value);
+                }
+            }
+
             object selectedModel = (await modelType.GetCollectionByType<object>([parametrs], nameof(DBProvider.GetCollectionModel))).First();
             PropertyInfo property = modelType.GetProperty(parametrHeaderName);
 
@@ -187,6 +225,11 @@ namespace WinFormsComponents.Controls
 
             if (modalForm.DialogResult.Equals(DialogResult.OK) && modalLV.SelectedModalResult?.Count() > 0)
             {
+                if (ForColName is not null)
+                {
+                    ForSelectedWhere = ForColName.ToDictionary(k => k, k => modelType.GetProperty(k).GetValue(modalLV.SelectedModels.First()));
+                }
+
                 SelectedVal = (int)modalLV.SelectedModalResult.First().Value;
 
                 await UploadTitleSelected();
@@ -232,7 +275,11 @@ namespace WinFormsComponents.Controls
             dependecyLV.Parameters = Parameters.Clone();
 
             if (SelectedVal is not null) 
-                dependecyLV.Parameters.Conditions += new ConditionsParametr(PKColName, ConditionalOperators.NotEqual, SelectedVal);
+                dependecyLV.Parameters.Conditions += new ConditionsParametr(PKColName, ConditionalOperators.NotEqual, LogicOperators.Or, SelectedVal);
+
+            if (ForSelectedWhere is not null)
+                foreach (KeyValuePair<string, object> kvp in ForSelectedWhere)
+                    dependecyLV.Parameters.Conditions += new ConditionsParametr(kvp.Key, ConditionalOperators.NotEqual, LogicOperators.Or, kvp.Value);
 
             catalogControl.KeyDown += dependecyLV.lvModelOnKeyDown;
 

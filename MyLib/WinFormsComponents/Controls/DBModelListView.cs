@@ -52,13 +52,13 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Набор параметров: фильтрации, сортировки, ограничений вывода
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public CollectionParametrs Parameters { get; set; }
 
         /// <summary>
         /// Набор изображений для списка
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ImageList ImageList { get; set; }
 
         /// <summary>
@@ -166,13 +166,19 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Колекция возвращаемая при выборе в модальном режиме
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public IEnumerable<ConditionsParametr> SelectedModalResult { get; private set; }
+
+        /// <summary>
+        /// Колекция полных объектов возвращаемая при выборе в модальном режиме
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IEnumerable<object> SelectedModels { get; private set; }
 
         /// <summary>
         /// Настройка взаимодействия с БД(Удаление/Оновление)
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         private TermsOfInteractionDB TermsOfInteractionDB { get; set; }
 
         /// <summary>
@@ -227,7 +233,7 @@ namespace WinFormsComponents.Controls
             lvModel.MultiSelect = MultiSelect;
             parametrRemovingName = ModelType.GetProperties().FirstOrDefault(i => (i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false) && IsRepairRow)?.Name;
             loader.Visible = true;
-            tsmiPagerCheckit.Checked = PageLimit != 0 || Properties.Settings.Default.Limit != 0;
+            tsmiPagerCheckit.Checked = PageLimit != 0;
             tsmiAllCountShow.Checked = IsShowCountAll;
             tsmiEnterCountShow.Checked = IsShowCountEnter;
             tsmiNumeretorVisible.Checked = IsShowNum;
@@ -241,7 +247,7 @@ namespace WinFormsComponents.Controls
             ShowGridVisible(IsGridLines);
             CheckSearch();
 
-            if (!await UpdateCountPage(PageLimit == 0 ? Properties.Settings.Default.Limit : PageLimit))
+            if (!await UpdateCountPage(PageLimit))
             {
                 await LoadListAsync();
             }
@@ -266,6 +272,7 @@ namespace WinFormsComponents.Controls
                     InsertChanged += (s, e) =>
                     {
                         SelectedModalResult = TermsOfInteractionDB.GetSelectedParamers(lvModel.SelectedItems, ModelType);
+                        SelectedModels = lvModel.SelectedItems.OfType<ListViewItem>().Select(i => i.Tag);
                         modalForm.DialogResult = DialogResult.OK;
                         modalForm.Close();
                     };
@@ -425,7 +432,7 @@ namespace WinFormsComponents.Controls
                 tsmiShowDeleted.Visible = false;
                 tsddbFilter.Visible = IsSearch || IsFilter || IsSorted;
 
-                if (!isModal) return;
+                return;
             }
 
             if (!Parameters.Conditions.Any(i => i.ColumnName.Equals(parametrRemovingName)) && ShowDeleted != ShowRemooving.Always)
@@ -937,8 +944,6 @@ namespace WinFormsComponents.Controls
 
         private void tsmitbLimitPageOnKeyPress(object sender, KeyPressEventArgs e) => e.NumRestrictionTextBox();
 
-        private void tsmiRepairLimitPageOnClick(object sender, EventArgs e) => tsmitbLimitPage.Text = Properties.Settings.Default.Limit.ToString();
-
         private void tsmiPagerCheckitOnCheckedChanged(object sender, EventArgs e)
         {
             Dictionary<bool, (string, string, Color)> parametrs = new()
@@ -949,13 +954,10 @@ namespace WinFormsComponents.Controls
 
             FilterFunction.CheckedChangedItemMenu(tsmiPagerCheckit, parametrs);
             tslPager.Visible = tsmitbLimitPage.Visible = tsmiPagerCheckit.Checked;
-            tsmiRepairLimitPage.Visible = tsmiPagerCheckit.Checked && Properties.Settings.Default.Limit != 0;
 
             if (tsmiPagerCheckit.Checked)
             {
-                tsmitbLimitPage.Text = Properties.Settings.Default.Limit != 0 && PageLimit == 0
-                                        ? Properties.Settings.Default.Limit.ToString()
-                                        : PageLimit == 0
+                tsmitbLimitPage.Text = PageLimit == 0
                                             ? "100"
                                             : PageLimit.ToString();
             }

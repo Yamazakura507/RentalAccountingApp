@@ -127,6 +127,7 @@
             Name = "DBModelSelectedList";
             Size = new Size(419, 30);
             Load += DBModelPickerOnLoad;
+            EnabledChanged += DBModelPickerOnLoad;
             tlpDBModelView.ResumeLayout(false);
             tlpDBModelView.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pbIcon).EndInit();

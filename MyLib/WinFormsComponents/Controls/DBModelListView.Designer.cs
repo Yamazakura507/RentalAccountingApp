@@ -53,7 +53,6 @@
             tsmiPagerCheckit = new ToolStripMenuItem();
             tslPager = new ToolStripLabel();
             tsmitbLimitPage = new ToolStripTextBox();
-            tsmiRepairLimitPage = new ToolStripMenuItem();
             tsmiAllCountShow = new ToolStripMenuItem();
             tsmiEnterCountShow = new ToolStripMenuItem();
             tsmiNumeretorVisible = new ToolStripMenuItem();
@@ -284,7 +283,7 @@
             // 
             // tsmiPager
             // 
-            tsmiPager.DropDownItems.AddRange(new ToolStripItem[] { tsmiPagerCheckit, tslPager, tsmitbLimitPage, tsmiRepairLimitPage });
+            tsmiPager.DropDownItems.AddRange(new ToolStripItem[] { tsmiPagerCheckit, tslPager, tsmitbLimitPage });
             tsmiPager.Image = Properties.Resources.pager;
             tsmiPager.Name = "tsmiPager";
             tsmiPager.Size = new Size(307, 22);
@@ -317,16 +316,6 @@
             tsmitbLimitPage.ToolTipText = "Укажите количество выводимых строк или плиток на одной странице";
             tsmitbLimitPage.Visible = false;
             tsmitbLimitPage.KeyPress += tsmitbLimitPageOnKeyPress;
-            // 
-            // tsmiRepairLimitPage
-            // 
-            tsmiRepairLimitPage.Image = Properties.Resources.repair_setting;
-            tsmiRepairLimitPage.Name = "tsmiRepairLimitPage";
-            tsmiRepairLimitPage.Size = new Size(180, 22);
-            tsmiRepairLimitPage.Text = "Востановить";
-            tsmiRepairLimitPage.ToolTipText = "Востановить значение из настроек";
-            tsmiRepairLimitPage.Visible = false;
-            tsmiRepairLimitPage.Click += tsmiRepairLimitPageOnClick;
             // 
             // tsmiAllCountShow
             // 
@@ -473,7 +462,7 @@
             tsbNextPage.Image = Properties.Resources.right_arrow;
             tsbNextPage.ImageTransparentColor = Color.Magenta;
             tsbNextPage.Name = "tsbNextPage";
-            tsbNextPage.Size = new Size(23, 20);
+            tsbNextPage.Size = new Size(23, 28);
             tsbNextPage.Tag = "0";
             tsbNextPage.Text = "Следующая страница(Ctrl+N)";
             tsbNextPage.ToolTipText = "Следующая страница(Ctrl+N)";
@@ -485,7 +474,7 @@
             tsbEndPage.Image = Properties.Resources.right_dou_arrow;
             tsbEndPage.ImageTransparentColor = Color.Magenta;
             tsbEndPage.Name = "tsbEndPage";
-            tsbEndPage.Size = new Size(23, 20);
+            tsbEndPage.Size = new Size(23, 28);
             tsbEndPage.Tag = "3";
             tsbEndPage.Text = "Последняя страница(Ctrl+E)";
             tsbEndPage.Click += tsbActionPageOnClick;
@@ -668,7 +657,6 @@
         private ToolStripMenuItem tsmiPagerCheckit;
         private ToolStripLabel tslPager;
         private ToolStripTextBox tsmitbLimitPage;
-        private ToolStripMenuItem tsmiRepairLimitPage;
         private ToolStrip tsIformationBar;
         private ToolStripLabel tslAllCount;
         private ToolStripLabel tslEnterCount;

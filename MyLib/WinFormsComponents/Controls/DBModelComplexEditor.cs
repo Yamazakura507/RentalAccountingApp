@@ -1,9 +1,11 @@
 ﻿using DataBaseProvaider;
+using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Reflection;
 using System.Reflection.Metadata;
 using WinFormsComponents.Classes;
 using WinFormsComponents.Classes.Enums;
@@ -425,6 +427,13 @@ namespace WinFormsComponents.Controls
                 ModelType = collection.DependencyViewType,
                 Dock = DockStyle.Fill
             };
+
+            PropertyInfo propertyRemoovingFlag = collection.DependencyViewType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.RemovingFlag ?? false);
+
+            if (propertyRemoovingFlag is not null)
+            {
+                dependecyLV.Parameters.Conditions += new ConditionsParametr(propertyRemoovingFlag.Name, ConditionalOperators.Equal, LogicOperators.And, true);
+            }
 
             collection.EditConditon(dependecyLV.Parameters, ConditionalOperators.NotIn);
             catalogControl.KeyDown += dependecyLV.lvModelOnKeyDown;

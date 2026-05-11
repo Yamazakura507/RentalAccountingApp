@@ -147,7 +147,7 @@ namespace RentalDBModels.Views
         /// <returns></returns>
         public static string FormatPositions(int countPosition)
         {
-            string word = WordDeclension.GetDeclension(countPosition, "позиция", "позиции", "позиций");
+            string word = countPosition.GetDeclension("позиция", "позиции", "позиций");
             return $"{countPosition} {word}";
         }
 
@@ -158,7 +158,7 @@ namespace RentalDBModels.Views
         /// <returns></returns>
         public static string FormatDays(int countDays)
         {
-            string word = WordDeclension.GetDeclension(countDays, "-го дня", "-х дней", "-ти дней");
+            string word = countDays.GetDeclension("-го дня", "-х дней", "-ти дней");
             return $"{countDays}{word}";
         }
     }

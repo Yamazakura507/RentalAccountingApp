@@ -3,7 +3,6 @@ using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Enums;
 using RentalAccountingApp.Properties;
 using RentalDBModels.Models.Interface;
-using RentalDBModels.Views.Abstract;
 using RentalDBModels.Views.Interface;
 using System.ComponentModel;
 using System.Reflection;
@@ -80,6 +79,7 @@ namespace RentalAccountingApp.Forms.EditForm
             UpdateTitle();
 
             this.model = await view.GetModel();
+
             this.Icon = Resources.editorIcon;
             await LoadInfoDependency();
         }

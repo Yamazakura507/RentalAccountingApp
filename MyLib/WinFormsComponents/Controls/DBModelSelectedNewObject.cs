@@ -84,7 +84,14 @@ namespace WinFormsComponents.Controls
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelSelectedNewObject(bool isNulValue = false)
+        public DBModelSelectedNewObject()
+        {
+            InitializeComponent();
+
+            IsNullVal = false;
+        }
+
+        public DBModelSelectedNewObject(bool isNulValue)
         {
             InitializeComponent();
 

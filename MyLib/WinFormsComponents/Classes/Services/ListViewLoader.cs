@@ -1,11 +1,8 @@
 ﻿using DataBaseProvaider.Attributes;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using WinFormsComponents.Classes.Interface;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WinFormsComponents.Classes.Services
 {
@@ -14,29 +11,6 @@ namespace WinFormsComponents.Classes.Services
     /// </summary>
     public class ListViewLoader : IListViewLoader
     {
-        /// <summary>
-        /// WinAPI способ получения первого видимого индекса
-        /// </summary>
-        [DllImport("user32.dll")]
-        private static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
-
-        private const int LVM_GETTOPINDEX = 0x1027;
-        private const int WM_HSCROLL = 0x0114;
-        /// <summary>
-        /// Размер буфера загруженных строк
-        /// </summary>
-        private const int BUFFER_SIZE = 200;
-        /// <summary>
-        /// Когда подгружать новые данные
-        /// </summary>
-        private const int PRELOAD_THRESHOLD = 50;
-
-        private int loadedStartIndex = 0;
-        private int loadedEndIndex = 0;
-        private bool isHorizontalScrolling = false;
-        private Dictionary<int, ListViewItem> itemCache = new Dictionary<int, ListViewItem>();
-        private Dictionary<int, int> columnWidthsCache = new Dictionary<int, int>();
-
         /// <summary>
         /// Цвет удаленных строк
         /// </summary>
@@ -131,6 +105,8 @@ namespace WinFormsComponents.Classes.Services
                     }
                     else
                     {
+                        if (vmAttribute.ViewHide) continue;
+
                         lvItem.SubItems.Add(rawValue.StringOutDBFormated(dfAttribute?.DataFormatString));
                     }
                 }

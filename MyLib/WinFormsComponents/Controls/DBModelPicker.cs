@@ -4,8 +4,8 @@ using DataBaseProvaider.Classes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using System.ComponentModel;
-using System.Data;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using WinFormsComponents.Classes.Interface;
 
 namespace WinFormsComponents.Controls
@@ -16,6 +16,7 @@ namespace WinFormsComponents.Controls
         private string parametrRemovingName = null;
         private string parametrHeaderName = null;
         private int? selectVal = null;
+        private Image image = null;
 
         /// <summary>
         /// Наименование колонки первичного ключа
@@ -24,9 +25,21 @@ namespace WinFormsComponents.Controls
         public string PKColName { get; set; } = "Id";
 
         /// <summary>
+        /// Наименование колонки ljgjkybntkmys[ rk.xtq
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public string[] ForColName { get; set; } = null;
+
+        /// <summary>
+        /// Значения выделения по колонкам дополнительной фильтрации
+        /// </summary>
+        public Dictionary<string, object> ForSelectedWhere = null;
+
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        /// <summary>
         /// Колекция элементов списка
         /// </summary>
-        private BindingList<object> Items { get; set; }
+        public BindingList<object> Items { get; set; }
 
         /// <summary>
         /// Набор параметров: фильтрации, сортировки, ограничений вывода
@@ -66,11 +79,8 @@ namespace WinFormsComponents.Controls
             get => selectVal;
             set
             {
-                if (selectVal != value)
-                {
-                    selectVal = value;
-                    OnSelectedChange();
-                }
+                selectVal = value;
+                OnSelectedChange();
             }
         }
 
@@ -78,20 +88,35 @@ namespace WinFormsComponents.Controls
         /// <summary>
         /// Иконка элемента
         /// </summary>
-        public Image Image { get; set; } = null;
+        public Image Image
+        {
+            get => image;
+            set
+            {
+                image = value;
+                pbIcon.BackgroundImage = value;
+            }
+        }
 
         /// <summary>
         /// Событие изменения выбора
         /// </summary>
         public event EventHandler SelectedChange;
 
-        public DBModelPicker(bool isNulValue = false)
+        public DBModelPicker()
         {
             InitializeComponent();
 
             Parameters ??= new();
-            IsNullVal = isNulValue;
-            btNullVal.Visible = isNulValue;
+            IsNullVal = btNullVal.Visible = false;
+        }
+
+        public DBModelPicker(bool isNulValue)
+        {
+            InitializeComponent();
+
+            Parameters ??= new();
+            IsNullVal = btNullVal.Visible = isNulValue;
         }
 
         /// <summary>
@@ -99,9 +124,14 @@ namespace WinFormsComponents.Controls
         /// </summary>
         private void LoadInfo()
         {
+            if (modelType is null) return;
+
             cbDBModel.ValueMember = PKColName;
 
-            if (Image is not null) pbIcon.Image = Image;
+            if (Image is not null)
+            {
+                pbIcon.BackgroundImage = Image;
+            }
             else pbIcon.Visible = false;
 
             LoadBaseParametr();
@@ -195,7 +225,15 @@ namespace WinFormsComponents.Controls
             }
         }
 
-        private void cbDBModelOnSelectedIndexChanged(object sender, EventArgs e) => SelectedVal = (int?)cbDBModel.SelectedValue;
+        private void cbDBModelOnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ForColName is not null)
+            {
+                ForSelectedWhere = ForColName.ToDictionary(k => k, k => modelType.GetProperty(k).GetValue(cbDBModel.SelectedItem));
+            }
+
+            SelectedVal = (int?)cbDBModel.SelectedValue;
+        }
 
         public void OnSelectedChange() => SelectedChange?.Invoke(this, EventArgs.Empty);
     }

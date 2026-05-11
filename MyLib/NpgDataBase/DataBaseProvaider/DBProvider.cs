@@ -1,4 +1,4 @@
-﻿using DataBaseProvaider.Objects;
+﻿    using DataBaseProvaider.Objects;
 using Npgsql;
 using PostgresSQL;
 using System.ComponentModel;
@@ -321,7 +321,7 @@ namespace DataBaseProvaider
 
             npgSqlProviderClone = null;
 
-            return agregateVal;
+            return agregateVal == DBNull.Value ? null : agregateVal;
         }
 
         /// <summary>

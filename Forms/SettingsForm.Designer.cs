@@ -89,7 +89,6 @@
             Name = "SettingsForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "НАСТРОЙКИ";
-            Load += SettingsFormOnLoad;
             tpConectionSettings.ResumeLayout(false);
             tcSettings.ResumeLayout(false);
             ResumeLayout(false);
