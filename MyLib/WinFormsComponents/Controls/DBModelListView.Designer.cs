@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             tsListMenu = new ToolStrip();
             tsbExcelExport = new ToolStripButton();
+            tsbReload = new ToolStripButton();
             tssExport = new ToolStripSeparator();
             tsbAdd = new ToolStripButton();
             tsbDel = new ToolStripButton();
@@ -89,7 +90,7 @@
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbExcelExport, tssExport, tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tssSetting, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbExcelExport, tsbReload, tssExport, tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tssSetting, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
             tsListMenu.Size = new Size(600, 31);
@@ -104,6 +105,16 @@
             tsbExcelExport.Size = new Size(23, 28);
             tsbExcelExport.ToolTipText = "Выгрузить в Excel(Ctrl+Shift+S)";
             tsbExcelExport.Click += tsbExcelExportOnClick;
+            // 
+            // tsbReload
+            // 
+            tsbReload.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbReload.Image = Properties.Resources.reload;
+            tsbReload.ImageTransparentColor = Color.Magenta;
+            tsbReload.Name = "tsbReload";
+            tsbReload.Size = new Size(23, 28);
+            tsbReload.ToolTipText = "Обновить список(Ctrl+M)";
+            tsbReload.Click += tsbReloadOnClick;
             // 
             // tssExport
             // 
@@ -296,7 +307,7 @@
             tsmiPagerCheckit.CheckOnClick = true;
             tsmiPagerCheckit.Image = Properties.Resources.uncheckible;
             tsmiPagerCheckit.Name = "tsmiPagerCheckit";
-            tsmiPagerCheckit.Size = new Size(180, 22);
+            tsmiPagerCheckit.Size = new Size(171, 22);
             tsmiPagerCheckit.Text = "Включить(Ctrl+P)";
             tsmiPagerCheckit.ToolTipText = "Включить постраничный вывод(Ctrl+P)";
             tsmiPagerCheckit.CheckedChanged += tsmiPagerCheckitOnCheckedChanged;
@@ -491,6 +502,7 @@
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;
+            lvModel.ItemSelectionChanged += lvModelOnItemSelectionChanged;
             lvModel.SelectedIndexChanged += lvModelOnSelectedIndexChanged;
             lvModel.MouseDoubleClick += lvModelOnMouseDoubleClick;
             // 
@@ -674,5 +686,6 @@
         private ToolStripButton tsbRepairEditing;
         private ToolStripButton tsbExcelExport;
         private ToolStripSeparator tssExport;
+        private ToolStripButton tsbReload;
     }
 }

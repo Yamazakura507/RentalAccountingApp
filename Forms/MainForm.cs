@@ -96,6 +96,8 @@ namespace RentalAccountingApp
         {
             await LoadFirsTask();
             await LoadSecondTask();
+            await LoadFourthTask();
+            LoadThirdTask();
         }
 
         /// <summary>
@@ -123,7 +125,7 @@ namespace RentalAccountingApp
             if (isLoad)
             {
                 isLoad = lHeaderTaskFirst.Visible = lClientTitle.Visible = pbClient.Visible =
-                lClientCategory.Visible = bClientCategoryReload.Visible = 
+                lClientCategory.Visible = bClientCategoryReload.Visible =
                 dbmpCategory.Visible = dmslCategory.Visible = false;
             }
         }
@@ -209,6 +211,39 @@ namespace RentalAccountingApp
 
             lMaxCategory.Text = $"{namesCategory.TrimStart(',', ' ')} - было выдано {maxCountInventory} {maxCountInventory.GetDeclension("раз", "раза", "раз")}";
             lNotPopularInventory.Text = namesInventory.TrimEnd('\n', ' ');
+        }
+
+        /// <summary>
+        /// Получение информации по третьему заданию курсового
+        /// </summary>
+        /// <remarks>
+        /// Клиенты, которые арендовали строго 3 товара из 6 категорий
+        /// </remarks>
+        /// <returns>Процес</returns>
+        public void LoadThirdTask()
+        {
+            dmlvFilterClients.ImageList = ilTabMenu;
+            dmlvFilterClients.ModelType = typeof(ViewCliensWithThreeInvInSixCat);
+        }
+
+        /// <summary>
+        /// Получение информации по четвертому заданию курсового
+        /// </summary>
+        /// <remarks>
+        /// Вывести за каждый месяц года, заданного пользователем, количество фактов выдачи инвентаря
+        /// </remarks>
+        /// <returns>Процес</returns>
+        public async Task LoadFourthTask()
+        {
+            dmlvRentalInventory.ImageList = ilTabMenu;
+            int minYear = ((int?)await DBProvider.Min<IssueToCountInventoryByGroup>(nameof(IssueToCountInventoryByGroup.IssueYear))) ?? 1991;
+            int maxYear = ((int?)await DBProvider.Max<IssueToCountInventoryByGroup>(nameof(IssueToCountInventoryByGroup.IssueYear))) ?? DateTime.Now.Year;
+
+            nudYearFilterInvevntoryRental.Minimum = minYear;
+            nudYearFilterInvevntoryRental.Maximum = maxYear;
+            dmlvRentalInventory.Parameters.Conditions +=
+                new ConditionsParametr(nameof(IssueToCountInventoryByGroup.IssueYear), ConditionalOperators.Equal, nudYearFilterInvevntoryRental.Value);
+            dmlvRentalInventory.ModelType = typeof(IssueToCountInventoryByGroup);
         }
 
         /// <summary>
@@ -656,8 +691,19 @@ namespace RentalAccountingApp
             dmslCategory.Visible = pbClient.Visible && !dbmpCategory.Visible;
 
             lbPhoneTitle.Visible = lClientPayTitle.Visible = pbClientPhone.Visible =
-                pbClientPay.Visible = lClientPhone.Visible = lSumPay.Visible = 
+                pbClientPay.Visible = lClientPhone.Visible = lSumPay.Visible =
                 pbClient.Visible && !String.IsNullOrEmpty(lSumPay.Text);
+        }
+
+        private async void nudYearFilterInvevntoryRentalOnValueChanged(object sender, EventArgs e)
+        {
+            ConditionsParametr parametr = dmlvRentalInventory.Parameters.Conditions.FirstOrDefault(i => i.ColumnName == nameof(IssueToCountInventoryByGroup.IssueYear));
+
+            if (parametr is not null && Convert.ToInt32(parametr.Value) != nudYearFilterInvevntoryRental.Value)
+            {
+                parametr.Value = nudYearFilterInvevntoryRental.Value;
+                await dmlvRentalInventory.LoadListAsync();
+            }
         }
     }
 }

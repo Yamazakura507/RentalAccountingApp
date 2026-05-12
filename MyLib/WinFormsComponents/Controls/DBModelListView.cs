@@ -152,10 +152,22 @@ namespace WinFormsComponents.Controls
         public bool IsEditor { get; set; } = false;
 
         /// <summary>
+        /// Метка режима удаления
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsRemoveRow { get; set; } = true;
+
+        /// <summary>
         /// Метка разрешающая множественный выбор
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public bool MultiSelect { get; set; } = true;
+
+        /// <summary>
+        /// Метка запрещающая выделение выбор
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool NotSelect { get; set; } = false;
 
         /// <summary>
         /// Включить постраничный вывод
@@ -654,7 +666,7 @@ namespace WinFormsComponents.Controls
         {
             bool isSelect = lvModel.SelectedItems.Count > 0;
 
-            if (isModal) return (false, false);
+            if (isModal || !IsRemoveRow) return (false, false);
             else if (parametrRemovingName is null && !IsEditor) return (isSelect, false);
 
             PropertyInfo property =
@@ -906,6 +918,10 @@ namespace WinFormsComponents.Controls
                     tsbExcelExportOnClick(null, null);
                     isComand = true;
                     break;
+                case Keys.M when e.Control:
+                    await LoadListAsync();
+                    isComand = true;
+                    break;
             }
 
             e.SuppressKeyPress = isComand;
@@ -1055,6 +1071,16 @@ namespace WinFormsComponents.Controls
                 {
                     ExcelReporter.ExportListViewToExcel(lvModel, saveDialog.FileName, sheetName);
                 }
+            }
+        }
+
+        private async void tsbReloadOnClick(object sender, EventArgs e) => await LoadListAsync();
+
+        private void lvModelOnItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (NotSelect && e.IsSelected)
+            {
+                e.Item.Selected = false;
             }
         }
     }

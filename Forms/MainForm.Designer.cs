@@ -108,7 +108,7 @@
             tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs, tsbClients, tsbJournal });
             tsMainMenu.Location = new Point(0, 0);
             tsMainMenu.Name = "tsMainMenu";
-            tsMainMenu.Size = new Size(766, 25);
+            tsMainMenu.Size = new Size(648, 25);
             tsMainMenu.TabIndex = 0;
             tsMainMenu.Text = "toolStrip1";
             // 
@@ -161,6 +161,7 @@
             ilTabMenu.Images.SetKeyName(2, "category.png");
             ilTabMenu.Images.SetKeyName(3, "materials.png");
             ilTabMenu.Images.SetKeyName(4, "clients.png");
+            ilTabMenu.Images.SetKeyName(5, "date.png");
             // 
             // tpStatistic
             // 
@@ -249,7 +250,7 @@
             tcStatistic.Location = new Point(0, 25);
             tcStatistic.Name = "tcStatistic";
             tcStatistic.SelectedIndex = 0;
-            tcStatistic.Size = new Size(766, 558);
+            tcStatistic.Size = new Size(648, 558);
             tcStatistic.TabIndex = 2;
             // 
             // tpTasks
@@ -260,7 +261,7 @@
             tpTasks.Location = new Point(4, 24);
             tpTasks.Name = "tpTasks";
             tpTasks.Padding = new Padding(3);
-            tpTasks.Size = new Size(758, 530);
+            tpTasks.Size = new Size(640, 530);
             tpTasks.TabIndex = 1;
             tpTasks.Text = "Задания";
             tpTasks.UseVisualStyleBackColor = true;
@@ -327,7 +328,7 @@
             tlpTasks.RowStyles.Add(new RowStyle());
             tlpTasks.RowStyles.Add(new RowStyle());
             tlpTasks.RowStyles.Add(new RowStyle());
-            tlpTasks.Size = new Size(752, 499);
+            tlpTasks.Size = new Size(634, 499);
             tlpTasks.TabIndex = 0;
             // 
             // dmlvRentalInventory
@@ -340,6 +341,7 @@
             dmlvRentalInventory.IsEditor = false;
             dmlvRentalInventory.IsFilter = false;
             dmlvRentalInventory.IsGridLines = true;
+            dmlvRentalInventory.IsRemoveRow = false;
             dmlvRentalInventory.IsRepairEditor = false;
             dmlvRentalInventory.IsRepairRow = false;
             dmlvRentalInventory.IsSearch = false;
@@ -347,15 +349,16 @@
             dmlvRentalInventory.IsShowCountEnter = true;
             dmlvRentalInventory.IsShowNum = false;
             dmlvRentalInventory.IsSorted = true;
-            dmlvRentalInventory.Location = new Point(3, 748);
+            dmlvRentalInventory.Location = new Point(3, 785);
             dmlvRentalInventory.MinimumSize = new Size(600, 300);
             dmlvRentalInventory.ModelType = null;
             dmlvRentalInventory.MultiSelect = false;
             dmlvRentalInventory.Name = "dmlvRentalInventory";
+            dmlvRentalInventory.NotSelect = true;
             dmlvRentalInventory.PageLimit = 0;
             dmlvRentalInventory.RemovingRowColor = Color.MistyRose;
             dmlvRentalInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
-            dmlvRentalInventory.Size = new Size(746, 325);
+            dmlvRentalInventory.Size = new Size(628, 324);
             dmlvRentalInventory.TabIndex = 35;
             dmlvRentalInventory.Visible = false;
             dmlvRentalInventory.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
@@ -365,7 +368,7 @@
             pbYearFilterInventoryRental.BackgroundImage = Properties.Resources.date;
             pbYearFilterInventoryRental.BackgroundImageLayout = ImageLayout.Zoom;
             pbYearFilterInventoryRental.Dock = DockStyle.Fill;
-            pbYearFilterInventoryRental.Location = new Point(111, 717);
+            pbYearFilterInventoryRental.Location = new Point(111, 754);
             pbYearFilterInventoryRental.MaximumSize = new Size(25, 0);
             pbYearFilterInventoryRental.Name = "pbYearFilterInventoryRental";
             pbYearFilterInventoryRental.Size = new Size(25, 25);
@@ -378,7 +381,7 @@
             lTitleYearFilterInventoryRental.AutoSize = true;
             lTitleYearFilterInventoryRental.Dock = DockStyle.Fill;
             lTitleYearFilterInventoryRental.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lTitleYearFilterInventoryRental.Location = new Point(3, 714);
+            lTitleYearFilterInventoryRental.Location = new Point(3, 751);
             lTitleYearFilterInventoryRental.Name = "lTitleYearFilterInventoryRental";
             lTitleYearFilterInventoryRental.Size = new Size(102, 31);
             lTitleYearFilterInventoryRental.TabIndex = 33;
@@ -393,11 +396,11 @@
             lTitleTaskFourth.Dock = DockStyle.Fill;
             lTitleTaskFourth.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lTitleTaskFourth.ForeColor = Color.Maroon;
-            lTitleTaskFourth.Location = new Point(3, 664);
+            lTitleTaskFourth.Location = new Point(3, 701);
             lTitleTaskFourth.Name = "lTitleTaskFourth";
-            lTitleTaskFourth.Size = new Size(746, 50);
+            lTitleTaskFourth.Size = new Size(628, 50);
             lTitleTaskFourth.TabIndex = 31;
-            lTitleTaskFourth.Text = "D:Вывести за каждый месяц года, заданного пользователем, количество фактов выдачи инвентаря";
+            lTitleTaskFourth.Text = "D: Количество фактов выдачи инвентаря, за каждый месяц года, заданного пользователем";
             lTitleTaskFourth.TextAlign = ContentAlignment.TopCenter;
             lTitleTaskFourth.Click += lTitleTaskFourthOnClick;
             // 
@@ -406,9 +409,9 @@
             plineThird.BackColor = Color.Black;
             tlpTasks.SetColumnSpan(plineThird, 4);
             plineThird.Dock = DockStyle.Fill;
-            plineThird.Location = new Point(3, 656);
+            plineThird.Location = new Point(3, 693);
             plineThird.Name = "plineThird";
-            plineThird.Size = new Size(746, 5);
+            plineThird.Size = new Size(628, 5);
             plineThird.TabIndex = 30;
             // 
             // lTitleTaskThird
@@ -418,9 +421,9 @@
             lTitleTaskThird.Dock = DockStyle.Fill;
             lTitleTaskThird.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lTitleTaskThird.ForeColor = Color.Maroon;
-            lTitleTaskThird.Location = new Point(3, 322);
+            lTitleTaskThird.Location = new Point(3, 347);
             lTitleTaskThird.Name = "lTitleTaskThird";
-            lTitleTaskThird.Size = new Size(746, 25);
+            lTitleTaskThird.Size = new Size(628, 25);
             lTitleTaskThird.TabIndex = 28;
             lTitleTaskThird.Text = "C:Клиенты, которые арендовали строго 3 товара из 6 категорий";
             lTitleTaskThird.TextAlign = ContentAlignment.TopCenter;
@@ -431,9 +434,9 @@
             plineSecond.BackColor = Color.Black;
             tlpTasks.SetColumnSpan(plineSecond, 4);
             plineSecond.Dock = DockStyle.Fill;
-            plineSecond.Location = new Point(3, 314);
+            plineSecond.Location = new Point(3, 339);
             plineSecond.Name = "plineSecond";
-            plineSecond.Size = new Size(746, 5);
+            plineSecond.Size = new Size(628, 5);
             plineSecond.TabIndex = 27;
             // 
             // btModeSerhPopular
@@ -443,7 +446,7 @@
             btModeSerhPopular.Dock = DockStyle.Fill;
             btModeSerhPopular.FlatAppearance.BorderSize = 0;
             btModeSerhPopular.FlatStyle = FlatStyle.Flat;
-            btModeSerhPopular.Location = new Point(724, 293);
+            btModeSerhPopular.Location = new Point(606, 318);
             btModeSerhPopular.Name = "btModeSerhPopular";
             btModeSerhPopular.Size = new Size(25, 15);
             btModeSerhPopular.TabIndex = 26;
@@ -456,9 +459,9 @@
             lNotPopularInventory.AutoSize = true;
             lNotPopularInventory.Dock = DockStyle.Fill;
             lNotPopularInventory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lNotPopularInventory.Location = new Point(142, 290);
+            lNotPopularInventory.Location = new Point(142, 315);
             lNotPopularInventory.Name = "lNotPopularInventory";
-            lNotPopularInventory.Size = new Size(576, 21);
+            lNotPopularInventory.Size = new Size(458, 21);
             lNotPopularInventory.TabIndex = 25;
             lNotPopularInventory.TextAlign = ContentAlignment.MiddleLeft;
             lNotPopularInventory.Visible = false;
@@ -468,7 +471,7 @@
             pbPNotPopularInventory.BackgroundImage = Properties.Resources.inventory;
             pbPNotPopularInventory.BackgroundImageLayout = ImageLayout.Zoom;
             pbPNotPopularInventory.Dock = DockStyle.Fill;
-            pbPNotPopularInventory.Location = new Point(111, 293);
+            pbPNotPopularInventory.Location = new Point(111, 318);
             pbPNotPopularInventory.MaximumSize = new Size(25, 0);
             pbPNotPopularInventory.Name = "pbPNotPopularInventory";
             pbPNotPopularInventory.Size = new Size(25, 15);
@@ -481,7 +484,7 @@
             lNotPopularInventoryTitle.AutoSize = true;
             lNotPopularInventoryTitle.Dock = DockStyle.Fill;
             lNotPopularInventoryTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lNotPopularInventoryTitle.Location = new Point(3, 290);
+            lNotPopularInventoryTitle.Location = new Point(3, 315);
             lNotPopularInventoryTitle.Name = "lNotPopularInventoryTitle";
             lNotPopularInventoryTitle.Size = new Size(102, 21);
             lNotPopularInventoryTitle.TabIndex = 23;
@@ -496,7 +499,7 @@
             bClientCategoryReload.Dock = DockStyle.Fill;
             bClientCategoryReload.FlatAppearance.BorderSize = 0;
             bClientCategoryReload.FlatStyle = FlatStyle.Flat;
-            bClientCategoryReload.Location = new Point(724, 100);
+            bClientCategoryReload.Location = new Point(606, 125);
             bClientCategoryReload.Name = "bClientCategoryReload";
             bClientCategoryReload.Size = new Size(25, 25);
             bClientCategoryReload.TabIndex = 22;
@@ -510,9 +513,9 @@
             lTitleTaskSecond.Dock = DockStyle.Fill;
             lTitleTaskSecond.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lTitleTaskSecond.ForeColor = Color.Maroon;
-            lTitleTaskSecond.Location = new Point(3, 209);
+            lTitleTaskSecond.Location = new Point(3, 234);
             lTitleTaskSecond.Name = "lTitleTaskSecond";
-            lTitleTaskSecond.Size = new Size(746, 50);
+            lTitleTaskSecond.Size = new Size(628, 50);
             lTitleTaskSecond.TabIndex = 20;
             lTitleTaskSecond.Text = "B:Поиск категории с максимальным количеством выдачи и 2 самых не популярных товара в ней";
             lTitleTaskSecond.TextAlign = ContentAlignment.TopCenter;
@@ -524,9 +527,9 @@
             tlpTasks.SetColumnSpan(lSumPay, 2);
             lSumPay.Dock = DockStyle.Fill;
             lSumPay.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lSumPay.Location = new Point(142, 159);
+            lSumPay.Location = new Point(142, 184);
             lSumPay.Name = "lSumPay";
-            lSumPay.Size = new Size(607, 39);
+            lSumPay.Size = new Size(489, 39);
             lSumPay.TabIndex = 13;
             lSumPay.TextAlign = ContentAlignment.MiddleLeft;
             lSumPay.Visible = false;
@@ -536,7 +539,7 @@
             pbClientPay.BackgroundImage = Properties.Resources.pay;
             pbClientPay.BackgroundImageLayout = ImageLayout.Zoom;
             pbClientPay.Dock = DockStyle.Fill;
-            pbClientPay.Location = new Point(111, 162);
+            pbClientPay.Location = new Point(111, 187);
             pbClientPay.MaximumSize = new Size(25, 0);
             pbClientPay.Name = "pbClientPay";
             pbClientPay.Size = new Size(25, 33);
@@ -549,7 +552,7 @@
             lClientPayTitle.AutoSize = true;
             lClientPayTitle.Dock = DockStyle.Fill;
             lClientPayTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lClientPayTitle.Location = new Point(3, 159);
+            lClientPayTitle.Location = new Point(3, 184);
             lClientPayTitle.Name = "lClientPayTitle";
             lClientPayTitle.Size = new Size(102, 39);
             lClientPayTitle.TabIndex = 11;
@@ -563,9 +566,9 @@
             tlpTasks.SetColumnSpan(lClientPhone, 2);
             lClientPhone.Dock = DockStyle.Fill;
             lClientPhone.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lClientPhone.Location = new Point(142, 128);
+            lClientPhone.Location = new Point(142, 153);
             lClientPhone.Name = "lClientPhone";
-            lClientPhone.Size = new Size(607, 31);
+            lClientPhone.Size = new Size(489, 31);
             lClientPhone.TabIndex = 10;
             lClientPhone.TextAlign = ContentAlignment.MiddleLeft;
             lClientPhone.Visible = false;
@@ -575,7 +578,7 @@
             pbClientPhone.BackgroundImage = Properties.Resources.phone;
             pbClientPhone.BackgroundImageLayout = ImageLayout.Zoom;
             pbClientPhone.Dock = DockStyle.Fill;
-            pbClientPhone.Location = new Point(111, 131);
+            pbClientPhone.Location = new Point(111, 156);
             pbClientPhone.MaximumSize = new Size(25, 0);
             pbClientPhone.Name = "pbClientPhone";
             pbClientPhone.Size = new Size(25, 25);
@@ -588,7 +591,7 @@
             lbPhoneTitle.AutoSize = true;
             lbPhoneTitle.Dock = DockStyle.Fill;
             lbPhoneTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lbPhoneTitle.Location = new Point(3, 128);
+            lbPhoneTitle.Location = new Point(3, 153);
             lbPhoneTitle.Name = "lbPhoneTitle";
             lbPhoneTitle.Size = new Size(102, 31);
             lbPhoneTitle.TabIndex = 8;
@@ -601,7 +604,7 @@
             lClientTitle.AutoSize = true;
             lClientTitle.Dock = DockStyle.Fill;
             lClientTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lClientTitle.Location = new Point(3, 97);
+            lClientTitle.Location = new Point(3, 122);
             lClientTitle.Name = "lClientTitle";
             lClientTitle.Size = new Size(102, 31);
             lClientTitle.TabIndex = 6;
@@ -617,7 +620,7 @@
             lTitleTaskFirst.ForeColor = Color.Maroon;
             lTitleTaskFirst.Location = new Point(3, 0);
             lTitleTaskFirst.Name = "lTitleTaskFirst";
-            lTitleTaskFirst.Size = new Size(746, 25);
+            lTitleTaskFirst.Size = new Size(628, 50);
             lTitleTaskFirst.TabIndex = 0;
             lTitleTaskFirst.Text = "A:Поиск клиента, который имеет максимальную сумму оплат в категории";
             lTitleTaskFirst.TextAlign = ContentAlignment.TopCenter;
@@ -631,7 +634,7 @@
             dbmpCategory.ForColName = null;
             dbmpCategory.Image = Properties.Resources.category;
             dbmpCategory.IsNullVal = false;
-            dbmpCategory.Location = new Point(111, 28);
+            dbmpCategory.Location = new Point(111, 53);
             dbmpCategory.ModelType = null;
             dbmpCategory.Name = "dbmpCategory";
             collectionParametrs1.Limit = 0;
@@ -640,7 +643,7 @@
             dbmpCategory.Parameters = collectionParametrs1;
             dbmpCategory.PKColName = "Id";
             dbmpCategory.SelectedVal = null;
-            dbmpCategory.Size = new Size(638, 30);
+            dbmpCategory.Size = new Size(520, 30);
             dbmpCategory.TabIndex = 1;
             dbmpCategory.SelectedChange += dbCategoryOnSelectedChange;
             // 
@@ -649,7 +652,7 @@
             lHeaderTaskFirst.AutoSize = true;
             lHeaderTaskFirst.Dock = DockStyle.Fill;
             lHeaderTaskFirst.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lHeaderTaskFirst.Location = new Point(3, 25);
+            lHeaderTaskFirst.Location = new Point(3, 50);
             lHeaderTaskFirst.Name = "lHeaderTaskFirst";
             tlpTasks.SetRowSpan(lHeaderTaskFirst, 2);
             lHeaderTaskFirst.Size = new Size(102, 72);
@@ -667,7 +670,7 @@
             dmslCategory.ImageKey = "category.png";
             dmslCategory.ImageList = ilTabMenu;
             dmslCategory.IsNullVal = false;
-            dmslCategory.Location = new Point(111, 64);
+            dmslCategory.Location = new Point(111, 89);
             dmslCategory.ModelType = null;
             dmslCategory.Name = "dmslCategory";
             collectionParametrs2.Limit = 0;
@@ -676,7 +679,7 @@
             dmslCategory.Parameters = collectionParametrs2;
             dmslCategory.PKColName = "Id";
             dmslCategory.SelectedVal = null;
-            dmslCategory.Size = new Size(638, 30);
+            dmslCategory.Size = new Size(520, 30);
             dmslCategory.TabIndex = 3;
             dmslCategory.TitleCatalogSelectedForm = "Категория";
             dmslCategory.Visible = false;
@@ -687,7 +690,7 @@
             pbClient.BackgroundImage = Properties.Resources.clients;
             pbClient.BackgroundImageLayout = ImageLayout.Zoom;
             pbClient.Dock = DockStyle.Fill;
-            pbClient.Location = new Point(111, 100);
+            pbClient.Location = new Point(111, 125);
             pbClient.MaximumSize = new Size(25, 0);
             pbClient.Name = "pbClient";
             pbClient.Size = new Size(25, 25);
@@ -699,9 +702,9 @@
             lClientCategory.AutoSize = true;
             lClientCategory.Dock = DockStyle.Fill;
             lClientCategory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lClientCategory.Location = new Point(142, 97);
+            lClientCategory.Location = new Point(142, 122);
             lClientCategory.Name = "lClientCategory";
-            lClientCategory.Size = new Size(576, 31);
+            lClientCategory.Size = new Size(458, 31);
             lClientCategory.TabIndex = 5;
             lClientCategory.Text = "Категория не имеет оплат";
             lClientCategory.TextAlign = ContentAlignment.MiddleLeft;
@@ -711,9 +714,9 @@
             plineFirst.BackColor = Color.Black;
             tlpTasks.SetColumnSpan(plineFirst, 4);
             plineFirst.Dock = DockStyle.Fill;
-            plineFirst.Location = new Point(3, 201);
+            plineFirst.Location = new Point(3, 226);
             plineFirst.Name = "plineFirst";
-            plineFirst.Size = new Size(746, 5);
+            plineFirst.Size = new Size(628, 5);
             plineFirst.TabIndex = 19;
             // 
             // lMaxCategoryTitle
@@ -721,7 +724,7 @@
             lMaxCategoryTitle.AutoSize = true;
             lMaxCategoryTitle.Dock = DockStyle.Fill;
             lMaxCategoryTitle.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lMaxCategoryTitle.Location = new Point(3, 259);
+            lMaxCategoryTitle.Location = new Point(3, 284);
             lMaxCategoryTitle.Name = "lMaxCategoryTitle";
             lMaxCategoryTitle.Size = new Size(102, 31);
             lMaxCategoryTitle.TabIndex = 18;
@@ -734,7 +737,7 @@
             pbMaxCat.BackgroundImage = Properties.Resources.category;
             pbMaxCat.BackgroundImageLayout = ImageLayout.Zoom;
             pbMaxCat.Dock = DockStyle.Fill;
-            pbMaxCat.Location = new Point(111, 262);
+            pbMaxCat.Location = new Point(111, 287);
             pbMaxCat.MaximumSize = new Size(25, 0);
             pbMaxCat.Name = "pbMaxCat";
             pbMaxCat.Size = new Size(25, 25);
@@ -747,9 +750,9 @@
             lMaxCategory.AutoSize = true;
             lMaxCategory.Dock = DockStyle.Fill;
             lMaxCategory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            lMaxCategory.Location = new Point(142, 259);
+            lMaxCategory.Location = new Point(142, 284);
             lMaxCategory.Name = "lMaxCategory";
-            lMaxCategory.Size = new Size(576, 31);
+            lMaxCategory.Size = new Size(458, 31);
             lMaxCategory.TabIndex = 17;
             lMaxCategory.Text = "Категории имеющие хотябы 1 выдачу не найдены";
             lMaxCategory.TextAlign = ContentAlignment.MiddleLeft;
@@ -762,7 +765,7 @@
             bReloadMaxCategory.Dock = DockStyle.Fill;
             bReloadMaxCategory.FlatAppearance.BorderSize = 0;
             bReloadMaxCategory.FlatStyle = FlatStyle.Flat;
-            bReloadMaxCategory.Location = new Point(724, 262);
+            bReloadMaxCategory.Location = new Point(606, 287);
             bReloadMaxCategory.Name = "bReloadMaxCategory";
             bReloadMaxCategory.Size = new Size(25, 25);
             bReloadMaxCategory.TabIndex = 21;
@@ -780,6 +783,7 @@
             dmlvFilterClients.IsEditor = false;
             dmlvFilterClients.IsFilter = false;
             dmlvFilterClients.IsGridLines = true;
+            dmlvFilterClients.IsRemoveRow = false;
             dmlvFilterClients.IsRepairEditor = false;
             dmlvFilterClients.IsRepairRow = false;
             dmlvFilterClients.IsSearch = false;
@@ -787,15 +791,16 @@
             dmlvFilterClients.IsShowCountEnter = true;
             dmlvFilterClients.IsShowNum = false;
             dmlvFilterClients.IsSorted = true;
-            dmlvFilterClients.Location = new Point(3, 350);
+            dmlvFilterClients.Location = new Point(3, 375);
             dmlvFilterClients.MinimumSize = new Size(600, 300);
             dmlvFilterClients.ModelType = null;
             dmlvFilterClients.MultiSelect = false;
             dmlvFilterClients.Name = "dmlvFilterClients";
+            dmlvFilterClients.NotSelect = true;
             dmlvFilterClients.PageLimit = 0;
             dmlvFilterClients.RemovingRowColor = Color.MistyRose;
             dmlvFilterClients.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
-            dmlvFilterClients.Size = new Size(746, 300);
+            dmlvFilterClients.Size = new Size(628, 312);
             dmlvFilterClients.TabIndex = 29;
             dmlvFilterClients.Visible = false;
             dmlvFilterClients.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
@@ -804,14 +809,15 @@
             // 
             tlpTasks.SetColumnSpan(nudYearFilterInvevntoryRental, 2);
             nudYearFilterInvevntoryRental.Dock = DockStyle.Fill;
-            nudYearFilterInvevntoryRental.Location = new Point(142, 717);
+            nudYearFilterInvevntoryRental.Location = new Point(142, 754);
             nudYearFilterInvevntoryRental.Maximum = new decimal(new int[] { 2026, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Minimum = new decimal(new int[] { 1992, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Name = "nudYearFilterInvevntoryRental";
-            nudYearFilterInvevntoryRental.Size = new Size(607, 23);
+            nudYearFilterInvevntoryRental.Size = new Size(489, 23);
             nudYearFilterInvevntoryRental.TabIndex = 32;
             nudYearFilterInvevntoryRental.Value = new decimal(new int[] { 1992, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Visible = false;
+            nudYearFilterInvevntoryRental.ValueChanged += nudYearFilterInvevntoryRentalOnValueChanged;
             // 
             // tsInfoTasks
             // 
@@ -819,7 +825,7 @@
             tsInfoTasks.Items.AddRange(new ToolStripItem[] { tslInfoTask });
             tsInfoTasks.Location = new Point(3, 502);
             tsInfoTasks.Name = "tsInfoTasks";
-            tsInfoTasks.Size = new Size(752, 25);
+            tsInfoTasks.Size = new Size(634, 25);
             tsInfoTasks.TabIndex = 1;
             tsInfoTasks.Text = "tsInfoTasks";
             // 
@@ -835,7 +841,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(766, 583);
+            ClientSize = new Size(648, 583);
             Controls.Add(tcStatistic);
             Controls.Add(tsMainMenu);
             Icon = (Icon)resources.GetObject("$this.Icon");
