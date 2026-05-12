@@ -30,8 +30,6 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
             tsMainMenu = new ToolStrip();
@@ -42,8 +40,6 @@
             ilTabMenu = new ImageList(components);
             tpStatistic = new TabPage();
             tlpStatistic = new TableLayoutPanel();
-            cStatisticAllPeriod = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            cStatisticQuarter = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tsStatistic = new ToolStrip();
             tsbReloadStatistics = new ToolStripButton();
             tcStatistic = new TabControl();
@@ -84,11 +80,11 @@
             nudYearFilterInvevntoryRental = new NumericUpDown();
             tsInfoTasks = new ToolStrip();
             tslInfoTask = new ToolStripLabel();
+            cStatisticQuarter = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            cStatisticAllPeriod = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tsMainMenu.SuspendLayout();
             tpStatistic.SuspendLayout();
             tlpStatistic.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).BeginInit();
             tsStatistic.SuspendLayout();
             tcStatistic.SuspendLayout();
             tpTasks.SuspendLayout();
@@ -101,6 +97,8 @@
             ((System.ComponentModel.ISupportInitialize)pbMaxCat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudYearFilterInvevntoryRental).BeginInit();
             tsInfoTasks.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).BeginInit();
             SuspendLayout();
             // 
             // tsMainMenu
@@ -171,7 +169,7 @@
             tpStatistic.Location = new Point(4, 24);
             tpStatistic.Name = "tpStatistic";
             tpStatistic.Padding = new Padding(3);
-            tpStatistic.Size = new Size(192, 72);
+            tpStatistic.Size = new Size(640, 530);
             tpStatistic.TabIndex = 0;
             tpStatistic.Text = "Статистика";
             tpStatistic.UseVisualStyleBackColor = true;
@@ -181,55 +179,22 @@
             tlpStatistic.ColumnCount = 2;
             tlpStatistic.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
             tlpStatistic.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tlpStatistic.Controls.Add(cStatisticAllPeriod, 0, 0);
             tlpStatistic.Controls.Add(cStatisticQuarter, 1, 0);
+            tlpStatistic.Controls.Add(cStatisticAllPeriod, 0, 0);
             tlpStatistic.Dock = DockStyle.Fill;
             tlpStatistic.Location = new Point(3, 28);
             tlpStatistic.Name = "tlpStatistic";
             tlpStatistic.RowCount = 1;
             tlpStatistic.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tlpStatistic.Size = new Size(186, 41);
+            tlpStatistic.Size = new Size(634, 499);
             tlpStatistic.TabIndex = 3;
-            // 
-            // cStatisticAllPeriod
-            // 
-            cStatisticAllPeriod.BackColor = Color.WhiteSmoke;
-            cStatisticAllPeriod.BorderlineColor = Color.LightGray;
-            cStatisticAllPeriod.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            cStatisticAllPeriod.Dock = DockStyle.Fill;
-            cStatisticAllPeriod.Location = new Point(3, 3);
-            cStatisticAllPeriod.Name = "cStatisticAllPeriod";
-            cStatisticAllPeriod.Size = new Size(87, 35);
-            cStatisticAllPeriod.TabIndex = 1;
-            cStatisticAllPeriod.Text = "Статистика бухгалтерии";
-            title1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            title1.Name = "Title1";
-            title1.Text = "Статистика бухгалтерии за все время";
-            cStatisticAllPeriod.Titles.Add(title1);
-            // 
-            // cStatisticQuarter
-            // 
-            cStatisticQuarter.BackColor = Color.WhiteSmoke;
-            cStatisticQuarter.BorderlineColor = Color.LightGray;
-            cStatisticQuarter.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            cStatisticQuarter.Dock = DockStyle.Fill;
-            cStatisticQuarter.Location = new Point(96, 3);
-            cStatisticQuarter.Name = "cStatisticQuarter";
-            cStatisticQuarter.Size = new Size(87, 35);
-            cStatisticQuarter.TabIndex = 0;
-            cStatisticQuarter.Text = "Статистика бухгалтерии";
-            title2.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
-            title2.Name = "Title1";
-            title2.Text = "Статистика бухгалтерии за последние 4 квартала";
-            cStatisticQuarter.Titles.Add(title2);
-            cStatisticQuarter.Resize += cStatisticOnResize;
             // 
             // tsStatistic
             // 
             tsStatistic.Items.AddRange(new ToolStripItem[] { tsbReloadStatistics });
             tsStatistic.Location = new Point(3, 3);
             tsStatistic.Name = "tsStatistic";
-            tsStatistic.Size = new Size(186, 25);
+            tsStatistic.Size = new Size(634, 25);
             tsStatistic.TabIndex = 2;
             // 
             // tsbReloadStatistics
@@ -837,6 +802,24 @@
             tslInfoTask.Size = new Size(542, 22);
             tslInfoTask.Text = "Для получения решения задания, нажмите шапку с его названием";
             // 
+            // cStatisticQuarter
+            // 
+            cStatisticQuarter.Dock = DockStyle.Fill;
+            cStatisticQuarter.Location = new Point(320, 3);
+            cStatisticQuarter.Name = "cStatisticQuarter";
+            cStatisticQuarter.Size = new Size(311, 493);
+            cStatisticQuarter.TabIndex = 0;
+            cStatisticQuarter.Text = "chart1";
+            // 
+            // cStatisticAllPeriod
+            // 
+            cStatisticAllPeriod.Dock = DockStyle.Fill;
+            cStatisticAllPeriod.Location = new Point(3, 3);
+            cStatisticAllPeriod.Name = "cStatisticAllPeriod";
+            cStatisticAllPeriod.Size = new Size(311, 493);
+            cStatisticAllPeriod.TabIndex = 1;
+            cStatisticAllPeriod.Text = "chart2";
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -856,8 +839,6 @@
             tpStatistic.ResumeLayout(false);
             tpStatistic.PerformLayout();
             tlpStatistic.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).EndInit();
-            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).EndInit();
             tsStatistic.ResumeLayout(false);
             tsStatistic.PerformLayout();
             tcStatistic.ResumeLayout(false);
@@ -874,6 +855,8 @@
             ((System.ComponentModel.ISupportInitialize)nudYearFilterInvevntoryRental).EndInit();
             tsInfoTasks.ResumeLayout(false);
             tsInfoTasks.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).EndInit();
+            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -888,8 +871,6 @@
         private ToolStripButton tsbJournal;
         private TabPage tpStatistic;
         private TabControl tcStatistic;
-        private System.Windows.Forms.DataVisualization.Charting.Chart cStatisticQuarter;
-        private System.Windows.Forms.DataVisualization.Charting.Chart cStatisticAllPeriod;
         private TabPage tpTasks;
         private TableLayoutPanel tlpTasks;
         private Label lTitleTaskFirst;
@@ -930,5 +911,7 @@
         private WinFormsComponents.Controls.DBModelListView dmlvRentalInventory;
         private ToolStrip tsInfoTasks;
         private ToolStripLabel tslInfoTask;
+        private System.Windows.Forms.DataVisualization.Charting.Chart cStatisticQuarter;
+        private System.Windows.Forms.DataVisualization.Charting.Chart cStatisticAllPeriod;
     }
 }
