@@ -235,6 +235,7 @@ namespace RentalAccountingApp
         /// <returns>Процес</returns>
         public async Task LoadFourthTask()
         {
+            dmlvRentalInventory.IsSorted = false;
             dmlvRentalInventory.ImageList = ilTabMenu;
             int minYear = ((int?)await DBProvider.Min<IssueToCountInventoryByGroup>(nameof(IssueToCountInventoryByGroup.IssueYear))) ?? 1991;
             int maxYear = ((int?)await DBProvider.Max<IssueToCountInventoryByGroup>(nameof(IssueToCountInventoryByGroup.IssueYear))) ?? DateTime.Now.Year;
@@ -243,6 +244,8 @@ namespace RentalAccountingApp
             nudYearFilterInvevntoryRental.Maximum = maxYear;
             dmlvRentalInventory.Parameters.Conditions +=
                 new ConditionsParametr(nameof(IssueToCountInventoryByGroup.IssueYear), ConditionalOperators.Equal, nudYearFilterInvevntoryRental.Value);
+            dmlvRentalInventory.Parameters.Orders += new OrderParametr(nameof(IssueToCountInventoryByGroup.IssueYear), OrderType.Asc);
+            dmlvRentalInventory.Parameters.Orders += new OrderParametr(nameof(IssueToCountInventoryByGroup.IssueMonth), OrderType.Asc);
             dmlvRentalInventory.ModelType = typeof(IssueToCountInventoryByGroup);
         }
 
@@ -323,7 +326,7 @@ namespace RentalAccountingApp
             {
                 UpdateAllStatistic(statistic);
 
-                if (chartIndex <= maxCountQuarter)
+                if (chartIndex < maxCountQuarter)
                 {
                     chartIndex++;
                     string chartAreaName = $"ChartArea{chartIndex}";

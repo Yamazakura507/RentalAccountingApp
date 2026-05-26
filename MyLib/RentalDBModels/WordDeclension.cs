@@ -6,24 +6,18 @@
         /// Универсальный метод склонения для трех форм слова
         /// </summary>
         /// <param name="number">Число</param>
-        /// <param name="form1">Форма для 1 склонения</param>
-        /// <param name="form2">Форма для 2 склонения</param>
-        /// <param name="form5">Форма для 3 склонения</param>
-        public static string GetDeclension(this int number, string form1, string form2, string form5)
+        /// <param name="formFirst">Форма для 1 склонения</param>
+        /// <param name="formSecond">Форма для 2 склонения</param>
+        /// <param name="formThird">Форма для 3 склонения</param>
+        public static string GetDeclension(this int number, string formFirst, string formSecond, string formThird)
         {
-            int lastDigit = number % 10;
-            int lastTwoDigits = number % 100;
+            number = Math.Abs(number) % 100;
+            if (number >= 11 && number <= 19) return formThird;
 
-            if (lastTwoDigits >= 11 && lastTwoDigits <= 19)
-                return form5;
-
-            if (lastDigit == 1)
-                return form1;
-
-            if (lastDigit >= 2 && lastDigit <= 4)
-                return form2;
-
-            return form5;
+            number %= 10;
+            if (number == 1) return formFirst;
+            if (number >= 2 && number <= 4) return formSecond;
+            return formThird;
         }
 
         /// <summary>

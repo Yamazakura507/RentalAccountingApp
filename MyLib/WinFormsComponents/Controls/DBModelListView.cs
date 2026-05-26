@@ -253,16 +253,15 @@ namespace WinFormsComponents.Controls
             tsmiEdit.Visible = tsbEdit.Visible = !isModal && UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
             tssFilter.Visible = tsbAdd.Visible || tsbEdit.Visible || tsbDel.Visible || tsbRepair.Visible;
             tsbRepairEditing.Visible = RepairEditingChanged is not null;
+            tsbReload.Visible = !isModal;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
             ShowGridVisible(IsGridLines);
             CheckSearch();
 
-            if (!await UpdateCountPage(PageLimit))
-            {
-                await LoadListAsync();
-            }
+            if (!tsmiPagerCheckit.Checked) await LoadListAsync();
+            else PagerDropDownOnClosing(null, null);
 
             LaodInfoDialog(thisForm);
         }
@@ -525,6 +524,8 @@ namespace WinFormsComponents.Controls
 
             tsbRepairEditing.Enabled = IsRepairEditor;
             loader.StopAnimation();
+
+            tsbDel.Visible = tsbEdit.Visible = tsbRepair.Visible = false;
         }
 
         /// <summary>
@@ -845,7 +846,7 @@ namespace WinFormsComponents.Controls
                     isComand = true;
                     await DeleteOrRepair();
                     break;
-                case Keys.Enter when (lvModel.SelectedItems.Count == 1 && UpdateChanged is not null) || (isModal && lvModel.SelectedItems.Count > 0):
+                case Keys.Enter when e.Control && (lvModel.SelectedItems.Count == 1 && UpdateChanged is not null) || (isModal && lvModel.SelectedItems.Count > 0):
                     isComand = true;
                     OnUpdateChanged(lvModel.SelectedItems[0].Tag);
                     break;
@@ -988,7 +989,7 @@ namespace WinFormsComponents.Controls
                 { true, ("Скрыть выбраное количество(Ctrl+Q)", "Скрыть выбраное количество строк(Ctrl+Q)", FilterOnColor) }
             };
 
-            InformationChecket(tsmiEnterCountShow, parametrs, (lvModel.SelectedItems.Count, "Выбрано: {0}", tslEnterCount));
+            InformationChecket(tsmiEnterCountShow, parametrs, (lvModel.SelectedIndices.Count, "Выбрано: {0}", tslEnterCount));
         }
 
         private async void tsmiAllCountShowOnCheckedChanged(object sender, EventArgs e)
@@ -1003,7 +1004,13 @@ namespace WinFormsComponents.Controls
             InformationChecket(tsmiAllCountShow, parametrs, (await modelType.GetResultByType<int>([Parameters.Conditions], nameof(DBProvider.Count)), "Всего: {0}", tslAllCount));
         }
 
-        private void lvModelOnMouseDoubleClick(object sender, MouseEventArgs e) => OnUpdateChanged(lvModel.SelectedItems[0].Tag);
+        private void lvModelOnMouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (tsbEdit.Visible)
+            {
+                OnUpdateChanged(lvModel.SelectedItems[0].Tag);
+            }
+        }
 
         protected virtual void OnInsertChanged()
         {

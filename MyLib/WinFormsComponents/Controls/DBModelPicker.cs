@@ -153,6 +153,7 @@ namespace WinFormsComponents.Controls
             bool isDefault = SelectedVal is not null && !IsNullVal;
 
             cbDBModel.BeginUpdate();
+            cbDBModel.DataSource = null;
             cbDBModel.Items.Clear();
 
             if (isDefault) cbDBModel.SelectedIndexChanged -= cbDBModelOnSelectedIndexChanged;

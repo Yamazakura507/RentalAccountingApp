@@ -30,6 +30,7 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
             DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
             tsMainMenu = new ToolStrip();
@@ -40,6 +41,8 @@
             ilTabMenu = new ImageList(components);
             tpStatistic = new TabPage();
             tlpStatistic = new TableLayoutPanel();
+            cStatisticQuarter = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            cStatisticAllPeriod = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tsStatistic = new ToolStrip();
             tsbReloadStatistics = new ToolStripButton();
             tcStatistic = new TabControl();
@@ -80,11 +83,11 @@
             nudYearFilterInvevntoryRental = new NumericUpDown();
             tsInfoTasks = new ToolStrip();
             tslInfoTask = new ToolStripLabel();
-            cStatisticQuarter = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            cStatisticAllPeriod = new System.Windows.Forms.DataVisualization.Charting.Chart();
             tsMainMenu.SuspendLayout();
             tpStatistic.SuspendLayout();
             tlpStatistic.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).BeginInit();
             tsStatistic.SuspendLayout();
             tcStatistic.SuspendLayout();
             tpTasks.SuspendLayout();
@@ -97,8 +100,6 @@
             ((System.ComponentModel.ISupportInitialize)pbMaxCat).BeginInit();
             ((System.ComponentModel.ISupportInitialize)nudYearFilterInvevntoryRental).BeginInit();
             tsInfoTasks.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).BeginInit();
             SuspendLayout();
             // 
             // tsMainMenu
@@ -106,7 +107,7 @@
             tsMainMenu.Items.AddRange(new ToolStripItem[] { tsbSetings, tsbCatalogs, tsbClients, tsbJournal });
             tsMainMenu.Location = new Point(0, 0);
             tsMainMenu.Name = "tsMainMenu";
-            tsMainMenu.Size = new Size(648, 25);
+            tsMainMenu.Size = new Size(714, 25);
             tsMainMenu.TabIndex = 0;
             tsMainMenu.Text = "toolStrip1";
             // 
@@ -169,7 +170,7 @@
             tpStatistic.Location = new Point(4, 24);
             tpStatistic.Name = "tpStatistic";
             tpStatistic.Padding = new Padding(3);
-            tpStatistic.Size = new Size(640, 530);
+            tpStatistic.Size = new Size(706, 530);
             tpStatistic.TabIndex = 0;
             tpStatistic.Text = "Статистика";
             tpStatistic.UseVisualStyleBackColor = true;
@@ -186,15 +187,39 @@
             tlpStatistic.Name = "tlpStatistic";
             tlpStatistic.RowCount = 1;
             tlpStatistic.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
-            tlpStatistic.Size = new Size(634, 499);
+            tlpStatistic.Size = new Size(700, 499);
             tlpStatistic.TabIndex = 3;
+            // 
+            // cStatisticQuarter
+            // 
+            cStatisticQuarter.Dock = DockStyle.Fill;
+            cStatisticQuarter.Location = new Point(353, 3);
+            cStatisticQuarter.Name = "cStatisticQuarter";
+            cStatisticQuarter.Size = new Size(344, 493);
+            cStatisticQuarter.TabIndex = 0;
+            cStatisticQuarter.Text = "chart1";
+            cStatisticQuarter.Resize += cStatisticOnResize;
+            // 
+            // cStatisticAllPeriod
+            // 
+            cStatisticAllPeriod.Dock = DockStyle.Fill;
+            cStatisticAllPeriod.Location = new Point(3, 3);
+            cStatisticAllPeriod.Name = "cStatisticAllPeriod";
+            cStatisticAllPeriod.Size = new Size(344, 493);
+            cStatisticAllPeriod.TabIndex = 1;
+            cStatisticAllPeriod.Text = "chart2";
+            title1.Font = new Font("Microsoft Sans Serif", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            title1.Name = "Title1";
+            title1.Text = "Статистика бухгалтерии за весь период";
+            cStatisticAllPeriod.Titles.Add(title1);
+            cStatisticAllPeriod.Resize += cStatisticOnResize;
             // 
             // tsStatistic
             // 
             tsStatistic.Items.AddRange(new ToolStripItem[] { tsbReloadStatistics });
             tsStatistic.Location = new Point(3, 3);
             tsStatistic.Name = "tsStatistic";
-            tsStatistic.Size = new Size(634, 25);
+            tsStatistic.Size = new Size(700, 25);
             tsStatistic.TabIndex = 2;
             // 
             // tsbReloadStatistics
@@ -215,7 +240,7 @@
             tcStatistic.Location = new Point(0, 25);
             tcStatistic.Name = "tcStatistic";
             tcStatistic.SelectedIndex = 0;
-            tcStatistic.Size = new Size(648, 558);
+            tcStatistic.Size = new Size(714, 558);
             tcStatistic.TabIndex = 2;
             // 
             // tpTasks
@@ -226,7 +251,7 @@
             tpTasks.Location = new Point(4, 24);
             tpTasks.Name = "tpTasks";
             tpTasks.Padding = new Padding(3);
-            tpTasks.Size = new Size(640, 530);
+            tpTasks.Size = new Size(706, 530);
             tpTasks.TabIndex = 1;
             tpTasks.Text = "Задания";
             tpTasks.UseVisualStyleBackColor = true;
@@ -293,7 +318,7 @@
             tlpTasks.RowStyles.Add(new RowStyle());
             tlpTasks.RowStyles.Add(new RowStyle());
             tlpTasks.RowStyles.Add(new RowStyle());
-            tlpTasks.Size = new Size(634, 499);
+            tlpTasks.Size = new Size(700, 499);
             tlpTasks.TabIndex = 0;
             // 
             // dmlvRentalInventory
@@ -309,7 +334,7 @@
             dmlvRentalInventory.IsRemoveRow = false;
             dmlvRentalInventory.IsRepairEditor = false;
             dmlvRentalInventory.IsRepairRow = false;
-            dmlvRentalInventory.IsSearch = false;
+            dmlvRentalInventory.IsSearch = true;
             dmlvRentalInventory.IsShowCountAll = true;
             dmlvRentalInventory.IsShowCountEnter = true;
             dmlvRentalInventory.IsShowNum = false;
@@ -323,7 +348,7 @@
             dmlvRentalInventory.PageLimit = 0;
             dmlvRentalInventory.RemovingRowColor = Color.MistyRose;
             dmlvRentalInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
-            dmlvRentalInventory.Size = new Size(628, 324);
+            dmlvRentalInventory.Size = new Size(694, 324);
             dmlvRentalInventory.TabIndex = 35;
             dmlvRentalInventory.Visible = false;
             dmlvRentalInventory.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
@@ -363,7 +388,7 @@
             lTitleTaskFourth.ForeColor = Color.Maroon;
             lTitleTaskFourth.Location = new Point(3, 701);
             lTitleTaskFourth.Name = "lTitleTaskFourth";
-            lTitleTaskFourth.Size = new Size(628, 50);
+            lTitleTaskFourth.Size = new Size(694, 50);
             lTitleTaskFourth.TabIndex = 31;
             lTitleTaskFourth.Text = "D: Количество фактов выдачи инвентаря, за каждый месяц года, заданного пользователем";
             lTitleTaskFourth.TextAlign = ContentAlignment.TopCenter;
@@ -376,7 +401,7 @@
             plineThird.Dock = DockStyle.Fill;
             plineThird.Location = new Point(3, 693);
             plineThird.Name = "plineThird";
-            plineThird.Size = new Size(628, 5);
+            plineThird.Size = new Size(694, 5);
             plineThird.TabIndex = 30;
             // 
             // lTitleTaskThird
@@ -388,7 +413,7 @@
             lTitleTaskThird.ForeColor = Color.Maroon;
             lTitleTaskThird.Location = new Point(3, 347);
             lTitleTaskThird.Name = "lTitleTaskThird";
-            lTitleTaskThird.Size = new Size(628, 25);
+            lTitleTaskThird.Size = new Size(694, 25);
             lTitleTaskThird.TabIndex = 28;
             lTitleTaskThird.Text = "C:Клиенты, которые арендовали строго 3 товара из 6 категорий";
             lTitleTaskThird.TextAlign = ContentAlignment.TopCenter;
@@ -401,7 +426,7 @@
             plineSecond.Dock = DockStyle.Fill;
             plineSecond.Location = new Point(3, 339);
             plineSecond.Name = "plineSecond";
-            plineSecond.Size = new Size(628, 5);
+            plineSecond.Size = new Size(694, 5);
             plineSecond.TabIndex = 27;
             // 
             // btModeSerhPopular
@@ -411,7 +436,7 @@
             btModeSerhPopular.Dock = DockStyle.Fill;
             btModeSerhPopular.FlatAppearance.BorderSize = 0;
             btModeSerhPopular.FlatStyle = FlatStyle.Flat;
-            btModeSerhPopular.Location = new Point(606, 318);
+            btModeSerhPopular.Location = new Point(672, 318);
             btModeSerhPopular.Name = "btModeSerhPopular";
             btModeSerhPopular.Size = new Size(25, 15);
             btModeSerhPopular.TabIndex = 26;
@@ -426,7 +451,7 @@
             lNotPopularInventory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lNotPopularInventory.Location = new Point(142, 315);
             lNotPopularInventory.Name = "lNotPopularInventory";
-            lNotPopularInventory.Size = new Size(458, 21);
+            lNotPopularInventory.Size = new Size(524, 21);
             lNotPopularInventory.TabIndex = 25;
             lNotPopularInventory.TextAlign = ContentAlignment.MiddleLeft;
             lNotPopularInventory.Visible = false;
@@ -464,7 +489,7 @@
             bClientCategoryReload.Dock = DockStyle.Fill;
             bClientCategoryReload.FlatAppearance.BorderSize = 0;
             bClientCategoryReload.FlatStyle = FlatStyle.Flat;
-            bClientCategoryReload.Location = new Point(606, 125);
+            bClientCategoryReload.Location = new Point(672, 125);
             bClientCategoryReload.Name = "bClientCategoryReload";
             bClientCategoryReload.Size = new Size(25, 25);
             bClientCategoryReload.TabIndex = 22;
@@ -480,7 +505,7 @@
             lTitleTaskSecond.ForeColor = Color.Maroon;
             lTitleTaskSecond.Location = new Point(3, 234);
             lTitleTaskSecond.Name = "lTitleTaskSecond";
-            lTitleTaskSecond.Size = new Size(628, 50);
+            lTitleTaskSecond.Size = new Size(694, 50);
             lTitleTaskSecond.TabIndex = 20;
             lTitleTaskSecond.Text = "B:Поиск категории с максимальным количеством выдачи и 2 самых не популярных товара в ней";
             lTitleTaskSecond.TextAlign = ContentAlignment.TopCenter;
@@ -494,7 +519,7 @@
             lSumPay.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lSumPay.Location = new Point(142, 184);
             lSumPay.Name = "lSumPay";
-            lSumPay.Size = new Size(489, 39);
+            lSumPay.Size = new Size(555, 39);
             lSumPay.TabIndex = 13;
             lSumPay.TextAlign = ContentAlignment.MiddleLeft;
             lSumPay.Visible = false;
@@ -533,7 +558,7 @@
             lClientPhone.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lClientPhone.Location = new Point(142, 153);
             lClientPhone.Name = "lClientPhone";
-            lClientPhone.Size = new Size(489, 31);
+            lClientPhone.Size = new Size(555, 31);
             lClientPhone.TabIndex = 10;
             lClientPhone.TextAlign = ContentAlignment.MiddleLeft;
             lClientPhone.Visible = false;
@@ -585,7 +610,7 @@
             lTitleTaskFirst.ForeColor = Color.Maroon;
             lTitleTaskFirst.Location = new Point(3, 0);
             lTitleTaskFirst.Name = "lTitleTaskFirst";
-            lTitleTaskFirst.Size = new Size(628, 50);
+            lTitleTaskFirst.Size = new Size(694, 50);
             lTitleTaskFirst.TabIndex = 0;
             lTitleTaskFirst.Text = "A:Поиск клиента, который имеет максимальную сумму оплат в категории";
             lTitleTaskFirst.TextAlign = ContentAlignment.TopCenter;
@@ -608,7 +633,7 @@
             dbmpCategory.Parameters = collectionParametrs1;
             dbmpCategory.PKColName = "Id";
             dbmpCategory.SelectedVal = null;
-            dbmpCategory.Size = new Size(520, 30);
+            dbmpCategory.Size = new Size(586, 30);
             dbmpCategory.TabIndex = 1;
             dbmpCategory.SelectedChange += dbCategoryOnSelectedChange;
             // 
@@ -644,7 +669,7 @@
             dmslCategory.Parameters = collectionParametrs2;
             dmslCategory.PKColName = "Id";
             dmslCategory.SelectedVal = null;
-            dmslCategory.Size = new Size(520, 30);
+            dmslCategory.Size = new Size(586, 30);
             dmslCategory.TabIndex = 3;
             dmslCategory.TitleCatalogSelectedForm = "Категория";
             dmslCategory.Visible = false;
@@ -669,7 +694,7 @@
             lClientCategory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lClientCategory.Location = new Point(142, 122);
             lClientCategory.Name = "lClientCategory";
-            lClientCategory.Size = new Size(458, 31);
+            lClientCategory.Size = new Size(524, 31);
             lClientCategory.TabIndex = 5;
             lClientCategory.Text = "Категория не имеет оплат";
             lClientCategory.TextAlign = ContentAlignment.MiddleLeft;
@@ -681,7 +706,7 @@
             plineFirst.Dock = DockStyle.Fill;
             plineFirst.Location = new Point(3, 226);
             plineFirst.Name = "plineFirst";
-            plineFirst.Size = new Size(628, 5);
+            plineFirst.Size = new Size(694, 5);
             plineFirst.TabIndex = 19;
             // 
             // lMaxCategoryTitle
@@ -717,7 +742,7 @@
             lMaxCategory.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point, 204);
             lMaxCategory.Location = new Point(142, 284);
             lMaxCategory.Name = "lMaxCategory";
-            lMaxCategory.Size = new Size(458, 31);
+            lMaxCategory.Size = new Size(524, 31);
             lMaxCategory.TabIndex = 17;
             lMaxCategory.Text = "Категории имеющие хотябы 1 выдачу не найдены";
             lMaxCategory.TextAlign = ContentAlignment.MiddleLeft;
@@ -730,7 +755,7 @@
             bReloadMaxCategory.Dock = DockStyle.Fill;
             bReloadMaxCategory.FlatAppearance.BorderSize = 0;
             bReloadMaxCategory.FlatStyle = FlatStyle.Flat;
-            bReloadMaxCategory.Location = new Point(606, 287);
+            bReloadMaxCategory.Location = new Point(672, 287);
             bReloadMaxCategory.Name = "bReloadMaxCategory";
             bReloadMaxCategory.Size = new Size(25, 25);
             bReloadMaxCategory.TabIndex = 21;
@@ -751,11 +776,11 @@
             dmlvFilterClients.IsRemoveRow = false;
             dmlvFilterClients.IsRepairEditor = false;
             dmlvFilterClients.IsRepairRow = false;
-            dmlvFilterClients.IsSearch = false;
+            dmlvFilterClients.IsSearch = true;
             dmlvFilterClients.IsShowCountAll = true;
             dmlvFilterClients.IsShowCountEnter = true;
             dmlvFilterClients.IsShowNum = false;
-            dmlvFilterClients.IsSorted = true;
+            dmlvFilterClients.IsSorted = false;
             dmlvFilterClients.Location = new Point(3, 375);
             dmlvFilterClients.MinimumSize = new Size(600, 300);
             dmlvFilterClients.ModelType = null;
@@ -765,7 +790,7 @@
             dmlvFilterClients.PageLimit = 0;
             dmlvFilterClients.RemovingRowColor = Color.MistyRose;
             dmlvFilterClients.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
-            dmlvFilterClients.Size = new Size(628, 312);
+            dmlvFilterClients.Size = new Size(694, 312);
             dmlvFilterClients.TabIndex = 29;
             dmlvFilterClients.Visible = false;
             dmlvFilterClients.VisibleMode = WinFormsComponents.Classes.Enums.VisibleMode.Row;
@@ -778,7 +803,7 @@
             nudYearFilterInvevntoryRental.Maximum = new decimal(new int[] { 2026, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Minimum = new decimal(new int[] { 1992, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Name = "nudYearFilterInvevntoryRental";
-            nudYearFilterInvevntoryRental.Size = new Size(489, 23);
+            nudYearFilterInvevntoryRental.Size = new Size(555, 23);
             nudYearFilterInvevntoryRental.TabIndex = 32;
             nudYearFilterInvevntoryRental.Value = new decimal(new int[] { 1992, 0, 0, 0 });
             nudYearFilterInvevntoryRental.Visible = false;
@@ -790,7 +815,7 @@
             tsInfoTasks.Items.AddRange(new ToolStripItem[] { tslInfoTask });
             tsInfoTasks.Location = new Point(3, 502);
             tsInfoTasks.Name = "tsInfoTasks";
-            tsInfoTasks.Size = new Size(634, 25);
+            tsInfoTasks.Size = new Size(700, 25);
             tsInfoTasks.TabIndex = 1;
             tsInfoTasks.Text = "tsInfoTasks";
             // 
@@ -802,29 +827,11 @@
             tslInfoTask.Size = new Size(542, 22);
             tslInfoTask.Text = "Для получения решения задания, нажмите шапку с его названием";
             // 
-            // cStatisticQuarter
-            // 
-            cStatisticQuarter.Dock = DockStyle.Fill;
-            cStatisticQuarter.Location = new Point(320, 3);
-            cStatisticQuarter.Name = "cStatisticQuarter";
-            cStatisticQuarter.Size = new Size(311, 493);
-            cStatisticQuarter.TabIndex = 0;
-            cStatisticQuarter.Text = "chart1";
-            // 
-            // cStatisticAllPeriod
-            // 
-            cStatisticAllPeriod.Dock = DockStyle.Fill;
-            cStatisticAllPeriod.Location = new Point(3, 3);
-            cStatisticAllPeriod.Name = "cStatisticAllPeriod";
-            cStatisticAllPeriod.Size = new Size(311, 493);
-            cStatisticAllPeriod.TabIndex = 1;
-            cStatisticAllPeriod.Text = "chart2";
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(648, 583);
+            ClientSize = new Size(714, 583);
             Controls.Add(tcStatistic);
             Controls.Add(tsMainMenu);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -839,6 +846,8 @@
             tpStatistic.ResumeLayout(false);
             tpStatistic.PerformLayout();
             tlpStatistic.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).EndInit();
+            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).EndInit();
             tsStatistic.ResumeLayout(false);
             tsStatistic.PerformLayout();
             tcStatistic.ResumeLayout(false);
@@ -855,8 +864,6 @@
             ((System.ComponentModel.ISupportInitialize)nudYearFilterInvevntoryRental).EndInit();
             tsInfoTasks.ResumeLayout(false);
             tsInfoTasks.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)cStatisticQuarter).EndInit();
-            ((System.ComponentModel.ISupportInitialize)cStatisticAllPeriod).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }

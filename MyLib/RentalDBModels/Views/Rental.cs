@@ -2,12 +2,12 @@
 using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
-using RentalDBModels.Models;
 using RentalDBModels.Models.DependenceModel;
 using RentalDBModels.Views.Abstract;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
+using System.Text;
 
 namespace RentalDBModels.Views
 {
@@ -101,7 +101,7 @@ namespace RentalDBModels.Views
                         BackColor = Color.LightYellow;
                     }
 
-                    return String.Format("{0} - [{1:N2} ₽/{2:N2} ₽ - {3:dd MMMM yyyy}]", status, payments.Sum, sumInventory, payments.Date);
+                    return String.Format("{0} - [Оплачено: {1:N2} ₽ - {3:dd MMMM yyyy}, Остаток: {2:N2} ₽]", status, payments.Sum, sumInventory-payments.Sum, payments.Date);
                 }
                 else
                 {
@@ -158,8 +158,49 @@ namespace RentalDBModels.Views
         /// <returns></returns>
         public static string FormatDays(int countDays)
         {
-            string word = countDays.GetDeclension("-го дня", "-х дней", "-ти дней");
-            return $"{countDays}{word}";
+            if (countDays <= 0) return "0 дней";
+
+            DateTime startDate = DateTime.Today;
+            DateTime endDate = startDate.AddDays(countDays);
+
+            int years = endDate.Year - startDate.Year;
+            int months = endDate.Month - startDate.Month;
+            int days = endDate.Day - startDate.Day;
+
+            if (days < 0)
+            {
+                months--;
+                days += DateTime.DaysInMonth(startDate.Year, startDate.Month);
+            }
+
+            if (months < 0)
+            {
+                years--;
+                months += 12;
+            }
+
+            StringBuilder builder = new ();
+            string format = "{0}{1} ";
+
+            if (years > 0)
+            {
+                string yearWord = years.GetDeclension("-го года", "-х лет", "-и лет");
+                builder.AppendFormat(format, years, yearWord);
+            }
+
+            if (months > 0)
+            {
+                string monthWord = months.GetDeclension("-го месяца", "-х месяцов", "-и месяцев");
+                builder.AppendFormat(format, months, monthWord);
+            }
+
+            if (days > 0 || builder.Length == 0)
+            {
+                string dayWord = days.GetDeclension("-го дня", "-х дней", "-и дней");
+                builder.AppendFormat(format.TrimEnd(), days, dayWord);
+            }
+
+            return builder.ToString();
         }
     }
 }

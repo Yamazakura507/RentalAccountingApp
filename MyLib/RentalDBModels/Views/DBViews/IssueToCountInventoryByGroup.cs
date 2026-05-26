@@ -5,8 +5,8 @@ namespace RentalDBModels.Views.DBViews
 {
     public class IssueToCountInventoryByGroup
     {
-        [ViewModel(Headline = true)]
-        [Description("Категория")]
+        [ViewModel(Headline = true, IsEdit = false)]
+        [Description("Период")]
         public string IssueDate => String.Format("{0} - {1}", IssueYear, IssueMonth);
 
         [ViewModel(ViewHide = true)]
@@ -16,7 +16,7 @@ namespace RentalDBModels.Views.DBViews
         public int IssueMonth { get; set; }
 
         [Description("Количество выданого инвентаря")]
-        [ViewModel]
+        [ViewModel(FilterOn = true)]
         public int CountInventroy { get; set; }
 
         [ViewModel(ViewHide = true, Image = true)]

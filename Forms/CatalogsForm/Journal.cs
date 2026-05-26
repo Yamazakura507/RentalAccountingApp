@@ -12,6 +12,7 @@ namespace RentalAccountingApp.Forms.CatalogsForm
             dmlvInventory.ModelType = typeof(Inventory);
             dmlvRental.ModelType = typeof(Rental);
             dmlvOplat.ModelType = typeof(Payments);
+            dmlvInventory.ImageList = dmlvOplat.ImageList = dmlvRental.ImageList = ilTabMenu;
         }
 
         private void tcDBViewrOnKeyDown(object sender, KeyEventArgs e)

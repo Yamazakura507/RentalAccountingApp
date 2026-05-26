@@ -30,9 +30,6 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Journal));
-            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs1 = new DataBaseProvaider.Objects.CollectionParametrs();
-            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs2 = new DataBaseProvaider.Objects.CollectionParametrs();
-            DataBaseProvaider.Objects.CollectionParametrs collectionParametrs3 = new DataBaseProvaider.Objects.CollectionParametrs();
             ilTabMenu = new ImageList(components);
             tcDBViewr = new TabControl();
             tpRental = new TabPage();
@@ -88,10 +85,10 @@
             dmlvRental.Enabled = false;
             dmlvRental.FilterOffColor = Color.MistyRose;
             dmlvRental.FilterOnColor = Color.LightGreen;
-            dmlvRental.ImageList = ilTabMenu;
             dmlvRental.IsEditor = false;
             dmlvRental.IsFilter = true;
             dmlvRental.IsGridLines = true;
+            dmlvRental.IsRemoveRow = true;
             dmlvRental.IsRepairEditor = true;
             dmlvRental.IsRepairRow = true;
             dmlvRental.IsSearch = true;
@@ -104,11 +101,8 @@
             dmlvRental.ModelType = null;
             dmlvRental.MultiSelect = true;
             dmlvRental.Name = "dmlvRental";
-            dmlvRental.PageLimit = 0;
-            collectionParametrs1.Limit = 0;
-            collectionParametrs1.Offset = 0;
-            collectionParametrs1.SerhingParametrsCount = 0;
-            dmlvRental.Parameters = collectionParametrs1;
+            dmlvRental.NotSelect = false;
+            dmlvRental.PageLimit = 20;
             dmlvRental.RemovingRowColor = Color.MistyRose;
             dmlvRental.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dmlvRental.Size = new Size(786, 416);
@@ -135,10 +129,10 @@
             dmlvInventory.Enabled = false;
             dmlvInventory.FilterOffColor = Color.MistyRose;
             dmlvInventory.FilterOnColor = Color.LightGreen;
-            dmlvInventory.ImageList = ilTabMenu;
             dmlvInventory.IsEditor = false;
             dmlvInventory.IsFilter = true;
             dmlvInventory.IsGridLines = true;
+            dmlvInventory.IsRemoveRow = true;
             dmlvInventory.IsRepairEditor = true;
             dmlvInventory.IsRepairRow = true;
             dmlvInventory.IsSearch = true;
@@ -151,11 +145,8 @@
             dmlvInventory.ModelType = null;
             dmlvInventory.MultiSelect = true;
             dmlvInventory.Name = "dmlvInventory";
+            dmlvInventory.NotSelect = false;
             dmlvInventory.PageLimit = 0;
-            collectionParametrs2.Limit = 0;
-            collectionParametrs2.Offset = 0;
-            collectionParametrs2.SerhingParametrsCount = 0;
-            dmlvInventory.Parameters = collectionParametrs2;
             dmlvInventory.RemovingRowColor = Color.MistyRose;
             dmlvInventory.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dmlvInventory.Size = new Size(786, 416);
@@ -182,10 +173,10 @@
             dmlvOplat.Enabled = false;
             dmlvOplat.FilterOffColor = Color.MistyRose;
             dmlvOplat.FilterOnColor = Color.LightGreen;
-            dmlvOplat.ImageList = ilTabMenu;
             dmlvOplat.IsEditor = false;
             dmlvOplat.IsFilter = true;
             dmlvOplat.IsGridLines = true;
+            dmlvOplat.IsRemoveRow = true;
             dmlvOplat.IsRepairEditor = false;
             dmlvOplat.IsRepairRow = false;
             dmlvOplat.IsSearch = true;
@@ -198,11 +189,8 @@
             dmlvOplat.ModelType = null;
             dmlvOplat.MultiSelect = true;
             dmlvOplat.Name = "dmlvOplat";
+            dmlvOplat.NotSelect = false;
             dmlvOplat.PageLimit = 0;
-            collectionParametrs3.Limit = 0;
-            collectionParametrs3.Offset = 0;
-            collectionParametrs3.SerhingParametrsCount = 0;
-            dmlvOplat.Parameters = collectionParametrs3;
             dmlvOplat.RemovingRowColor = Color.MistyRose;
             dmlvOplat.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dmlvOplat.Size = new Size(786, 416);

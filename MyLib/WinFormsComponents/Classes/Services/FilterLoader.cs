@@ -117,12 +117,12 @@ namespace WinFormsComponents.Classes.Services
                         Format = DateTimePickerFormat.Custom,
                         CustomFormat = "dd MMMM yyyy",
                         Enabled = isEnable,
-                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
+                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now.Date : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
                         MinDate = settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
                         Value = GetClampedValue(
                                     min is null ? new DateTime(1991,12,25) : ((DateOnly)min).ToDateTime(TimeOnly.MinValue),
                                     settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
-                                    settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
+                                    settingFilter?.Maximum is null ? DateTime.Now.Date : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
                     }),
                     new (new Label() { Text = "Максимальное значение", Enabled = isEnable }),
                     new (new DateTimePicker()
@@ -130,12 +130,12 @@ namespace WinFormsComponents.Classes.Services
                         Format = DateTimePickerFormat.Custom,
                         CustomFormat = "dd MMMM yyyy",
                         Enabled = isEnable,
-                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
+                        MaxDate = settingFilter?.Maximum is null ? DateTime.Now.Date : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue),
                         MinDate = settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
                         Value = GetClampedValue(
-                                    max is null ? DateTime.Now : ((DateOnly)max).ToDateTime(TimeOnly.MinValue),
+                                    max is null ? DateTime.Now.Date : ((DateOnly)max).ToDateTime(TimeOnly.MinValue),
                                     settingFilter?.Minimum is null ? new DateTime(1991,12,25) : ((DateOnly)settingFilter?.Minimum).ToDateTime(TimeOnly.MinValue),
-                                    settingFilter?.Maximum is null ? DateTime.Now : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
+                                    settingFilter?.Maximum is null ? DateTime.Now.Date : ((DateOnly)settingFilter?.Maximum).ToDateTime(TimeOnly.MinValue))
                     })
                 ]
             };

@@ -164,7 +164,7 @@
             tsbEdit.Name = "tsbEdit";
             tsbEdit.Size = new Size(23, 28);
             tsbEdit.Text = "Редактировать(Enter)";
-            tsbEdit.ToolTipText = "Редактировать(Enter)";
+            tsbEdit.ToolTipText = "Редактировать(Ctrl+Enter)";
             tsbEdit.Visible = false;
             tsbEdit.Click += tsbEditOnClick;
             // 
@@ -298,8 +298,8 @@
             tsmiPager.Image = Properties.Resources.pager;
             tsmiPager.Name = "tsmiPager";
             tsmiPager.Size = new Size(307, 22);
-            tsmiPager.Text = "Страничник";
-            tsmiPager.ToolTipText = "Страничник";
+            tsmiPager.Text = "Пагинатор";
+            tsmiPager.ToolTipText = "Пагинатор";
             // 
             // tsmiPagerCheckit
             // 
@@ -433,6 +433,7 @@
             tsbStartPage.Size = new Size(23, 28);
             tsbStartPage.Tag = "2";
             tsbStartPage.Text = "В начало списка(Ctrl+H)";
+            tsbStartPage.Visible = false;
             tsbStartPage.Click += tsbActionPageOnClick;
             // 
             // tsbBackPage
@@ -444,6 +445,7 @@
             tsbBackPage.Size = new Size(23, 28);
             tsbBackPage.Tag = "1";
             tsbBackPage.Text = "Предыдущая страница(Ctrl+B)";
+            tsbBackPage.Visible = false;
             tsbBackPage.Click += tsbActionPageOnClick;
             // 
             // tstbActualPage
@@ -457,15 +459,17 @@
             tstbActualPage.Text = "1";
             tstbActualPage.TextBoxTextAlign = HorizontalAlignment.Center;
             tstbActualPage.ToolTipText = "Текущая старница(Enter)";
+            tstbActualPage.Visible = false;
             tstbActualPage.KeyPress += tstbActualPageOnKeyPress;
             // 
             // tslCountPages
             // 
             tslCountPages.Font = new Font("Segoe UI", 12F);
             tslCountPages.Name = "tslCountPages";
-            tslCountPages.Size = new Size(37, 28);
+            tslCountPages.Size = new Size(37, 21);
             tslCountPages.Text = "/cnt";
             tslCountPages.ToolTipText = "Всего cnt страниц";
+            tslCountPages.Visible = false;
             // 
             // tsbNextPage
             // 
@@ -473,10 +477,11 @@
             tsbNextPage.Image = Properties.Resources.right_arrow;
             tsbNextPage.ImageTransparentColor = Color.Magenta;
             tsbNextPage.Name = "tsbNextPage";
-            tsbNextPage.Size = new Size(23, 28);
+            tsbNextPage.Size = new Size(23, 20);
             tsbNextPage.Tag = "0";
             tsbNextPage.Text = "Следующая страница(Ctrl+N)";
             tsbNextPage.ToolTipText = "Следующая страница(Ctrl+N)";
+            tsbNextPage.Visible = false;
             tsbNextPage.Click += tsbActionPageOnClick;
             // 
             // tsbEndPage
@@ -485,9 +490,10 @@
             tsbEndPage.Image = Properties.Resources.right_dou_arrow;
             tsbEndPage.ImageTransparentColor = Color.Magenta;
             tsbEndPage.Name = "tsbEndPage";
-            tsbEndPage.Size = new Size(23, 28);
+            tsbEndPage.Size = new Size(23, 20);
             tsbEndPage.Tag = "3";
             tsbEndPage.Text = "Последняя страница(Ctrl+E)";
+            tsbEndPage.Visible = false;
             tsbEndPage.Click += tsbActionPageOnClick;
             // 
             // lvModel
@@ -496,6 +502,7 @@
             lvModel.Dock = DockStyle.Fill;
             lvModel.FullRowSelect = true;
             lvModel.GridLines = true;
+            lvModel.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             lvModel.Location = new Point(3, 3);
             lvModel.Name = "lvModel";
             lvModel.Size = new Size(594, 363);
@@ -547,7 +554,7 @@
             tsmiEdit.Name = "tsmiEdit";
             tsmiEdit.Size = new Size(189, 22);
             tsmiEdit.Text = "Редактировать(Enter)";
-            tsmiEdit.ToolTipText = "Редактировать(Enter)";
+            tsmiEdit.ToolTipText = "Редактировать(Ctrl+Enter)";
             tsmiEdit.Visible = false;
             tsmiEdit.Click += tsbEditOnClick;
             // 
@@ -600,15 +607,15 @@
             // 
             cmsModalModel.Items.AddRange(new ToolStripItem[] { tsmiSelected });
             cmsModalModel.Name = "cmsModalModel";
-            cmsModalModel.Size = new Size(191, 26);
+            cmsModalModel.Size = new Size(218, 26);
             cmsModalModel.Opening += cmsModalModelOnOpening;
             // 
             // tsmiSelected
             // 
             tsmiSelected.Image = Properties.Resources.add;
             tsmiSelected.Name = "tsmiSelected";
-            tsmiSelected.Size = new Size(190, 22);
-            tsmiSelected.Text = "Выбрать(Insert/Enter)";
+            tsmiSelected.Size = new Size(217, 22);
+            tsmiSelected.Text = "Выбрать(Insert/Ctrl+Enter)";
             tsmiSelected.Click += tsmiSelectedOnClick;
             // 
             // DBModelListView
