@@ -31,6 +31,7 @@
             components = new System.ComponentModel.Container();
             tsListMenu = new ToolStrip();
             tsbExcelExport = new ToolStripButton();
+            tsddbPrint = new ToolStripDropDownButton();
             tsbReload = new ToolStripButton();
             tssExport = new ToolStripSeparator();
             tsbAdd = new ToolStripButton();
@@ -75,6 +76,7 @@
             tsmiDel = new ToolStripMenuItem();
             tsmiRepair = new ToolStripMenuItem();
             tsmiEdit = new ToolStripMenuItem();
+            tsmiPrint = new ToolStripMenuItem();
             tsIformationBar = new ToolStrip();
             tslAllCount = new ToolStripLabel();
             tslEnterCount = new ToolStripLabel();
@@ -90,10 +92,10 @@
             // 
             // tsListMenu
             // 
-            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbExcelExport, tsbReload, tssExport, tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tssSetting, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
+            tsListMenu.Items.AddRange(new ToolStripItem[] { tsbExcelExport, tsddbPrint, tsbReload, tssExport, tsbAdd, tsbDel, tsbRepair, tsbEdit, tsbRepairEditing, tssFilter, tstbSearh, tsbSearh, tsddbFilter, tsddbSettingsListView, tssSetting, tsbTileMode, tsbRowMode, tsbGrid, tsbNonGrid, tssPager, tsbStartPage, tsbBackPage, tstbActualPage, tslCountPages, tsbNextPage, tsbEndPage });
             tsListMenu.Location = new Point(0, 0);
             tsListMenu.Name = "tsListMenu";
-            tsListMenu.Size = new Size(600, 31);
+            tsListMenu.Size = new Size(600, 25);
             tsListMenu.TabIndex = 2;
             // 
             // tsbExcelExport
@@ -102,9 +104,17 @@
             tsbExcelExport.Image = Properties.Resources.download;
             tsbExcelExport.ImageTransparentColor = Color.Magenta;
             tsbExcelExport.Name = "tsbExcelExport";
-            tsbExcelExport.Size = new Size(23, 28);
+            tsbExcelExport.Size = new Size(23, 22);
             tsbExcelExport.ToolTipText = "Выгрузить в Excel(Ctrl+Shift+S)";
             tsbExcelExport.Click += tsbExcelExportOnClick;
+            // 
+            // tsddbPrint
+            // 
+            tsddbPrint.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsddbPrint.Image = Properties.Resources.print;
+            tsddbPrint.ImageTransparentColor = Color.Magenta;
+            tsddbPrint.Name = "tsddbPrint";
+            tsddbPrint.Size = new Size(29, 22);
             // 
             // tsbReload
             // 
@@ -112,14 +122,14 @@
             tsbReload.Image = Properties.Resources.reload;
             tsbReload.ImageTransparentColor = Color.Magenta;
             tsbReload.Name = "tsbReload";
-            tsbReload.Size = new Size(23, 28);
+            tsbReload.Size = new Size(23, 22);
             tsbReload.ToolTipText = "Обновить список(Ctrl+M)";
             tsbReload.Click += tsbReloadOnClick;
             // 
             // tssExport
             // 
             tssExport.Name = "tssExport";
-            tssExport.Size = new Size(6, 31);
+            tssExport.Size = new Size(6, 25);
             // 
             // tsbAdd
             // 
@@ -127,7 +137,7 @@
             tsbAdd.Image = Properties.Resources.add;
             tsbAdd.ImageTransparentColor = Color.Magenta;
             tsbAdd.Name = "tsbAdd";
-            tsbAdd.Size = new Size(23, 28);
+            tsbAdd.Size = new Size(23, 22);
             tsbAdd.Text = "Добавить";
             tsbAdd.ToolTipText = "Добавить(Insert)";
             tsbAdd.Click += tsbInsertOnClick;
@@ -183,13 +193,13 @@
             // tssFilter
             // 
             tssFilter.Name = "tssFilter";
-            tssFilter.Size = new Size(6, 31);
+            tssFilter.Size = new Size(6, 25);
             // 
             // tstbSearh
             // 
             tstbSearh.BorderStyle = BorderStyle.FixedSingle;
             tstbSearh.Name = "tstbSearh";
-            tstbSearh.Size = new Size(100, 31);
+            tstbSearh.Size = new Size(100, 25);
             tstbSearh.ToolTipText = "Поиск(Enter)";
             tstbSearh.KeyPress += tstbSearhOnKeyPress;
             // 
@@ -199,7 +209,7 @@
             tsbSearh.Image = Properties.Resources.searh;
             tsbSearh.ImageTransparentColor = Color.Magenta;
             tsbSearh.Name = "tsbSearh";
-            tsbSearh.Size = new Size(23, 28);
+            tsbSearh.Size = new Size(23, 22);
             tsbSearh.Text = "Поиск";
             tsbSearh.ToolTipText = "Поиск";
             tsbSearh.Click += tsbSearhOnClick;
@@ -211,7 +221,7 @@
             tsddbFilter.Image = Properties.Resources.filter;
             tsddbFilter.ImageTransparentColor = Color.Magenta;
             tsddbFilter.Name = "tsddbFilter";
-            tsddbFilter.Size = new Size(29, 28);
+            tsddbFilter.Size = new Size(29, 22);
             tsddbFilter.Text = "Фильтр";
             tsddbFilter.ToolTipText = "Фильтр(Поиск/Фильтрация/Сортировка)";
             // 
@@ -289,7 +299,7 @@
             tsddbSettingsListView.Image = Properties.Resources.setings;
             tsddbSettingsListView.ImageTransparentColor = Color.Magenta;
             tsddbSettingsListView.Name = "tsddbSettingsListView";
-            tsddbSettingsListView.Size = new Size(29, 28);
+            tsddbSettingsListView.Size = new Size(29, 22);
             tsddbSettingsListView.Text = "Настройки и расширения списка";
             // 
             // tsmiPager
@@ -365,7 +375,7 @@
             // 
             tssSetting.Alignment = ToolStripItemAlignment.Right;
             tssSetting.Name = "tssSetting";
-            tssSetting.Size = new Size(6, 31);
+            tssSetting.Size = new Size(6, 25);
             // 
             // tsbTileMode
             // 
@@ -374,7 +384,7 @@
             tsbTileMode.Image = Properties.Resources.tile_mode;
             tsbTileMode.ImageTransparentColor = Color.Magenta;
             tsbTileMode.Name = "tsbTileMode";
-            tsbTileMode.Size = new Size(23, 28);
+            tsbTileMode.Size = new Size(23, 22);
             tsbTileMode.Tag = "0";
             tsbTileMode.Text = "Отображать плиткой";
             tsbTileMode.ToolTipText = "Отображать плиткой(Ctrl+U)";
@@ -414,7 +424,7 @@
             tsbNonGrid.Image = Properties.Resources.non_grid;
             tsbNonGrid.ImageTransparentColor = Color.Magenta;
             tsbNonGrid.Name = "tsbNonGrid";
-            tsbNonGrid.Size = new Size(23, 28);
+            tsbNonGrid.Size = new Size(23, 22);
             tsbNonGrid.Text = "Скрыть сетку";
             tsbNonGrid.ToolTipText = "Скрыть сетку(Ctrl+G)";
             tsbNonGrid.Click += tsbGridOnClick;
@@ -422,7 +432,7 @@
             // tssPager
             // 
             tssPager.Name = "tssPager";
-            tssPager.Size = new Size(6, 31);
+            tssPager.Size = new Size(6, 25);
             // 
             // tsbStartPage
             // 
@@ -466,7 +476,7 @@
             // 
             tslCountPages.Font = new Font("Segoe UI", 12F);
             tslCountPages.Name = "tslCountPages";
-            tslCountPages.Size = new Size(37, 21);
+            tslCountPages.Size = new Size(37, 22);
             tslCountPages.Text = "/cnt";
             tslCountPages.ToolTipText = "Всего cnt страниц";
             tslCountPages.Visible = false;
@@ -477,7 +487,7 @@
             tsbNextPage.Image = Properties.Resources.right_arrow;
             tsbNextPage.ImageTransparentColor = Color.Magenta;
             tsbNextPage.Name = "tsbNextPage";
-            tsbNextPage.Size = new Size(23, 20);
+            tsbNextPage.Size = new Size(23, 22);
             tsbNextPage.Tag = "0";
             tsbNextPage.Text = "Следующая страница(Ctrl+N)";
             tsbNextPage.ToolTipText = "Следующая страница(Ctrl+N)";
@@ -490,7 +500,7 @@
             tsbEndPage.Image = Properties.Resources.right_dou_arrow;
             tsbEndPage.ImageTransparentColor = Color.Magenta;
             tsbEndPage.Name = "tsbEndPage";
-            tsbEndPage.Size = new Size(23, 20);
+            tsbEndPage.Size = new Size(23, 22);
             tsbEndPage.Tag = "3";
             tsbEndPage.Text = "Последняя страница(Ctrl+E)";
             tsbEndPage.Visible = false;
@@ -505,7 +515,7 @@
             lvModel.HeaderStyle = ColumnHeaderStyle.Nonclickable;
             lvModel.Location = new Point(3, 3);
             lvModel.Name = "lvModel";
-            lvModel.Size = new Size(594, 363);
+            lvModel.Size = new Size(594, 369);
             lvModel.TabIndex = 3;
             lvModel.UseCompatibleStateImageBehavior = false;
             lvModel.View = View.Details;
@@ -515,9 +525,9 @@
             // 
             // cmsModel
             // 
-            cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair, tsmiEdit });
+            cmsModel.Items.AddRange(new ToolStripItem[] { tsmiAdd, tsmiDel, tsmiRepair, tsmiEdit, tsmiPrint });
             cmsModel.Name = "cmsModel";
-            cmsModel.Size = new Size(190, 92);
+            cmsModel.Size = new Size(190, 114);
             cmsModel.Opening += cmsModelOnOpening;
             // 
             // tsmiAdd
@@ -558,6 +568,13 @@
             tsmiEdit.Visible = false;
             tsmiEdit.Click += tsbEditOnClick;
             // 
+            // tsmiPrint
+            // 
+            tsmiPrint.Image = Properties.Resources.print;
+            tsmiPrint.Name = "tsmiPrint";
+            tsmiPrint.Size = new Size(189, 22);
+            tsmiPrint.Text = "Печать";
+            // 
             // tsIformationBar
             // 
             tsIformationBar.Dock = DockStyle.Bottom;
@@ -595,12 +612,12 @@
             tlp.Controls.Add(lvModel, 0, 0);
             tlp.Controls.Add(tsIformationBar, 0, 1);
             tlp.Dock = DockStyle.Fill;
-            tlp.Location = new Point(0, 31);
+            tlp.Location = new Point(0, 25);
             tlp.Name = "tlp";
             tlp.RowCount = 2;
             tlp.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tlp.RowStyles.Add(new RowStyle());
-            tlp.Size = new Size(600, 369);
+            tlp.Size = new Size(600, 375);
             tlp.TabIndex = 5;
             // 
             // cmsModalModel
@@ -694,5 +711,7 @@
         private ToolStripButton tsbExcelExport;
         private ToolStripSeparator tssExport;
         private ToolStripButton tsbReload;
+        private ToolStripDropDownButton tsddbPrint;
+        private ToolStripMenuItem tsmiPrint;
     }
 }

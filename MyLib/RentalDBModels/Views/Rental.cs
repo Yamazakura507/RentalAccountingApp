@@ -4,20 +4,24 @@ using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using RentalDBModels.Models.DependenceModel;
 using RentalDBModels.Views.Abstract;
+using RentalDBModels.Views.DBFunction;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;
-using System.Text;
 
 namespace RentalDBModels.Views
 {
+    [Print(Title = "Чек | Счёт", NameResourceReport = "billReport", ReportParameters = ["idRental=Id"])]
     public class Rental : BaseRemovingView
     {
         private double sumInventory = 0;
+        private int countInventory = 0;
+        Task<GetRentalInfo> getRentalInfo = null;
+        private bool isColorLoaded = false;
 
         [ViewModel(Headline = true, IsEdit = false)]
         [Description("Заявка от клиента")]
-        public Task<string> ClientName => GetClientInfo();
+        public Task<string> ClientName => GetCilent();
 
         [ViewModel(FilterOn = true)]
         [Description("Дата аренды")]
@@ -43,6 +47,21 @@ namespace RentalDBModels.Views
         [ViewModel(ViewHide = true, Image = true)]
         public string ImageKey { get; set; } = "rent.png";
 
+        public override Color BackColor 
+        { 
+            get
+            {
+                if (!isColorLoaded) _ = WithColor();
+                
+                return base.BackColor;
+            }
+            set 
+            {
+                isColorLoaded = true;
+                base.BackColor = value;
+            }
+        }
+
         [ViewModel(ViewHide = true)]
         public override Type ModelType { get => typeof(Models.Rental); }
         [ViewModel(ViewHide = true)]
@@ -57,150 +76,31 @@ namespace RentalDBModels.Views
         [Dependency("Инвентарь в аренде", typeof(Inventory), DependencyType.OneToMany, ImageKey = "inventory.png", DependencyModelType = typeof(InventoryRental))]
         Task<IEnumerable<int>> InventoryId => GetDependenciesId<InventoryRental>();
 
-
-        private async Task<string> GetClientInfo() => (await DBProvider.GetModel<Clients>(this.IdClient)).OwnerName;
-
-        private async Task<double> GetSumInventory()
+        public Task<GetRentalInfo> GetRentalInfo
         {
-            ConditionsParametr[] parametrsInventoryRental = [new ConditionsParametr(nameof(InventoryRental.IdRental), ConditionalOperators.Equal, this.Id)];
-            List<int> idsInventory = (await DBProvider.GetColumnModel<int, InventoryRental>(nameof(InventoryRental.IdInventory), parametrsInventoryRental)).ToList();
-
-            if (idsInventory.Count == 0) return 0;
-
-            ConditionsParametr[] parametrInventory = [new ConditionsParametr(nameof(Inventory.Id), ConditionalOperators.In, idsInventory)];
-
-            return Convert.ToDouble(await DBProvider.Sum<Inventory>(nameof(Inventory.Price), parametrInventory));
-        }
-
-        private async Task<string> GetBaseInfo()
-        {
-            int rentalCountDays = ((ReturnDate?.DayNumber ?? DateOnly.FromDateTime(DateTime.Now).DayNumber) - IssueDate.DayNumber) + 1;
-            sumInventory = await GetSumInventory() * rentalCountDays;
-
-            return String.Format("Арендовано {0}, в течении {1}, на сумму: {2:N2} ₽", FormatPositions(await CountInventory), FormatDays(rentalCountDays), sumInventory);
-        }
-
-        private async Task<string> GetPayInfo()
-        {
-            string status = "Не оплачено";
-
-            if (IdPayment is not null)
+            get
             {
-                Payments payments = (await DBProvider.GetModel<Payments>(IdPayment.Value));
-
-                if (payments.Sum < sumInventory)
+                if (getRentalInfo is null)
                 {
-                    if (ReturnDate is not null && DateOnly.FromDateTime(DateTime.Now.Date) > ReturnDate)
-                    {
-                        status = "Частичная оплата | Долг";
-                        BackColor = Color.LightBlue;
-                    }
-                    else
-                    {
-                        status = "Частичная оплата";
-                        BackColor = Color.LightYellow;
-                    }
-
-                    return String.Format("{0} - [Оплачено: {1:N2} ₽ - {3:dd MMMM yyyy}, Остаток: {2:N2} ₽]", status, payments.Sum, sumInventory-payments.Sum, payments.Date);
-                }
-                else
-                {
-                    status = "Оплачено";
-                    BackColor = Color.FromArgb(219, 255, 221);
+                    getRentalInfo = DBProvider.GetCallFunctionModel<GetRentalInfo>([this.Id]);
                 }
 
-                return String.Format("{0} - [{1:N2} ₽ - {2:dd MMMM yyyy}]", status, payments.Sum, payments.Date);
+                return getRentalInfo;
             }
-            else if (ReturnDate is not null && DateOnly.FromDateTime(DateTime.Now) > ReturnDate)
-            {
-                status = "Не оплачено | Долг";
-                BackColor = Color.LightGray;
-            }
-
-            return status;
         }
 
-        /// <summary>
-        /// Склонение слова "позиция" в зависимости от числа
-        /// </summary>
-        public static string GetPositionDeclension(int number)
+        private async Task<string> GetCilent() => (await GetRentalInfo).Client;
+        private async Task<string> GetPayInfo() => (await GetRentalInfo).PayInfo;
+        private async Task<string> GetBaseInfo() => (await GetRentalInfo).GetBaseInfo();
+        private async Task WithColor() 
         {
-            int lastDigit = number % 10;
-            int lastTwoDigits = number % 100;
-
-            if (lastTwoDigits >= 11 && lastTwoDigits <= 19)
-                return "позиций";
-
-            if (lastDigit == 1)
-                return "позиция";
-
-            if (lastDigit >= 2 && lastDigit <= 4)
-                return "позиции";
-
-            return "позиций";
+            BackColor = (await GetRentalInfo).StatusColor;
         }
 
-        /// <summary>
-        /// Возвращает склонированую фразу количество позиций
-        /// </summary>
-        /// <param name="countPosition">Количество позиций</param>
-        /// <returns></returns>
-        public static string FormatPositions(int countPosition)
+        public void RefrashRentalInfo()
         {
-            string word = countPosition.GetDeclension("позиция", "позиции", "позиций");
-            return $"{countPosition} {word}";
-        }
-
-        /// <summary>
-        /// Возвращает склонированую фразу количество дней
-        /// </summary>
-        /// <param name="countDays">Количество дней</param>
-        /// <returns></returns>
-        public static string FormatDays(int countDays)
-        {
-            if (countDays <= 0) return "0 дней";
-
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = startDate.AddDays(countDays);
-
-            int years = endDate.Year - startDate.Year;
-            int months = endDate.Month - startDate.Month;
-            int days = endDate.Day - startDate.Day;
-
-            if (days < 0)
-            {
-                months--;
-                days += DateTime.DaysInMonth(startDate.Year, startDate.Month);
-            }
-
-            if (months < 0)
-            {
-                years--;
-                months += 12;
-            }
-
-            StringBuilder builder = new ();
-            string format = "{0}{1} ";
-
-            if (years > 0)
-            {
-                string yearWord = years.GetDeclension("-го года", "-х лет", "-и лет");
-                builder.AppendFormat(format, years, yearWord);
-            }
-
-            if (months > 0)
-            {
-                string monthWord = months.GetDeclension("-го месяца", "-х месяцов", "-и месяцев");
-                builder.AppendFormat(format, months, monthWord);
-            }
-
-            if (days > 0 || builder.Length == 0)
-            {
-                string dayWord = days.GetDeclension("-го дня", "-х дней", "-и дней");
-                builder.AppendFormat(format.TrimEnd(), days, dayWord);
-            }
-
-            return builder.ToString();
+            getRentalInfo = null;
+            isColorLoaded = false;
         }
     }
 }

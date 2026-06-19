@@ -1,6 +1,7 @@
 ﻿using DataBaseProvaider;
 using DataBaseProvaider.Attributes;
 using DataBaseProvaider.Objects;
+using System.ComponentModel;
 using System.Reflection;
 using WinFormsComponents.Controls;
 

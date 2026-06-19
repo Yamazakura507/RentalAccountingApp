@@ -12,7 +12,6 @@ using WinFormsComponents.Classes.Enums;
 using WinFormsComponents.Classes.Interface;
 using WinFormsComponents.Classes.Model;
 using WinFormsComponents.Classes.Services;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WinFormsComponents.Controls
 {
@@ -26,6 +25,7 @@ namespace WinFormsComponents.Controls
         private string parametrRemovingName = null;
         private Loader loader = new();
         private bool isModal = false;
+        private Lazy<List<PrintAttribute>> printAttributes;
 
         /// <summary>
         /// Колекция элементов списка
@@ -170,6 +170,12 @@ namespace WinFormsComponents.Controls
         public bool NotSelect { get; set; } = false;
 
         /// <summary>
+        /// Метка указывающая режим загрузки списка
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        public bool IsYieldMode { get; set; } = false;
+
+        /// <summary>
         /// Включить постраничный вывод
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
@@ -230,6 +236,7 @@ namespace WinFormsComponents.Controls
             Parameters ??= new();
             TermsOfInteractionDB ??= new();
             tsmiPager.DropDown.Closing += PagerDropDownOnClosing;
+            printAttributes = new Lazy<List<PrintAttribute>>(() => ModelType?.GetCustomAttributes<PrintAttribute>().ToList() ?? new ());
             loader.AutoSetup(this);
         }
 
@@ -253,12 +260,14 @@ namespace WinFormsComponents.Controls
             tsmiEdit.Visible = tsbEdit.Visible = !isModal && UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
             tssFilter.Visible = tsbAdd.Visible || tsbEdit.Visible || tsbDel.Visible || tsbRepair.Visible;
             tsbRepairEditing.Visible = RepairEditingChanged is not null;
-            tsbReload.Visible = !isModal;
+            tsddbPrint.Visible = tsbReload.Visible = !isModal;
 
             CreateParametrShowRemoving();
             ShowVisibleMode(VisibleMode);
             ShowGridVisible(IsGridLines);
             CheckSearch();
+
+            if(!isModal) PrintLoad(tsddbPrint);
 
             if (!tsmiPagerCheckit.Checked) await LoadListAsync();
             else PagerDropDownOnClosing(null, null);
@@ -374,6 +383,110 @@ namespace WinFormsComponents.Controls
             tsmiSearh.Enabled = tsmiSearh.DropDownItems.Count > 0;
             tsmiFilter.Enabled = tsmiFilter.DropDownItems.Count > 0;
             tsmiSorted.Enabled = tsmiSorted.DropDownItems.Count > 0;
+        }
+
+        /// <summary>
+        /// Загрузчик списка шаблонов печати
+        /// </summary>
+        /// <param name="mainMenuItem">Ценральный элемент меню печати</param>
+        /// <param name="isManyExport">Вывести тольок шаблоны с возможностью множесвенного экспорта</param>
+        /// <param name="isGeneral">Вывести тольок шаблоны без параметров</param>
+        private void PrintLoad(ToolStripDropDownItem mainMenuItem, bool isManyExport = true, bool isGeneral = true, bool isSel = false)
+        {
+            List<PrintAttribute> prints = printAttributes.Value.Where(GetPrintFilter(isManyExport, isGeneral, isSel)).ToList();
+
+            if (prints.Count == 0)
+            {
+                mainMenuItem.Visible = false;
+                return;
+            }
+
+            mainMenuItem.Visible = true;
+            mainMenuItem.DropDownItems.Clear();
+
+            foreach (PrintAttribute print in prints)
+            {
+                ToolStripMenuItem menuItem = CreatePrintMenuItem(print);
+                mainMenuItem.DropDownItems.Add(menuItem);
+            }
+        }
+
+        /// <summary>
+        /// Фильтрация шаблонов печати
+        /// </summary>
+        /// <param name="isManyExport">Разрешение множественного экспорта</param>
+        /// <param name="isGeneral">Метка общего отчета</param>
+        /// <param name="isSel">Проверка при выделеном элементе</param>
+        /// <returns>Функцию проверки шаблона</returns>
+        private Func<PrintAttribute, bool> GetPrintFilter(bool isManyExport, bool isGeneral, bool isSel)
+        {
+            return print =>
+            {
+                bool hasParams = print.ReportParameters is not null;
+
+                if (isSel)
+                {
+                    if (isGeneral)
+                    {
+                        return hasParams ? (isManyExport ? print.IsManyExport : true) : true;
+                    }
+                    else
+                    {
+                        return isManyExport ? (print.IsManyExport && hasParams) : hasParams;
+                    }
+                }
+
+                return !hasParams;
+            };
+        }
+
+        /// <summary>
+        /// Создаём элемент меню печати
+        /// </summary>
+        /// <param name="print">Шаблон печати</param>
+        /// <returns>Элемент меню шаблона</returns>
+        private ToolStripMenuItem CreatePrintMenuItem(PrintAttribute print)
+        {
+            ToolStripMenuItem menuItem = new (print.Title, Properties.Resources.print)
+            {
+                Tag = print
+            };
+
+            if (print.ExtensionsExport == null || !print.ExtensionsExport.Any()) return menuItem;
+
+            menuItem.DropDownItems.Add(new ToolStripMenuItem());
+
+            menuItem.DropDownOpening += (s, e) =>
+            {
+                menuItem.DropDownItems.Clear();
+
+                foreach (PrintExtension extension in print.ExtensionsExport)
+                {
+                    ToolStripMenuItem extensionItem = CreateExtensionMenuItem(extension);
+                    menuItem.DropDownItems.Add(extensionItem);
+                }
+            };
+
+            return menuItem;
+        }
+
+        /// <summary>
+        /// Создаём элемент меню расширения печатоемого документа
+        /// </summary>
+        /// <param name="extension">Расширение печати</param>
+        /// <returns>Элемент меню расширения печати</returns>
+        private ToolStripMenuItem CreateExtensionMenuItem(PrintExtension extension)
+        {
+            string title = extension.GetDescription().Split('|')[0];
+            Image icon = extension.GetCommit().GetBitmapResources() ?? Properties.Resources.print;
+
+            ToolStripMenuItem menuItem = new (title, icon)
+            {
+                Tag = extension
+            };
+
+            menuItem.Click += PrintMenuItemOnClick;
+            return menuItem;
         }
 
         /// <summary>
@@ -515,6 +628,7 @@ namespace WinFormsComponents.Controls
             Items = await modelType.GetCollectionByType<object>([Parameters], nameof(DBProvider.GetCollectionModel));
 
             OnPreVisualizationChanged();
+            listViewLoader.IsYieldMode = this.IsYieldMode;
             await listViewLoader.PopulateListView(lvModel, Items);
 
             if (IsShowCountAll)
@@ -695,6 +809,25 @@ namespace WinFormsComponents.Controls
         }
 
         /// <summary>
+        /// Проверка выделеных элементов на соответствие условиям шаблонов печати
+        /// </summary>
+        private void SelectedPrintCheck()
+        {
+            if (ModelType.GetCustomAttributes<PrintAttribute>().Count() > 0)
+            {
+                bool isMany = lvModel.SelectedItems.Count > 1;
+                bool isSel = lvModel.SelectedItems.Count > 0;
+
+                PrintLoad(tsmiPrint, isMany, false, isSel);
+                PrintLoad(tsddbPrint, isMany, true, isSel);
+            }
+            else
+            {
+                tsmiPrint.Visible = tsddbPrint.Visible = false;
+            }
+        }
+
+        /// <summary>
         /// Метод удаления/востановления выделеных строк
         /// </summary>
         /// <returns>Процес</returns>
@@ -811,6 +944,8 @@ namespace WinFormsComponents.Controls
             tsbEdit.Visible = UpdateChanged is not null && lvModel.SelectedItems.Count == 1;
             tslEnterCount.Text = String.Format("Выбрано: {0}", lvModel.SelectedItems.Count);
             tssFilter.Visible = tsbAdd.Visible || tsbEdit.Visible || tsbDel.Visible || tsbRepair.Visible;
+
+            SelectedPrintCheck();
         }
 
         private void cmsModelOnOpening(object sender, CancelEventArgs e)
@@ -822,6 +957,8 @@ namespace WinFormsComponents.Controls
             tsmiDel.Visible = isRemove;
             tsmiRepair.Visible = isRepair;
             tsmiEdit.Visible = isEdit;
+
+            SelectedPrintCheck();
 
             e.Cancel = !(InsertChanged is not null || isRemove || isRepair || isEdit);
         }
@@ -1069,6 +1206,7 @@ namespace WinFormsComponents.Controls
 
         private void tsbExcelExportOnClick(object sender, EventArgs e)
         {
+            loader.StartAnimation();
             using (SaveFileDialog saveDialog = ExcelReporter.ExportDialog)
             {
                 string sheetName = modelType.GetProperties().FirstOrDefault(i => i.GetCustomAttribute<ViewModelAttribute>()?.Headline ?? false)?.GetCustomAttribute<DescriptionAttribute>().Description;
@@ -1079,6 +1217,7 @@ namespace WinFormsComponents.Controls
                     ExcelReporter.ExportListViewToExcel(lvModel, saveDialog.FileName, sheetName);
                 }
             }
+            loader.StopAnimation();
         }
 
         private async void tsbReloadOnClick(object sender, EventArgs e) => await LoadListAsync();
@@ -1089,6 +1228,43 @@ namespace WinFormsComponents.Controls
             {
                 e.Item.Selected = false;
             }
+        }
+
+        private async void PrintMenuItemOnClick(object? sender, EventArgs e)
+        {
+            loader.StartAnimation();
+            IEnumerable<object> selectedModels = lvModel.SelectedItems.OfType<ListViewItem>().Select(i => i.Tag);
+
+            ToolStripMenuItem tsmiPrintDoc = (ToolStripMenuItem)sender;
+            PrintExtension extension = (PrintExtension)tsmiPrintDoc.Tag;
+            
+            PrintAttribute print = tsmiPrintDoc.OwnerItem.Tag as PrintAttribute;
+            int countSelect = selectedModels.Count();
+            bool isMany = countSelect > 1;
+
+            CommonDialog dialog = print.GetPrintDialog(extension, isMany, countSelect, selectedModels);
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+               if (isMany)
+               {
+                    string extc = extension.GetDescription().Split('.').Last();
+                    loader.StopAnimation();
+
+                    foreach (object model in selectedModels)
+                    {
+                       string exportPath = String.Format("{0}\\{1}", ((FolderBrowserDialog)dialog).SelectedPath, print.CombainExportName(extc, model));
+
+                       await File.WriteAllBytesAsync(exportPath, await print.ExportReport(extension, model));
+                    }
+               }
+               else
+               {
+                    await File.WriteAllBytesAsync(((SaveFileDialog)dialog).FileName, await print.ExportReport(extension, countSelect > 0 ? selectedModels.First() : null));
+                    loader.StopAnimation();
+               }
+            }
+            
         }
     }
 }

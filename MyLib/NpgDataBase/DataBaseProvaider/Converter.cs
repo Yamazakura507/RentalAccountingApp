@@ -1,4 +1,5 @@
-﻿using DataBaseProvaider.Classes;
+﻿using DataBaseProvaider.Attributes;
+using DataBaseProvaider.Classes;
 using DataBaseProvaider.Enums;
 using DataBaseProvaider.Objects;
 using Npgsql;
@@ -8,6 +9,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace DataBaseProvaider
 {
@@ -136,6 +138,19 @@ namespace DataBaseProvaider
         }
 
         /// <summary>
+        /// Добавляем подчеркивание перед каждой заглавной буквой, кроме первой и преобразуем все в нижний регистр
+        /// </summary>
+        /// <param name="input">Исходная строка в CamelCase</param>
+        /// <returns></returns>
+        public static string ToSnakeCase(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            return Regex.Replace(input, "(?<=.)([A-Z])", "_$1").ToLower();
+        }
+
+        /// <summary>
         /// Получение описания элемнта <see cref="Enum"/>
         /// </summary>
         /// <param name="enumElement">Элемент <see cref="Enum"/></param>
@@ -144,6 +159,19 @@ namespace DataBaseProvaider
         {
             FieldInfo field = enumElement.GetType().GetField(enumElement.ToString());
             DescriptionAttribute attribute = field?.GetCustomAttribute<DescriptionAttribute>();
+
+            return attribute?.Description ?? enumElement.ToString();
+        }
+
+        /// <summary>
+        /// Получение коментария элемнта <see cref="Enum"/>
+        /// </summary>
+        /// <param name="enumElement">Элемент <see cref="Enum"/></param>
+        /// <returns>Коментарий <see cref="Enum"/> элемента</returns>
+        public static string GetCommit(this Enum enumElement)
+        {
+            FieldInfo field = enumElement.GetType().GetField(enumElement.ToString());
+            CommentAttribute attribute = field?.GetCustomAttribute<CommentAttribute>();
 
             return attribute?.Description ?? enumElement.ToString();
         }
@@ -319,6 +347,34 @@ namespace DataBaseProvaider
                 }
 
                 conditionsStr = conditionsStr.TrimEnd();
+            }
+
+            return (conditionsStr, conditionsParametr?.ToArray());
+        }
+
+        /// <summary>
+        /// Приводит набор параметров к строчному виду запроса
+        /// </summary>
+        /// <param name="parametrs">Набор параметров</param>
+        /// <returns>Кортеж из строки части запроса для фильтрации и набор параметров подставляемых в запрос</returns>
+        internal static (string, NpgsqlParameter[]) ToStringParametrs(this object[] parametrs)
+        {
+            string conditionsStr = String.Empty;
+            List<NpgsqlParameter> conditionsParametr = null;
+
+            if (parametrs is not null && parametrs.Length != 0)
+            {
+                string paramTag;
+                conditionsParametr = new();
+
+                for (int i = 0; i < parametrs.Length; i++)
+                {
+                    paramTag = "@param" + i;
+                    conditionsParametr.Add(new NpgsqlParameter(paramTag, parametrs[i]));
+                    conditionsStr += paramTag + ", ";
+                }
+
+                conditionsStr = conditionsStr.TrimEnd([',', ' ']);
             }
 
             return (conditionsStr, conditionsParametr?.ToArray());

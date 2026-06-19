@@ -1,4 +1,6 @@
-﻿namespace DataBaseProvaider.Classes
+﻿using System.Runtime.CompilerServices;
+
+namespace DataBaseProvaider.Classes
 {
     /// <summary>
     /// Класс <see cref="IEnumerable{T}"/> расширений
@@ -45,6 +47,28 @@
             {
                 yield return item;
             }
+        }
+
+        /// <summary>
+        /// Преобразование масива кортежей в словарь
+        /// </summary>
+        /// <typeparam name="TKey">Тип ключа</typeparam>
+        /// <typeparam name="TValue">Тип значения</typeparam>
+        /// <param name="items">Масив кортежей</param>
+        /// <returns>Словарь на основе масива кортежей</returns>
+        public static Dictionary<TKey, TValue> ToDictionary<TKey,TValue>(this (TKey Key, TValue Value)[]? items) => items?.ToDictionary(x => x.Key, x => x.Value) ?? new();
+
+        /// <summary>
+        /// Преобразование масива строк в словарь по разделительному символу
+        /// </summary>
+        /// <param name="items">Масив строк вида [ Ключ1 Символ разделитель Значение1,... ]</param>
+        /// <param name="splitSymbol">Символ разделитель</param>
+        /// <returns>Словарь на основе масива строк</returns>
+        public static Dictionary<string, string> ToDictionary(this string[]? items, char splitSymbol = '=')
+        {
+            return items?.Select(p => p.Split(splitSymbol))
+                .Where(parts => parts.Length == 2)
+                .ToDictionary(parts => parts[0], parts => parts[1]) ?? new();
         }
     }
 }

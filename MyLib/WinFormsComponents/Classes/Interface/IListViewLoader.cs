@@ -8,6 +8,10 @@ namespace WinFormsComponents.Classes.Interface
     internal interface IListViewLoader
     {
         /// <summary>
+        /// Режим ленивой загрузки
+        /// </summary>
+        public bool IsYieldMode { get; set; }
+        /// <summary>
         /// Заполнение ListView данными
         /// </summary>
         Task PopulateListView(ListView listView, BindingList<dynamic> items);

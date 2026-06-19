@@ -164,6 +164,17 @@ namespace DataBaseProvaider
         }
 
         /// <summary>
+        /// Получение списка объектов модели по вызову функции
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели</typeparam>
+        /// <param name="functionParametrs">Набор значений параметров функции</param>
+        /// <param name="functionName">Наименование функции, по умолчанию будет сформировано из типа</param>
+        /// <param name="parametrs">Набор различных паарметров фильтрации сортировки запрпоса</param>
+        /// <returns>Объект модели</returns>
+        async public static Task<TModel> GetCallFunctionModel<TModel>(object[] functionParametrs = null, string functionName = null, CollectionParametrs parametrs = null) where TModel : new() =>
+            (await GetCallFunctionCollectionModel<TModel>(functionParametrs, functionName, parametrs))[0];
+
+        /// <summary>
         /// Получение списка объектов модели
         /// </summary>
         /// <typeparam name="TModel">Тип модели</typeparam>
@@ -191,6 +202,60 @@ namespace DataBaseProvaider
                 npgSqlProviderClone = msProvider;
 
                 DataTable dataTable = await msProvider.GetTableAsync(command, conditions.parametrs, true);
+
+                if (dataTable != null)
+                {
+                    for (int i = 0; i < dataTable.Rows.Count; i++)
+                    {
+                        collection.Add(dataTable.Rows[i].RowToObject<TModel>());
+                    }
+                }
+            }
+
+            npgSqlProviderClone = null;
+
+            return collection;
+        }
+
+        /// <summary>
+        /// Получение списка объектов модели по вызову функции
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели</typeparam>
+        /// <param name="functionParametrs">Набор значений параметров функции</param>
+        /// <param name="functionName">Наименование функции, по умолчанию будет сформировано из типа</param>
+        /// <param name="parametrs">Набор различных паарметров фильтрации сортировки запрпоса</param>
+        /// <returns>Динамическую коллекцию типа модели</returns>
+        async public static Task<BindingList<TModel>> GetCallFunctionCollectionModel<TModel>(object[] functionParametrs = null, string functionName = null, CollectionParametrs parametrs = null) where TModel : new()
+        {
+            ConectionCheck();
+
+            parametrs = parametrs ?? new CollectionParametrs();
+
+            (string quary, NpgsqlParameter[] parametrs) conditions = parametrs.ToStringConditions();
+            (string quary, NpgsqlParameter[] parametrs) funcParametrs = functionParametrs.ToStringParametrs();
+            BindingList<TModel> collection = new();
+
+            string command = String.Format(
+                                "SELECT * FROM \"{0}\"({1}) t{2}{3}{4}{5}",
+                                functionName ?? typeof(TModel).Name.ToSnakeCase(),
+                                funcParametrs.quary,
+                                conditions.quary,
+                                parametrs.ToStringOrders(),
+                                parametrs.ToStringLimit(),
+                                parametrs.ToStringOffset());
+
+            using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
+            {
+                npgSqlProviderClone = msProvider;
+
+                NpgsqlParameter[] conditionsAndParametrs = conditions.parametrs ?? funcParametrs.parametrs;
+
+                if (funcParametrs.parametrs is not null && conditions.parametrs is not null)
+                {
+                    conditionsAndParametrs = conditions.parametrs.Union(funcParametrs.parametrs).ToArray();
+                }
+
+                DataTable dataTable = await msProvider.GetTableAsync(command, conditionsAndParametrs, true);
 
                 if (dataTable != null)
                 {
@@ -273,7 +338,7 @@ namespace DataBaseProvaider
         /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
         /// <param name="columnName">Наименование колонки поиска</param>
         /// <returns>Максимальное значение колонки</returns>
-        async public static Task<object> Max<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "max", conditions);
+        async public static Task<object> Max<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, nameof(Max), conditions);
 
         /// <summary>
         /// Получение минимального значения по колонке в таблице модели
@@ -282,7 +347,7 @@ namespace DataBaseProvaider
         /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
         /// <param name="columnName">Наименование колонки поиска</param>
         /// <returns>Минимальное значение колонки</returns>
-        async public static Task<object> Min<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "min", conditions);
+        async public static Task<object> Min<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, nameof(Min), conditions);
 
         /// <summary>
         /// Получение суммы значений по колонке в таблице модели
@@ -291,7 +356,7 @@ namespace DataBaseProvaider
         /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
         /// <param name="columnName">Наименование колонки поиска</param>
         /// <returns>Минимальное значение колонки</returns>
-        async public static Task<object> Sum<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, "sum", conditions);
+        async public static Task<object> Sum<TModel>(string columnName, IEnumerable<ConditionsParametr> conditions = null) => await AgregateFunc<TModel>(columnName, nameof(Sum), conditions);
 
         /// <summary>
         /// Получение значения агрегатной функции по колонке в таблице модели
@@ -322,6 +387,50 @@ namespace DataBaseProvaider
             npgSqlProviderClone = null;
 
             return agregateVal == DBNull.Value ? null : agregateVal;
+        }
+
+        /// <summary>
+        /// Получение значений набора агрегатных функций по колонке в таблице модели
+        /// </summary>
+        /// <typeparam name="TModel">Тип модели таблицы</typeparam>
+        /// <param name="conditions">Параметры фильтрации(если пусто то выведиться полное количество строк)</param>
+        /// <param name="columnName">Наименование колонки поиска</param>
+        /// <param name="namesFunc">Наименования агрегатных функций</param>
+        /// <returns>Результат функции</returns>
+        async public static Task<Dictionary<string, object>> ArgegateFuncStack<TModel>(string columnName, string[] namesFunc, IEnumerable<ConditionsParametr> conditions = null)
+        {
+            ConectionCheck();
+
+            CollectionParametrs parametrs = new() { Conditions = conditions };
+            (string quary, NpgsqlParameter[] parametrs) conditionsCommand = parametrs.ToStringConditions();
+
+            string tableName = typeof(TModel).Name;
+            string command = String.Format(
+                "SELECT {2} FROM \"{0}\" t{1};",
+                tableName,
+                conditionsCommand.quary,
+                String.Join(", ", namesFunc.Select(i => String.Format(
+                                                            "{1}(t.\"{0}\") \"{2}\"",
+                                                            columnName,
+                                                            i.ToUpper(), i))));
+
+            Dictionary<string, object> agregateVals = new ();
+
+            using (NpgsqlProvider msProvider = NpgsqlProvider.Clone())
+            {
+                npgSqlProviderClone = msProvider;
+                DataRow row = await msProvider.GetRowAsync(command, conditionsCommand.parametrs);
+
+                foreach (DataColumn column in row.Table.Columns)
+                {
+                    object val = row[column.ColumnName];
+                    agregateVals.Add(column.ColumnName, val == DBNull.Value ? null : val);
+                }
+            }
+
+            npgSqlProviderClone = null;
+
+            return agregateVals;
         }
 
         /// <summary>

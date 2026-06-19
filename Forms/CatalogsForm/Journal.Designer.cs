@@ -96,13 +96,14 @@
             dmlvRental.IsShowCountEnter = true;
             dmlvRental.IsShowNum = false;
             dmlvRental.IsSorted = true;
+            dmlvRental.IsYieldMode = false;
             dmlvRental.Location = new Point(3, 3);
             dmlvRental.MinimumSize = new Size(600, 130);
             dmlvRental.ModelType = null;
             dmlvRental.MultiSelect = true;
             dmlvRental.Name = "dmlvRental";
             dmlvRental.NotSelect = false;
-            dmlvRental.PageLimit = 20;
+            dmlvRental.PageLimit = 50;
             dmlvRental.RemovingRowColor = Color.MistyRose;
             dmlvRental.ShowDeleted = WinFormsComponents.Classes.Enums.ShowRemooving.ExecNotRemoving;
             dmlvRental.Size = new Size(786, 416);
@@ -140,6 +141,7 @@
             dmlvInventory.IsShowCountEnter = true;
             dmlvInventory.IsShowNum = false;
             dmlvInventory.IsSorted = true;
+            dmlvInventory.IsYieldMode = false;
             dmlvInventory.Location = new Point(3, 3);
             dmlvInventory.MinimumSize = new Size(530, 130);
             dmlvInventory.ModelType = null;
@@ -184,6 +186,7 @@
             dmlvOplat.IsShowCountEnter = true;
             dmlvOplat.IsShowNum = false;
             dmlvOplat.IsSorted = true;
+            dmlvOplat.IsYieldMode = false;
             dmlvOplat.Location = new Point(3, 3);
             dmlvOplat.MinimumSize = new Size(600, 130);
             dmlvOplat.ModelType = null;

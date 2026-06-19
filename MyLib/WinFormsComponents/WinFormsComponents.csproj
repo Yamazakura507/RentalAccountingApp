@@ -29,6 +29,36 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="Designer">
+      <HintPath>Lib\Designer.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport">
+      <HintPath>Lib\FastReport.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Bars">
+      <HintPath>Lib\FastReport.Bars.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Compat">
+      <HintPath>Lib\FastReport.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Data.Postgres">
+      <HintPath>Lib\FastReport.Data.Postgres.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.DataVisualization">
+      <HintPath>Lib\FastReport.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Editor">
+      <HintPath>Lib\FastReport.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>Lib\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>Lib\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Controls\DBModelComplexEditor.cs">
       <SubType>UserControl</SubType>
     </Compile>

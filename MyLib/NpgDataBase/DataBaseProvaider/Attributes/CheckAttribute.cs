@@ -3,6 +3,9 @@ using System.Text.RegularExpressions;
 
 namespace DataBaseProvaider.Attributes
 {
+    /// <summary>
+    /// Атрибут проверки интерфейса
+    /// </summary>
     public class CheckAttribute : Attribute
     {
         /// <summary>
