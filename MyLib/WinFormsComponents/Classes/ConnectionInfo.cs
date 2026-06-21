@@ -10,11 +10,24 @@ namespace WinFormsComponents.Classes
         /// <summary>
         /// Список соединений
         /// </summary>
-        public static ConnectionElement[] Conections => JsonConvert.DeserializeObject<ConnectionElement[]>(File.ReadAllText("connection_list.json"));
+        public static ConnectionElement[] Conections
+        {
+            get
+            {
+                try
+                {
+                    return JsonConvert.DeserializeObject<ConnectionElement[]>(File.ReadAllText("connection_list.json"));
+                }
+                catch
+                {
+                    return null;
+                }
+            }
+        }
         /// <summary>
         /// Активное соединение
         /// </summary>
-        public static ConnectionElement ActiveConnection => Conections.FirstOrDefault(i => i.IsActive);
+        public static ConnectionElement ActiveConnection => Conections?.FirstOrDefault(i => i.IsActive);
         /// <summary>
         /// Соединение по умолчанию
         /// </summary>

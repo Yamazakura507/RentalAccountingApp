@@ -6,12 +6,17 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Images\Icons\inventory.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="MyLib\**" />
     <EmbeddedResource Remove="MyLib\**" />
     <None Remove="MyLib\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\Icons\inventory.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +57,36 @@
     <ProjectReference Include="MyLib\NpgDataBase\DataBaseProvaider\DataBaseProvaider.csproj" />
     <ProjectReference Include="MyLib\RentalDBModels\RentalDBModels.csproj" />
     <ProjectReference Include="MyLib\WinFormsComponents\WinFormsComponents.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Designer">
+      <HintPath>MyLib\WinFormsComponents\Lib\Designer.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Bars">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.Bars.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Compat">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.Compat.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Data.Postgres">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.Data.Postgres.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.DataVisualization">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="FastReport.Editor">
+      <HintPath>MyLib\WinFormsComponents\Lib\FastReport.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis">
+      <HintPath>MyLib\WinFormsComponents\Lib\Microsoft.CodeAnalysis.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp">
+      <HintPath>MyLib\WinFormsComponents\Lib\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
